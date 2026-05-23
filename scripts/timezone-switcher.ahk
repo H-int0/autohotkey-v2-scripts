@@ -3,30 +3,10 @@
 #MaxThreadsBuffer True
 ProcessSetPriority "High"
 
-; Hide the tray icon by default
 A_IconHidden := 1
 
 ; =========================================================
-; FEATURE 1: CAPSLOCK NUMPAD
-; =========================================================
-
-#HotIf GetKeyState("CapsLock", "T")
-
-*1::Send '{Blind}{Numpad1}'
-*2::Send '{Blind}{Numpad2}'
-*3::Send '{Blind}{Numpad3}'
-*4::Send '{Blind}{Numpad4}'
-*5::Send '{Blind}{Numpad5}'
-*6::Send '{Blind}{Numpad6}'
-*7::Send '{Blind}{Numpad7}'
-*8::Send '{Blind}{Numpad8}'
-*9::Send '{Blind}{Numpad9}'
-*0::Send '{Blind}{Numpad0}'
-
-#HotIf
-
-; =========================================================
-; FEATURE 2: TIMEZONE SWITCHER
+; FEATURE: TIMEZONE SWITCHER
 ; =========================================================
 
 TZData := Map()
@@ -162,7 +142,7 @@ TZOrder.Push("Eastern Standard Time")
 #!`::
 {
     currentID := GetCurrentTimeZoneID()
-    nextIndex := 1 
+    nextIndex := 1
 
     Loop TZOrder.Length {
         if (TZOrder[A_Index] = currentID) {
@@ -175,7 +155,7 @@ TZOrder.Push("Eastern Standard Time")
 
     nextID := TZOrder[nextIndex]
     RunWait('tzutil /s "' nextID '"',, "Hide")
-    
+
     msgLabel := TZData.Has(nextID) ? TZData[nextID] : nextID
     ShowToolTip("Switched TZ = " msgLabel)
 }
@@ -188,7 +168,7 @@ TZOrder.Push("Eastern Standard Time")
 }
 
 ; =========================================================
-; FEATURE 3: TOGGLE TRAY ICON (Win + Ctrl + \)
+; Accessibility: TOGGLE TRAY ICON (Win + Ctrl + \)
 ; =========================================================
 
 #^\::
@@ -208,9 +188,9 @@ GetCurrentTimeZoneID()
     tempFile := A_Temp "\tzout.txt"
     if FileExist(tempFile)
         FileDelete(tempFile)
-    
+
     RunWait(A_ComSpec ' /c "tzutil /g > ' tempFile '"',, "Hide")
-    
+
     if FileExist(tempFile) {
         out := FileRead(tempFile)
         FileDelete(tempFile)
