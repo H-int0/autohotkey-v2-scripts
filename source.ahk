@@ -3,8 +3,15 @@
 #MaxThreadsBuffer True
 ProcessSetPriority "High"
 
-; Hide the tray icon by default
-A_IconHidden := 1
+; =========================================================
+; CONFIGURATION
+; =========================================================
+
+; Tray icon visibility on startup. Uncomment one.
+;
+;
+A_IconHidden := 1    ; Un-comment for the behaviour to be = Hidden (default)
+; A_IconHidden := 0  ; Un-comment for the behaviour to be = Visible
 
 ; =========================================================
 ; FEATURE 1: CAPSLOCK NUMPAD
@@ -156,13 +163,40 @@ TZOrder.Push("Eastern Standard Time")
 ; TZOrder.Push("Hawaiian Standard Time")
 
 ; =========================================================
+; CUSTOM TIMEZONES
+; =========================================================
+
+; Add your own timezones here. Each entry takes two lines.
+;
+; Format:
+;   TZData["Windows ID"] := "(UTC +X) `"Your Label`""
+;   TZOrder.Push("Windows ID")
+;
+; To find a Windows timezone ID, open Command Prompt and run:
+;   tzutil /l
+;
+; Remove the semicolons from both lines to enable an entry.
+; =========================================================
+
+; Your Custom Timezone
+; TZData["Your Windows ID Here"] := "(UTC +X) `"Your Label`""
+; TZOrder.Push("Your Windows ID Here")
+;
+; HERE:
+;
+;
+;
+;
+;
+
+; =========================================================
 ; LOGIC
 ; =========================================================
 
 #!`::
 {
     currentID := GetCurrentTimeZoneID()
-    nextIndex := 1 
+    nextIndex := 1
 
     Loop TZOrder.Length {
         if (TZOrder[A_Index] = currentID) {
@@ -175,7 +209,7 @@ TZOrder.Push("Eastern Standard Time")
 
     nextID := TZOrder[nextIndex]
     RunWait('tzutil /s "' nextID '"',, "Hide")
-    
+
     msgLabel := TZData.Has(nextID) ? TZData[nextID] : nextID
     ShowToolTip("Switched TZ = " msgLabel)
 }
@@ -188,7 +222,7 @@ TZOrder.Push("Eastern Standard Time")
 }
 
 ; =========================================================
-; FEATURE 3: TOGGLE TRAY ICON (Win + Ctrl + \)
+; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
 ; =========================================================
 
 #^\::
@@ -208,9 +242,9 @@ GetCurrentTimeZoneID()
     tempFile := A_Temp "\tzout.txt"
     if FileExist(tempFile)
         FileDelete(tempFile)
-    
+
     RunWait(A_ComSpec ' /c "tzutil /g > ' tempFile '"',, "Hide")
-    
+
     if FileExist(tempFile) {
         out := FileRead(tempFile)
         FileDelete(tempFile)

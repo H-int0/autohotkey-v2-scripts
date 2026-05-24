@@ -3,7 +3,15 @@
 #MaxThreadsBuffer True
 ProcessSetPriority "High"
 
-A_IconHidden := 1
+; =========================================================
+; CONFIGURATION
+; =========================================================
+
+; Tray icon visibility on startup. Uncomment one.
+;
+;
+A_IconHidden := 1    ; Un-comment for the behaviour to be = Hidden (default)
+; A_IconHidden := 0  ; Un-comment for the behaviour to be = Visible
 
 ; =========================================================
 ; FEATURE: TIMEZONE SWITCHER
@@ -134,6 +142,33 @@ TZOrder.Push("Eastern Standard Time")
 ; Hawaii
 ; TZData["Hawaiian Standard Time"] := "(UTC -10) `"Hawaii`""
 ; TZOrder.Push("Hawaiian Standard Time")
+
+; =========================================================
+; CUSTOM TIMEZONES
+; =========================================================
+
+; Add your own timezones here. Each entry takes two lines.
+;
+; Format:
+;   TZData["Windows ID"] := "(UTC +X) `"Your Label`""
+;   TZOrder.Push("Windows ID")
+;
+; To find a Windows timezone ID, open Command Prompt and run:
+;   tzutil /l
+;
+; Remove the semicolons from both lines to enable an entry.
+; =========================================================
+
+; Your Custom Timezone
+; TZData["Your Windows ID Here"] := "(UTC +X) `"Your Label`""
+; TZOrder.Push("Your Windows ID Here")
+;
+; HERE:
+;
+;
+;
+;
+;
 
 ; =========================================================
 ; LOGIC
