@@ -27,9 +27,10 @@ Follow the steps below to safely remove the script from the Startup.
 - Look for a process named **AutoHotkey** or **strap.ahk** in the list.
 - Click on it to select it.
 - Click the **End Task** button inside the Task Manager
-- or right click the **AutoHotkey** process and click **End Task** frome the menu that appears.
+- or right click the **AutoHotkey** process and click **End Task** from the menu that appears.
+  - If Task Manager looks tiny with no tabs, click More details at the bottom first.
 
-Your keyboard should return to normal immediately after this.
+Your keyboard should now return to normal immediately after this.
 
 ---
 
