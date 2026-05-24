@@ -4,7 +4,7 @@
 ProcessSetPriority "High"
 
 ; =========================================================
-; CONFIGURATION
+; CONFIG: TRAY ICON VISIBILITY
 ; =========================================================
 
 ; Tray icon visibility on startup. Uncomment one.
@@ -17,7 +17,20 @@ A_IconHidden := 1    ; Un-comment for the behaviour to be = Hidden (default)
 ; FEATURE: CAPSLOCK NUMPAD
 ; =========================================================
 
-#HotIf GetKeyState("CapsLock", "T")
+#HotIf GetKeyState("CapsLock", "T") && GetKeyState("Shift", "P")
+
++1::SendText "!"
++2::SendText "@"
++3::SendText "#"
++4::SendText "$"
++5::SendText "%"
++6::SendText "^"
++7::SendText "&"
++8::SendText "*"
++9::SendText "("
++0::SendText ")"
+
+#HotIf GetKeyState("CapsLock", "T") && !GetKeyState("Shift", "P")
 
 *1::Send '{Blind}{Numpad1}'
 *2::Send '{Blind}{Numpad2}'
