@@ -3,32 +3,53 @@
 #MaxThreadsBuffer True
 ProcessSetPriority "High"
 
+
 ; =========================================================
 ; CONFIG: TRAY ICON VISIBILITY
 ; =========================================================
-
-; Tray icon visibility on startup. Uncomment one.
 ;
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line by adding a semicolon (;) at the beginning.
+; 3. Save the file and reload the script.
+;
+;   A_IconHidden := 1   → Tray icon is HIDDEN on startup (default)
+;   A_IconHidden := 0   → Tray icon is VISIBLE on startup
+;
+; =========================================================
 ;
 A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
 ; A_IconHidden := 0  ; Un-comment for the behavior to be = Visible
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+
 
 ; =========================================================
 ; CONFIG: NUMPAD SHIFT SYMBOLS
 ; =========================================================
-
-; What happens when Shift is held with CapsLock ON and a number key is pressed.
 ;
-;   Enabled  →  Shift+numrow types symbols normally:   ! @ # $ % ^ & * ( )
+; >> What happens when Shift is held with CapsLock ON and a number key is pressed.
+;
+;   Enabled  →  Shift+numrow types symbols normally: "! @ # $ % ^ & * ( )"  (default)
 ;   Disabled →  Shift+numrow does nothing
 ;
-; Uncomment one.
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line.
+; 3. Save and reload the script.
+;
+; =========================================================
 ;
 NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 ; NumpadShiftSymbols := false  ; Disabled: Shift does nothing
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+
 
 ; =========================================================
-; FEATURE: CAPSLOCK NUMPAD
+; FEATURE 1: CAPSLOCK NUMPAD
 ; =========================================================
 
 #HotIf GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
