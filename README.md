@@ -32,6 +32,24 @@ With more planned for the future.
 
 ---
 
+## Structure
+
+```bash
+\
+|   .gitignore
+|   CHANGELOG.md
+|   CONFIGURE.md
+|   README.md
+|   RECOVERY.md
+|
++---source
+|       source.ahk
+|
+\---standalone-scripts
+        numpad-emulator.ahk
+        timezone-switcher.ahk 
+```
+
 ## Supported OS
 
 - Windows 7
@@ -138,7 +156,7 @@ Each time you cycle, a small tooltip appears near your cursor showing the timezo
 - Changes are applied instantly and saved directly to Windows Settings.
 - Your preferences will persist through restarts and won't randomly reset on their own.
 
-→ To add, remove, or reorder timezones, or to set a startup timezone, see [CONFIGURE.md](CONFIGURE.md#adding-a-timezone-not-in-the-list).
+→ Add custom timezones or set a startup timezone, see [CONFIGURE.md](CONFIGURE.md#adding-a-timezone-not-in-the-list).
 
 ---
 

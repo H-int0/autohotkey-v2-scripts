@@ -49,7 +49,7 @@ NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 
 
 ; =========================================================
-; FEATURE 1: CAPSLOCK NUMPAD
+; FEATURE: CAPSLOCK NUMPAD
 ; =========================================================
 
 #HotIf GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
