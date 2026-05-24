@@ -3,7 +3,26 @@
 #MaxThreadsBuffer True
 ProcessSetPriority "High"
 
-A_IconHidden := 1
+
+; =========================================================
+; CONFIG: TRAY ICON VISIBILITY
+; =========================================================
+;
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line by adding a semicolon (;) at the beginning.
+; 3. Save the file and reload the script.
+;
+;   A_IconHidden := 1   → Tray icon is HIDDEN on startup (default)
+;   A_IconHidden := 0   → Tray icon is VISIBLE on startup
+;
+; =========================================================
+;
+A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
+; A_IconHidden := 0  ; Un-comment for the behavior to be = Visible
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
 
 ; =========================================================
 ; FEATURE: TIMEZONE SWITCHER
@@ -12,8 +31,11 @@ A_IconHidden := 1
 TZData := Map()
 TZOrder := []
 
-; --- TIMEZONE LIST ---
-; Uncomment both lines to add to cycle, comment both out to remove.
+; ===================== TIMEZONE LIST =====================
+; >> Uncomment both lines to add to cycle
+; >> comment both out to remove.
+;
+
 
 ; UTC
 TZData["UTC"] := "(UTC +0) `"UTC`""
@@ -134,6 +156,115 @@ TZOrder.Push("Eastern Standard Time")
 ; Hawaii
 ; TZData["Hawaiian Standard Time"] := "(UTC -10) `"Hawaii`""
 ; TZOrder.Push("Hawaiian Standard Time")
+
+
+; =========================================================
+; CONFIG: CUSTOM TIMEZONES
+; =========================================================
+;
+; Add your own timezones here. Each entry takes two lines.
+;
+; FORMAT:
+;   TZData["Windows ID"] := "(UTC +X) `"Your Label`""
+;   TZOrder.Push("Windows ID")
+;
+; HOW TO FIND YOUR WINDOWS TIMEZONE ID:
+;   1. Open Command Prompt and run:  tzutil /l
+;   2. Find your timezone (e.g., "Tokyo Standard Time").
+;   3. Copy the exact ID.
+;
+; INSTRUCTIONS:
+;   1. Replace "Your Windows ID Here" with the actual ID.
+;   2. Replace "Your Label" with any name you like.
+;   3. Remove the semicolon (;) from the start of BOTH lines to enable.
+;   4. Place your entry ABOVE the "^ ADD ABOVE HERE ^" line.
+;
+; ======= Your Custom Timezone SHOULD LOOK LIKE THIS ======
+;
+; EXAMPLE:
+;   TZData["Vladivostok Standard Time"] := "(UTC +10) `"Vladivostok`""
+;   TZOrder.Push("Vladivostok Standard Time")
+;
+; =========================================================
+;
+;
+;
+;
+; ^^^^^^^^^^^^^^^^^^^^ ADD ABOVE HERE: ^^^^^^^^^^^^^^^^^^^^
+;
+
+
+; =========================================================
+; CONFIG: STARTUP TIMEZONE
+; =========================================================
+;
+; INSTRUCTIONS:
+;   - Leave EVERY line commented → keep current Windows timezone.
+;   - Uncomment EXACTLY ONE line → force that timezone on script startup.
+;
+; If you need a timezone not listed below, use the "ADD CUSTOM TIMEZONE FOR STARTUP" section.
+;
+; =========================================================
+;
+; StartupTZID := "UTC"
+; StartupTZID := "GMT Standard Time"
+; StartupTZID := "W. Europe Standard Time"
+; StartupTZID := "Egypt Standard Time"
+; StartupTZID := "Arab Standard Time"
+; StartupTZID := "Russian Standard Time"
+; StartupTZID := "Iran Standard Time"
+; StartupTZID := "Arabian Standard Time"
+; StartupTZID := "Afghanistan Standard Time"
+; StartupTZID := "Pakistan Standard Time"
+; StartupTZID := "India Standard Time"
+; StartupTZID := "Bangladesh Standard Time"
+; StartupTZID := "SE Asia Standard Time"
+; StartupTZID := "China Standard Time"
+; StartupTZID := "Singapore Standard Time"
+; StartupTZID := "Tokyo Standard Time"
+; StartupTZID := "AUS Eastern Standard Time"
+; StartupTZID := "New Zealand Standard Time"
+; StartupTZID := "Azores Standard Time"
+; StartupTZID := "Cape Verde Standard Time"
+; StartupTZID := "SA Eastern Standard Time"
+; StartupTZID := "E. South America Standard Time"
+; StartupTZID := "Venezuela Standard Time"
+; StartupTZID := "SA Western Standard Time"
+; StartupTZID := "Eastern Standard Time"
+; StartupTZID := "Central Standard Time"
+; StartupTZID := "Mountain Standard Time"
+; StartupTZID := "Pacific Standard Time"
+; StartupTZID := "Alaskan Standard Time"
+; StartupTZID := "Hawaiian Standard Time"
+;
+
+
+; =========================================================
+; ADD CUSTOM TIMEZONE FOR STARTUP
+; =========================================================
+;
+; Use this section if the timezone you want is NOT in the list above.
+;
+; INSTRUCTIONS:
+; 1. Open Command Prompt and run:  tzutil /l
+; 2. Find your timezone ID (e.g., "Pacific Standard Time").
+; 3. Delete the semicolon (;) from the start of the line below.
+; 4. Replace "Your_Custom_Windows_ID_Here" with your exact Windows ID.
+;
+; IMPORTANT:
+;    Make sure ALL "StartupTZID" lines in the section above stay commented out (with a semicolon) if you use this option.
+;
+; =========================================================
+;
+; StartupTZID := "Your_Custom_Windows_ID_Here"
+;
+; ^^^^^^^^^^^^^^^^^^^^^^ ABOVE HERE: ^^^^^^^^^^^^^^^^^^^^^^
+;
+
+
+if IsSet(StartupTZID)
+    RunWait('tzutil /s "' StartupTZID '"',, "Hide")
+
 
 ; =========================================================
 ; LOGIC
