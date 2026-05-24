@@ -4,7 +4,7 @@
 ProcessSetPriority "High"
 
 ; =========================================================
-; CONFIGURATION
+; CONFIG: TRAY ICON VISIBILITY
 ; =========================================================
 
 ; Tray icon visibility on startup. Uncomment one.
@@ -20,7 +20,7 @@ A_IconHidden := 1    ; Un-comment for the behaviour to be = Hidden (default)
 TZData := Map()
 TZOrder := []
 
-; --- TIMEZONE LIST ---
+; ===================== TIMEZONE LIST =====================
 ; Uncomment both lines to add to cycle, comment both out to remove.
 
 ; UTC
@@ -144,7 +144,7 @@ TZOrder.Push("Eastern Standard Time")
 ; TZOrder.Push("Hawaiian Standard Time")
 
 ; =========================================================
-; CUSTOM TIMEZONES
+; CONFIG: CUSTOM TIMEZONES
 ; =========================================================
 
 ; Add your own timezones here. Each entry takes two lines.
@@ -169,6 +169,47 @@ TZOrder.Push("Eastern Standard Time")
 ;
 ;
 ;
+
+; =========================================================
+; CONFIG: STARTUP TIMEZONE
+; =========================================================
+;
+; Leave commented to keep current Windows timezone.
+; Uncomment ONE line to force timezone at startup.
+
+; StartupTZID := "UTC"
+; StartupTZID := "GMT Standard Time"
+; StartupTZID := "W. Europe Standard Time"
+; StartupTZID := "Egypt Standard Time"
+; StartupTZID := "Arab Standard Time"
+; StartupTZID := "Russian Standard Time"
+; StartupTZID := "Iran Standard Time"
+; StartupTZID := "Arabian Standard Time"
+; StartupTZID := "Afghanistan Standard Time"
+; StartupTZID := "Pakistan Standard Time"
+; StartupTZID := "India Standard Time"
+; StartupTZID := "Bangladesh Standard Time"
+; StartupTZID := "SE Asia Standard Time"
+; StartupTZID := "China Standard Time"
+; StartupTZID := "Singapore Standard Time"
+; StartupTZID := "Tokyo Standard Time"
+; StartupTZID := "AUS Eastern Standard Time"
+; StartupTZID := "New Zealand Standard Time"
+; StartupTZID := "Azores Standard Time"
+; StartupTZID := "Cape Verde Standard Time"
+; StartupTZID := "SA Eastern Standard Time"
+; StartupTZID := "E. South America Standard Time"
+; StartupTZID := "Venezuela Standard Time"
+; StartupTZID := "SA Western Standard Time"
+; StartupTZID := "Eastern Standard Time"
+; StartupTZID := "Central Standard Time"
+; StartupTZID := "Mountain Standard Time"
+; StartupTZID := "Pacific Standard Time"
+; StartupTZID := "Alaskan Standard Time"
+; StartupTZID := "Hawaiian Standard Time"
+
+if IsSet(StartupTZID)
+    RunWait('tzutil /s "' StartupTZID '"',, "Hide")
 
 ; =========================================================
 ; LOGIC
