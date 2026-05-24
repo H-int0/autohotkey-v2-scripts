@@ -10,8 +10,8 @@ ProcessSetPriority "High"
 ; Tray icon visibility on startup. Uncomment one.
 ;
 ;
-A_IconHidden := 1    ; Un-comment for the behaviour to be = Hidden (default)
-; A_IconHidden := 0  ; Un-comment for the behaviour to be = Visible
+A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
+; A_IconHidden := 0  ; Un-comment for the behavior to be = Visible
 
 ; =========================================================
 ; CONFIG: NUMPAD SHIFT SYMBOLS
@@ -192,7 +192,7 @@ TZOrder.Push("Eastern Standard Time")
 ; =========================================================
 ; CONFIG: CUSTOM TIMEZONES
 ; =========================================================
-
+;
 ; Add your own timezones here. Each entry takes two lines.
 ;
 ; Format:
@@ -203,18 +203,20 @@ TZOrder.Push("Eastern Standard Time")
 ;   tzutil /l
 ;
 ; Remove the semicolons from both lines to enable an entry.
-; =========================================================
-
-; Your Custom Timezone
+;
+; ================== Your Custom Timezone =================
+;
 ; TZData["Your Windows ID Here"] := "(UTC +X) `"Your Label`""
 ; TZOrder.Push("Your Windows ID Here")
 ;
-; HERE:
+; =========================================================
 ;
 ;
 ;
 ;
+; ^^^^^^^^^^^^^^^^^^^^ ADD ABOVE HERE: ^^^^^^^^^^^^^^^^^^^^
 ;
+
 
 ; =========================================================
 ; CONFIG: STARTUP TIMEZONE
@@ -222,7 +224,7 @@ TZOrder.Push("Eastern Standard Time")
 ;
 ; Leave commented to keep current Windows timezone.
 ; Uncomment ONE line to force timezone at startup.
-
+;
 ; StartupTZID := "UTC"
 ; StartupTZID := "GMT Standard Time"
 ; StartupTZID := "W. Europe Standard Time"
@@ -253,6 +255,30 @@ TZOrder.Push("Eastern Standard Time")
 ; StartupTZID := "Pacific Standard Time"
 ; StartupTZID := "Alaskan Standard Time"
 ; StartupTZID := "Hawaiian Standard Time"
+;
+;
+; =========================================================
+; ADD CUSTOM TIMEZONE FOR STARTUP
+; =========================================================
+;
+; Use this section if the timezone you want is NOT in the list above.
+; 
+; INSTRUCTIONS:
+; 1. Open your Windows Command Prompt and type:  tzutil /l
+;    (This will give you a list of all official Windows Timezone IDs).
+; 2. Find your ID (e.g., "Pacific Standard Time" or "W. Europe Standard Time").
+; 3. Delete the semicolon (;) from the start of the line below to turn it on.
+; 4. Replace "Your_Custom_Windows_ID_Here" with your exact Windows ID.
+;
+; IMPORTANT: Make sure all the "StartupTZID" lines in Option A above stay 
+; commented out with a semicolon (;) if you use this option!
+;
+; =========================================================
+;
+; StartupTZID := "Your_Custom_Windows_ID_Here"
+;
+; ^^^^^^^^^^^^^^^^^^^^^^ ABOVE HERE: ^^^^^^^^^^^^^^^^^^^^^^
+;
 
 if IsSet(StartupTZID)
     RunWait('tzutil /s "' StartupTZID '"',, "Hide")
