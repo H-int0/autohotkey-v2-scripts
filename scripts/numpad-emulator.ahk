@@ -10,8 +10,8 @@ ProcessSetPriority "High"
 ; Tray icon visibility on startup. Uncomment one.
 ;
 ;
-A_IconHidden := 1    ; Un-comment for the behaviour to be = Hidden (default)
-; A_IconHidden := 0  ; Un-comment for the behaviour to be = Visible
+A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
+; A_IconHidden := 0  ; Un-comment for the behavior to be = Visible
 
 ; =========================================================
 ; CONFIG: NUMPAD SHIFT SYMBOLS
