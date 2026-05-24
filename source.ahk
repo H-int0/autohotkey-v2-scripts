@@ -14,10 +14,24 @@ A_IconHidden := 1    ; Un-comment for the behaviour to be = Hidden (default)
 ; A_IconHidden := 0  ; Un-comment for the behaviour to be = Visible
 
 ; =========================================================
+; CONFIG: NUMPAD SHIFT SYMBOLS
+; =========================================================
+
+; What happens when Shift is held with CapsLock ON and a number key is pressed.
+;
+;   Enabled  →  Shift+numrow types symbols normally:   ! @ # $ % ^ & * ( )
+;   Disabled →  Shift+numrow does nothing
+;
+; Uncomment one.
+;
+NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
+; NumpadShiftSymbols := false  ; Disabled: Shift does nothing
+
+; =========================================================
 ; FEATURE 1: CAPSLOCK NUMPAD
 ; =========================================================
 
-#HotIf GetKeyState("CapsLock", "T") && GetKeyState("Shift", "P")
+#HotIf GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
 
 +1::SendText "!"
 +2::SendText "@"
@@ -30,7 +44,7 @@ A_IconHidden := 1    ; Un-comment for the behaviour to be = Hidden (default)
 +9::SendText "("
 +0::SendText ")"
 
-#HotIf GetKeyState("CapsLock", "T") && !GetKeyState("Shift", "P")
+#HotIf GetKeyState("CapsLock", "T") && (!NumpadShiftSymbols || !GetKeyState("Shift", "P"))
 
 *1::Send '{Blind}{Numpad1}'
 *2::Send '{Blind}{Numpad2}'
