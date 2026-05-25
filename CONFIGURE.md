@@ -2,24 +2,29 @@
 
 This guide covers how to configure and customize Strap beyond its default behavior.
 
-- It focuses primarily on the combined `source/source.ahk` build, since that is the main version of the script.
-- Standalone scripts follow the same configuration principles whenever the feature exists in those files as well.
+- It focuses primarily on the scripts inside the `distribution/` and `modules/` directories.
+- You can configure the pre‑combined `distribution/source.ahk` directly, or build your own combination using `distribution/custom.ahk`.
+- Independent components inside `modules/` follow the same configuration principles.
+- Include markers for copying into `custom.ahk`.
 
 ---
 
 ## Table of Contents
 
 - [Changing the Default Tray Icon Visibility](#changing-the-default-tray-icon-visibility)
-- [Changing CapsLock Numpad Shift Behavior](#changing-capslock-numpad-shift-behavior)
+- [Changing CapsLock numpad Shift Behavior](#changing-capslock-numpad-shift-behavior)
 - [Adding a Timezone Not in the List](#adding-a-timezone-not-in-the-list)
 - [Setting a Startup Timezone](#setting-a-startup-timezone)
-- [Adding a Timezone Not in the List for Startup](#adding-a-custom-timezone-to-startup-not-in-the-list)
+- [Adding a Custom Timezone to Startup (not in the list)](#adding-a-custom-timezone-to-startup-not-in-the-list)
+- [Building a Custom Script](#building-a-custom-script)
 
 ---
 
 ## Changing the Default Tray Icon Visibility
 
-By default, Strap hides the tray icon on startup. To make it visible instead, switch which startup option is uncommented in the configuration block near the top of the script.
+> By default, Strap hides the tray icon on startup. To make it visible instead, switch which startup option is uncommented in the configuration block near the top of the script.
+
+This setting works the same in `distribution/source.ahk`, any module from `modules/`, and your own `custom.ahk` build.
 
 **To configure this behavior follow the steps below:**
 
@@ -58,14 +63,14 @@ A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
 
 Only one line should stay active.
 
-**To make the tray icon visible on startup:**
+- **To make the tray icon visible on startup:**
 
 ```ahk
 ; A_IconHidden := 1  ; Un-comment for the behavior to be = Hidden (default)
 A_IconHidden := 0    ; Un-comment for the behavior to be = Visible
 ```
 
-**To go back to hidden on startup:**
+- **To go back to hidden on startup:**
 
 ```ahk
 A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
@@ -82,17 +87,17 @@ The change does not take effect until the script is restarted.
 
 ---
 
-## Changing CapsLock Numpad Shift Behavior
+## Changing CapsLock numpad Shift Behavior
 
-This applies to the numpad emulator.
-
-- By default, when CapsLock is on and you hold Shift, the number row keeps the usual shifted symbols: `! @ # $ % ^ & * ( )`.
+> By default, when CapsLock is on and you hold Shift, the number row keeps the usual shifted symbols: `! @ # $ % ^ & * ( )`.
 
 **To configure this behavior follow the steps below:**
 
 ### Step 1: Open the numpad script
 
-Open `standalone-scripts/numpad-emulator.ahk` if you are using the standalone version, or edit the CapsLock numpad section in `source/source.ahk` if you are using the combined build.
+- Combined script: `distribution/source.ahk`
+- numpad module: `modules/numpad-emulator.ahk`
+- Your custom build: `distribution/custom.ahk`
 
 ### Step 2: Find the Shift setting
 
@@ -100,7 +105,7 @@ It looks like this:
 
 ```ahk
 ; =========================================================
-; CONFIG: NUMPAD SHIFT SYMBOLS
+; CONFIG: numpad SHIFT SYMBOLS
 ; =========================================================
 ;
 ; >> What happens when Shift is held with CapsLock ON and a number key is pressed.
@@ -115,8 +120,8 @@ It looks like this:
 ;
 ; =========================================================
 ;
-NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
-; NumpadShiftSymbols := false  ; Disabled: Shift does nothing
+numpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
+; numpadShiftSymbols := false  ; Disabled: Shift does nothing
 ;
 ; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
 ;
@@ -124,23 +129,23 @@ NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 
 ### Step 3: Choose the Active line
 
-- `NumpadShiftSymbols := true` keeps shifted symbols working normally while CapsLock is active.
-- `NumpadShiftSymbols := false` disables those shifted symbols while CapsLock is active.
+- `numpadShiftSymbols := true` → shifted symbols work normally (default)
+- `numpadShiftSymbols := false` → shifted symbols do nothing while CapsLock is on
 
 Only one line should stay active.
 
-**To keep shifted symbols enabled (default):**
+- **To keep shifted symbols enabled (default):**
 
 ```ahk
-NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
-; NumpadShiftSymbols := false  ; Disabled: Shift does nothing
+numpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
+; numpadShiftSymbols := false  ; Disabled: Shift does nothing
 ```
 
-**To disable shifted symbols:**
+- **To disable shifted symbols:**
 
 ```ahk
-; NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
-NumpadShiftSymbols := false  ; Disabled: Shift does nothing
+; numpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
+numpadShiftSymbols := false  ; Disabled: Shift does nothing
 ```
 
 ### Step 4: Save and Reload
@@ -155,7 +160,7 @@ If the timezone you want is not already in the script, add it to the **CUSTOM TI
 
 ### Step 1: Find the Windows timezone ID
 
-Timezone changes go through `tzutil`, Windows' built-in timezone utility. Open Command Prompt and run:
+Open Command Prompt and run:
 
 ```cmd
 tzutil /l
@@ -168,11 +173,13 @@ This prints all timezones Windows knows about. Each entry looks like this:
 Tokyo Standard Time
 ```
 
-The second line is the Windows ID. That is what the script needs.
+The second line of each entry is the Windows ID (e.g., `Tokyo Standard Time`).
 
 ### Step 2: Open the script in a text editor
 
-Open `source/source.ahk` for the combined build, or `standalone-scripts/timezone-switcher.ahk` if you are only using the timezone feature.
+- Combined script: `distribution/source.ahk`
+- Timezone module: `modules/timezone-switcher.ahk`
+- Your custom build: `distribution/custom.ahk`
 
 ### Step 3: Find the CUSTOM TIMEZONES section
 
@@ -217,7 +224,7 @@ It looks like this:
 
 ### Step 4: Add your entry
 
-Each timezone takes two lines. Both lines must be uncommented:
+Each timezone takes two lines. Place them **above** the `ADD ABOVE HERE` line.
 
 ```ahk
 ; Your City or Label
@@ -233,11 +240,9 @@ TZData["Vladivostok Standard Time"] := "(UTC +10) `"Vladivostok`""
 TZOrder.Push("Vladivostok Standard Time")
 ```
 
-Place your entry **above** the `; ^^^^^^^^^^^^^^^^^^^^ ADD ABOVE HERE: ^^^^^^^^^^^^^^^^^^^^` line.
+> The order of enabled entries controls the cycle order. Put the new timezone where you want it to appear in the cycle.
 
-The order of enabled entries controls the cycle order. Put the new timezone where you want it to appear in the cycle.
-
-**An example of newly added timezones may look like:**
+**An example of how a newly added timezones might look like:**
 
 ```ahk
 ; =========================================================
@@ -302,7 +307,9 @@ This controls what timezone Strap applies when it launches.
 
 ### Step 1: Open the script in a text editor
 
-Open `source/source.ahk` for the combined build, or `standalone-scripts/timezone-switcher.ahk` for the timezone-only version.
+- Combined script: `distribution/source.ahk`
+- Timezone module: `modules/timezone-switcher.ahk`
+- Your custom build: `distribution/custom.ahk`
 
 ### Step 2: Find the startup timezone block
 
@@ -354,12 +361,12 @@ It looks like this:
 ;
 ```
 
-### Step 3: Choose the timezone
+### Step 3: Choose the timezone and uncomment it
 
 - Leave every line commented to keep whatever timezone Windows already had.
 - Uncomment exactly one line to force that timezone on startup.
 
-If more than one line is uncommented, the most bottom uncommented timezone is applied on startup.
+> If more than one line is uncommented, the bottom-most uncommented timezone is applied on startup.
 
 **An example may look like this:**
 
@@ -415,13 +422,13 @@ Save the file and restart the script. The selected timezone will be applied at l
 
 ---
 
-## Adding a Custom Timezone to Startup not in the list
+## Adding a Custom Timezone to Startup (not in the list)
 
-If the timezone you want is not already in the list of timezones available for startup, add it to the `ADD CUSTOM TIMEZONE FOR STARTUP` section under the `CONFIG: STARTUP TIMEZONE` section.
+If your desired startup timezone is not in the pre‑defined list, use the `ADD CUSTOM TIMEZONE FOR STARTUP` section.
 
 ### Step 1: Find the Windows Timezone ID
 
-Timezone changes go through `tzutil`, Windows' built-in timezone utility. Open Command Prompt and run:
+Open Command Prompt and run:
 
 ```cmd
 tzutil /l
@@ -434,11 +441,13 @@ This prints all timezones Windows knows about. Each entry looks like this:
 Tokyo Standard Time
 ```
 
-**The second line is the Windows ID. That is what we need.**
+The second line of each entry is the Windows ID (e.g., `Tokyo Standard Time`).
 
 ### Step 2: Open the script in your text editor
 
-Open `source/source.ahk` for the combined build, or `standalone-scripts/timezone-switcher.ahk` if you are only using the timezone feature.
+- Combined script: `distribution/source.ahk`
+- Timezone module: `modules/timezone-switcher.ahk`
+- Your custom build: `distribution/custom.ahk`
 
 ### Step 3: Find the `ADD CUSTOM TIMEZONE FOR STARTUP` section
 
@@ -484,9 +493,9 @@ In the space marked with `ABOVE HERE`
 - Delete the semicolon (`;`) at the beginning of the line `; StartupTZID := "Your_Custom_Windows_ID_Here"`.
 - Replace `Your_Custom_Windows_ID_Here` with the actual Windows timezone ID.
 
-Make sure all other `StartupTZID` lines in the **CONFIG: STARTUP TIMEZONE** section remain commented out.
+> Make sure all other `StartupTZID` lines in the **CONFIG: STARTUP TIMEZONE** section remain commented out.
 
-**An example of it may look like:**
+**An example of how it might look like:**
 
 ```ahk
 ; =========================================================
@@ -500,6 +509,76 @@ StartupTZID := "Tokyo Standard Time"
 ### Step 5: Save and Reload
 
 After saving, reload the script so the updated timezone list is loaded.
+
+---
+
+## Building a Custom Script
+
+> The `distribution/custom.ahk` file is a template that lets you combine the features you want.
+
+- It already contains:
+  - Tray icon visibility configuration
+  - A block to paste module code into
+  - Global tray toggle hotkey (`Win + Ctrl + \`)
+  - Global helper functions (`ShowToolTip`, `RemoveToolTip`)
+
+**Steps** to build a Custom Script:
+
+### Step 1: Open `distribution/custom.ahk` in a text editor
+
+### Step 2: Open the module(s) you want to include and find the markers
+
+Each module in `modules/` contains markers that tell you exactly what to copy:
+
+It looks like this:
+
+```ahk
+; ===========================================================================================================================================================================
+; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
+; ===========================================================================================================================================================================
+
+[feature code - configuration, hotkeys, and feature‑specific functions]
+
+; ===========================================================================================================================================================================
+; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
+; ===========================================================================================================================================================================
+
+```
+
+### Step 3: Copy the marked section
+
+- Select from `>> COPY BELOW THIS LINE` down to `>> COPY ABOVE THIS LINE` (excluding the marker lines themselves if you prefer, but including them is harmless).
+
+> **Do not copy** the tray toggle hotkey or the global `ShowToolTip` functions, `custom.ahk` already provides them.
+
+### Step 4: Paste into `custom.ahk`
+
+Inside `custom.ahk`, find the block:
+
+```ahk
+; ========================================================= PASTE MODULES BELOW THIS LINE =========================================================
+
+
+
+; ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PASTE MODULES ABOVE THIS LINE ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+Paste the copied code between those two lines.
+
+### Step 5 (optional): Repeat for other modules
+
+- You can paste multiple modules one after another.
+- The order does not matter because they use different hotkeys.
+
+### Step 6 (optional): Configure each feature as needed
+
+- Edit the configuration sections inside the pasted code as per your needs.
+
+### Step 7: Save and run `distribution/custom.ahk`
+
+- Save the file and restart the script.
+
+> Your customized script will now run with only the features you selected.
 
 ---
 

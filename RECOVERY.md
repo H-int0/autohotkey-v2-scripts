@@ -60,6 +60,13 @@ C:\Users\YourName\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
 
 ---
 
+> If you don't see an `AppData` folder, it may be hidden. To show it:
+
+- Open **File Explorer** and click the **View** tab from the top.
+- Under **Show/hide**, check **Hidden items**.
+
+---
+
 ## Step 4: Verify
 
 Restart your computer. This time your keyboard should behave completely normally. If Strap no longer appears in Task Manager after boot, the removal was successful.
