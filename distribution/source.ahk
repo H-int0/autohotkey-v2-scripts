@@ -74,7 +74,7 @@ NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 
 
 ; =========================================================
-; FEATURE 1: CAPSLOCK NUMPAD
+; FEATURE: NUMPAD EMULATOR
 ; =========================================================
 
 #HotIf GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
@@ -106,7 +106,7 @@ NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 #HotIf
 
 ; =========================================================
-; FEATURE 2: TIMEZONE SWITCHER
+; FEATURE: TIMEZONE SWITCHER
 ; =========================================================
 
 TZData := Map()
@@ -378,6 +378,101 @@ if IsSet(StartupTZID)
     msgLabel := TZData.Has(currentID) ? TZData[currentID] : currentID
     ShowToolTip("Current TZ = " msgLabel)
 }
+
+
+; =========================================================
+; CONFIG: FORCE KILL TASK
+; =========================================================
+;
+; >> Press Win+Ctrl+K to close the active window (like Alt+F4).
+; >> If the window is frozen, it will force kill the process instead.
+;
+;   Enabled  →  Win+Ctrl+K closes/kills the active window (default)
+;   Disabled →  Win+Ctrl+K does nothing
+;
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line.
+; 3. Save and reload the script.
+;
+; =========================================================
+;
+EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
+; EndTaskEnabled := false  ; Disabled: Win+Ctrl+K does nothing
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+
+
+; =========================================================
+; FEATURE: FORCE KILL TASK
+; =========================================================
+
+#HotIf EndTaskEnabled
+#^k:: {
+    activeHwnd := 0
+    try {
+        activeHwnd := WinGetID("A")
+    } catch {
+        return
+    }
+    
+    if (!activeHwnd) {
+        return
+    }
+        
+    cls := ""
+    try {
+        cls := WinGetClass("ahk_id " activeHwnd)
+    } catch {
+        return
+    }
+    
+    if (cls = "Progman" || cls = "WorkerW" || cls = "Shell_TrayWnd") {
+        return
+    }
+
+    pid := 0
+    try {
+        pid := WinGetPID("ahk_id " activeHwnd)
+    } catch {
+        return
+    }
+    
+    if (!pid) {
+        return
+    }
+
+    isResponding := true
+    
+    ; 1. Check if the OS has already flagged it as hung
+    if (DllCall("IsHungAppWindow", "Ptr", activeHwnd)) {
+        isResponding := false
+    } else {
+        ; 2. Ping the window to see if it's alive
+        try {
+            ; Send WM_NULL (0x0). If the app's thread is frozen, this will time out.
+            SendMessage(0x0, 0, 0,, "ahk_id " activeHwnd,,,, 250)
+        } catch {
+            ; It failed to respond within 250ms (or closed unexpectedly)
+            isResponding := false
+        }
+    }
+
+    if (!isResponding) {
+        ; Window is frozen: use taskkill to forcefully terminate the process
+        try {
+            RunWait("taskkill /PID " pid " /F",, "Hide")
+        }
+    } else {
+        ; Window is healthy: ask it to close gracefully (Alt+F4 behavior)
+        try {
+            WinClose("ahk_id " activeHwnd)
+        }
+    }
+}
+#HotIf
+
 
 ; =========================================================
 ; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
