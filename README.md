@@ -1,6 +1,6 @@
 # Strap
 
-Strap is a lightweight AutoHotkey_v2 script for Windows that adds keyboard shortcuts to devices that lack certain physical keys or need quick access to system-level features.
+> Strap is a lightweight AutoHotkey_v2 script for Windows that adds keyboard shortcuts to devices that lack certain physical keys or need quick access to system-level features.
 
 Currently, it ships with two features:
 
@@ -22,9 +22,11 @@ With more planned for the future.
 - [Running the Script](#running-the-script)
 - [Features](#features)
   - [Accessibility: Tray Icon Toggle](#accessibility-tray-icon-toggle)
-  - [1. Numpad Emulator](#1-numpad-emulator)
+  - [1. numpad Emulator](#1-numpad-emulator)
   - [2. Timezone Switcher](#2-timezone-switcher)
+- [Modules](#modules)
 - [Configuration](#configuration)
+- [Building a Custom Script](#building-a-custom-script)
 - [Auto-Start on Boot](#auto-start-on-boot)
 - [Updating the Startup Copy](#updating-the-startup-copy)
 - [Removing the Startup Copy](#removing-the-startup-copy)
@@ -42,15 +44,16 @@ With more planned for the future.
 |   README.md
 |   RECOVERY.md
 |
-+---source
-|       source.ahk
++---distribution
+|       source.ahk                    # Combined script (both features)
+|       custom.ahk                    # Template for building your own combination
 |
-\---standalone-scripts
+\---modules
         numpad-emulator.ahk
-        timezone-switcher.ahk 
+        timezone-switcher.ahk
 ```
 
-## Supported OS
+## OS Supported
 
 - Windows 7
 - Windows 8
@@ -72,23 +75,23 @@ With more planned for the future.
 Open Command Prompt and run:
 
 ```cmd
-git clone https://github.com/H-int0/Strap.git
+git clone https://github.com/H-int0/autohotkey-scripts-bundle.git
 ```
 
 ### Option B: Download as ZIP
 
-1. Go to [github.com/H-int0/Strap](https://github.com/H-int0/Strap)
+1. Go to [github.com/H-int0/AutoHotkey-scripts-bundle](https://github.com/H-int0/autohotkey-scripts-bundle)
 2. Click the green **Code** button
 3. Click **Download ZIP**
 4. Extract the folder somewhere on your device
 
-Once you have the files, double-click `source/source.ahk` to run the script.
+> Once you have the files, double-click `distribution/source.ahk` to run the script.
 
 ---
 
 ## Running the Script
 
-To run Strap, simply double-click `source/source.ahk`.
+To run Strap, simply double-click `distribution/source.ahk`.
 
 A tray icon will briefly appear in the right bottom corner of your taskbar and then hide itself. That means it's running. You won't see any window or confirmation.
 
@@ -96,21 +99,20 @@ To stop it, make the tray icon visible first with `Win + Ctrl + \`, then right-c
 
 ---
 
-## Standalone Scripts
+## Modules
 
-The `standalone-scripts/` folder contains standalone versions of each feature. These are useful if you only want one feature running without the other.
+The `modules/` folder contains each feature as a standalone script that you can run directly, or whose code you can copy into `distribution/custom.ahk` to build your own personalized combination.
 
 | File | What it does |
 | --- | --- |
-| `standalone-scripts/numpad-emulator.ahk` | CapsLock numpad |
-| `standalone-scripts/timezone-switcher.ahk` | Timezone switcher |
+| `modules/numpad-emulator.ahk` | CapsLock numpad emulator |
+| `modules/timezone-switcher.ahk` | Timezone switcher with tooltip |
 
-- Run them the same way as `source/source.ahk` just double-click the file.
-- They include the same tray icon toggle (`Win + Ctrl + \`) so you can exit them the same way.
+- Run any module the same way as `distribution/source.ahk` just double‑click the file.
+- Each module includes the same tray icon toggle (`Win + Ctrl + \`) so you can exit it easily.
+- **Do not run a module at the same time as `distribution/source.ahk`** they share hotkeys and will conflict.
 
----
-
-**Note:** Don't run any standalone script at the same time as `source/source.ahk`. They share the same hotkeys and may conflict with each other. Furthermore, if your intent was to run a particular feature and not others that might not work since source/source.ahk is running.
+> See [Building a Custom Script](CONFIGURE.md#building-a-custom-script) to learn how to combine modules into your own `custom.ahk`.
 
 ---
 
@@ -123,24 +125,23 @@ The `standalone-scripts/` folder contains standalone versions of each feature. T
 - The tray icon is hidden by default to keep your system tray clean.
 - Press `Win + Ctrl + \` to show or hide it at any time.
 
-When visible, right-clicking it lets you reload or exit the script and much more.
+When visible, right‑clicking it lets you reload or exit the script.
 
-→ To change the default tray icon visibility, see [CONFIGURE.md](CONFIGURE.md#changing-the-default-tray-icon-visibility).
+> To change the default tray icon visibility, see [CONFIGURE.md](CONFIGURE.md#changing-the-default-tray-icon-visibility).
 
 ---
 
-### 1. Numpad Emulator
+### 1. numpad Emulator
 
 Behavior:
 
-- When CapsLock is enabled:
+- When CapsLock is **enabled**:
   - Number row keys `0-9` behave like numpad keys.
   - Holding Shift keeps the normal shifted symbols: `! @ # $ % ^ & * ( )`.
-
-- When CapsLock is disabled:
+- When CapsLock is **disabled**:
   - Number row keys behave normally.
 
-→ To change the Shift behavior, see [CONFIGURE.md](CONFIGURE.md#changing-capslock-numpad-shift-behavior).
+> To change the Shift behavior, see [CONFIGURE.md](CONFIGURE.md#changing-capslock-numpad-shift-behavior).
 
 ---
 
@@ -148,19 +149,19 @@ Behavior:
 
 **Hotkeys:**
 
-- Use `Win + Alt + `` ` to switch to the next timezone in your list.
-- Use `Win + Ctrl + `` ` to show what timezone your system is currently on.
+- `Win + Alt + `` ` switch to the next timezone in your list.
+- `Win + Ctrl + `` ` show the current timezone.
 
-Each time you cycle, a small tooltip appears near your cursor showing the timezone you just switched to.
+Each time you cycle, a small tooltip appears near your cursor showing the new timezone.
 
-- Changes are applied instantly and saved directly to Windows Settings.
-- Your preferences will persist through restarts and won't randomly reset on their own.
+- Changes are applied instantly and saved to Windows Settings.
+- Your preferences persist through restarts.
 
-→ Add custom timezones or set a startup timezone, see [CONFIGURE.md](CONFIGURE.md#adding-a-timezone-not-in-the-list).
+> Add custom timezones or set a startup timezone in [CONFIGURE.md](CONFIGURE.md#adding-a-timezone-not-in-the-list).
 
 ---
 
-**Note:** If switching does not work, go to **Settings → Time & Language → Date & Time** and turn off **Set time zone automatically**. Windows will override manual timezone changes if that is enabled.
+**Note:** If switching does not work, go to **Settings > Time & Language > Date & Time** and turn off **Set time zone automatically**. Windows will override manual timezone changes if that is enabled.
 
 ---
 
@@ -216,21 +217,31 @@ Out of the box, Strap cycles through these six timezones:
 
 ---
 
+## Building a Custom Script
+
+- If you want only one feature, run its module directly.
+- If you want a different combination (e.g., only numpad emulator and timezone switcher, but nothing else), you can build your own script using `distribution/custom.ahk` as a template.
+
+> Full instructions are in [CONFIGURE.md](CONFIGURE.md#building-a-custom-script).
+
+---
+
 ## Configuration
 
-Refer [CONFIGURE.md](CONFIGURE.md) for the exact steps for:
+Refer to [CONFIGURE.md](CONFIGURE.md) for detailed steps on:
 
 - [Changing the Default Tray Icon Visibility](CONFIGURE.md#changing-the-default-tray-icon-visibility)
-- [Changing CapsLock Numpad Shift Behavior](CONFIGURE.md#changing-capslock-numpad-shift-behavior)
+- [Changing CapsLock numpad Shift Behavior](CONFIGURE.md#changing-capslock-numpad-shift-behavior)
 - [Adding a Timezone Not in the List](CONFIGURE.md#adding-a-timezone-not-in-the-list)
 - [Setting a Startup Timezone](CONFIGURE.md#setting-a-startup-timezone)
-- [Adding a Timezone Not in the List for Startup](CONFIGURE.md#adding-a-custom-timezone-to-startup-not-in-the-list)
+- [Adding a Custom Timezone to Startup](CONFIGURE.md#adding-a-custom-timezone-to-startup-not-in-the-list)
+- [Building a Custom Script](CONFIGURE.md#building-a-custom-script)
 
 ---
 
 ## Auto-Start on Boot
 
-By default, you need to manually run `source/source.ahk` every time your computer restarts.
+> By default, you need to manually run the script every time your computer restarts.
 
 If you'd rather have it launch automatically on startup, you can add a copy of it to the Windows startup folder.
 
@@ -241,10 +252,18 @@ If you'd rather have it launch automatically on startup, you can add a copy of i
 
 ### Option A: Command Prompt
 
-Open Command Prompt and run the following, replacing `YOUR_PATH` with the full path to your `source/source.ahk`:
+Open Command Prompt and run the following, replacing `YOUR_PATH` with the full path to your `distribution/source.ahk` or `distribution/custom.ahk`:
+
+- For the combined script (`distribution/source.ahk`):
 
 ```cmd
 copy "YOUR_PATH\source\source.ahk" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
+```
+
+- For a custom script (`distribution/custom.ahk`):
+
+```cmd
+copy "YOUR_PATH\distribution\custom.ahk" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
 ```
 
 **Example:**
@@ -256,27 +275,32 @@ copy "C:\Users\YourName\scripts\strap\source\source.ahk" "%APPDATA%\Microsoft\Wi
 ### Option B: Manual
 
 1. Press `Win + R`, type `shell:startup`, and press Enter.
-2. Copy your `source/source.ahk` file into the folder that opens.
-
-Yup, that's it.
+2. Copy your script (`source.ahk` or `custom.ahk`) into the folder that opens.
+3. (optional) Rename it to `strap.ahk`.
 
 ---
 
 ## Updating the Startup Copy
 
-After editing `source/source.ahk`, the copy in the startup folder won't update automatically. You'll need to replace it manually.
-
----
+After editing your script, the copy in the startup folder does not update automatically. You'll need to replace it manually.
 
 ### Option-A: Command Prompt
 
 Run the following, replacing `YOUR_PATH` with the full path to your `source/source.ahk`:
 
+- For the combined script:
+
 ```cmd
-copy /Y "YOUR_PATH\source\source.ahk" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
+copy /Y "YOUR_PATH\distribution\source.ahk" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
 ```
 
-The `/Y` flag overwrites without asking for confirmation.
+- For a custom build:
+
+```cmd
+copy /Y "YOUR_PATH\distribution\custom.ahk" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
+```
+
+> The `/Y` flag overwrites without asking for confirmation.
 
 **Example:**
 
@@ -288,7 +312,8 @@ copy /Y "C:\Users\YourName\scripts\strap\source\source.ahk" "%APPDATA%\Microsoft
 
 1. Press `Win + R`, type `shell:startup`, and press Enter.
 2. Delete the existing `strap.ahk` from the folder.
-3. Copy your updated `source/source.ahk` into the same folder and rename it to `strap.ahk`.
+3. Copy your updated `distribution/source.ahk` (or `distribution/custom.ahk` if you are using a personalized layout) into the same folder
+4. (optional) Rename it to `strap.ahk`.
 
 ---
 
@@ -311,13 +336,13 @@ del "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
 
 ## Troubleshooting
 
-- **Numpad keys aren't working**: Make sure CapsLock is ON. If it still doesn't work, try reloading the script through the tray icon.
+- **numpad keys aren't working**: Make sure CapsLock is ON. If it still doesn't work, try reloading the script through the tray icon.
 
-- **Timezone isn't switching**: Go to **Settings → Time & Language → Date & Time** and make sure that **"Set time zone automatically"** is turned off. Windows will override manual timezone changes if this is enabled.
+- **Timezone isn't switching**: Go to **Settings > Time & Language > Date & Time** and make sure that **"Set time zone automatically"** is turned off. Windows will override manual timezone changes if this is enabled.
 
-- **Script seems to be running but nothing works**: Right-click the tray icon (make it visible first with `Win + Ctrl + \`) and select **Reload**. If that doesn't help, **Exit** and double-click `source/source.ahk` again.
+- **Script seems to be running but nothing works**: Right-click the tray icon (make it visible first with `Win + Ctrl + \`) and select **Reload**. If that doesn't help, **Exit** and double-click the script again.
 
-- **Keyboard is behaving strangely after installing the script**: See [RECOVERY.md](RECOVERY.md) for step-by-step instructions to safely remove the script.
+> **Keyboard is behaving strangely after installing the script**: See [RECOVERY.md](RECOVERY.md) for step-by-step instructions to safely remove the script.
 
 ---
 
