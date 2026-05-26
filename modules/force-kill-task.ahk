@@ -50,6 +50,47 @@ A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
 ;
 
 
+; =========================================================
+; CONFIG: TOOLTIPS
+; =========================================================
+;
+; >> Customize tooltip display duration and individual messages.
+;
+; =========================================================
+;
+; INSTRUCTIONS:
+;
+; 1. EDIT THESE VALUES DIRECTLY:
+;    - Change Config_TooltipDuration (milliseconds) to alter how long tooltips stay on screen.
+;    - Change the message text inside the quotes "" to customize what each tooltip says.
+;
+; 2. ENABLE / DISABLE A TOOLTIP:
+;    - To turn a tooltip OFF, put a semicolon (;) at the beginning of its line.
+;    - To turn it ON, remove that semicolon.
+;
+; 3. Save the file and reload the script.
+;
+; =========================================================
+;
+; Duration in milliseconds (1000 = 1 sec)
+Global Config_TooltipDuration := 3000
+;                                ^ <-- Edit this number (in milliseconds) to change how long tooltips stay visible
+;
+; ---------------------------------------------------------
+;
+;
+; ----- Color Picker tooltip -----
+Global Msg_ColorPicker := "Copied to Clipboard"
+;                         ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
+;
+; ----- Force Kill Task tooltip -----
+Global Msg_EndTask := "Evaporated"
+;                     ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+
+
 ; ===========================================================================================================================================================================
 ; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
 ; ===========================================================================================================================================================================
@@ -79,7 +120,7 @@ EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
 
 
 ; =========================================================
-; FEATURE: END TASK
+; FEATURE: FORCE KILL TASK (Win + Ctrl + K)
 ; =========================================================
 
 #HotIf EndTaskEnabled
@@ -137,16 +178,14 @@ EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
         ; Window is frozen: use taskkill to forcefully terminate the process
         try {
             RunWait("taskkill /PID " pid " /F",, "Hide")
-            ToolTip("Evaporated")
-            SetTimer(() => ToolTip(), -2000)
+            ShowToolTip(Msg_EndTask)
         }
     } else {
         ; Window is healthy: ask it to close gracefully (Alt+F4 behavior)
         try {
             WinClose("ahk_id " activeHwnd)
             WinWaitClose("ahk_id " activeHwnd,, 5)
-            ToolTip("Evaporated")
-            SetTimer(() => ToolTip(), -2000)
+            ShowToolTip(Msg_EndTask)
         }
     }
 }
@@ -158,7 +197,7 @@ EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
 
 
 ; =========================================================
-; Accessibility: TOGGLE TRAY ICON (Win + Ctrl + \)
+; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
 ; =========================================================
 
 #^\::
@@ -167,4 +206,59 @@ EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
         A_IconHidden := 0
     else
         A_IconHidden := 1
+}
+
+; =========================================================
+; GLOBAL HELPER FUNCTIONS
+; =========================================================
+
+Global ActiveToolTipText := ""
+
+ShowToolTip(text)
+{
+    if (text = "")
+        return
+        
+    Global ActiveToolTipText
+    ActiveToolTipText := text
+    
+    SetTimer(TrackToolTipPos, 10)
+    SetTimer(RemoveToolTip, -Config_TooltipDuration)
+}
+
+TrackToolTipPos()
+{
+    Global ActiveToolTipText
+    static lastX := -1, lastY := -1, lastText := ""
+    
+    if (ActiveToolTipText = "")
+    {
+        SetTimer(TrackToolTipPos, 0)
+        try ToolTip()
+        lastX := -1, lastY := -1, lastText := ""
+        return
+    }
+
+    try {
+        CoordMode("Mouse", "Screen")
+        CoordMode("ToolTip", "Screen")
+        MouseGetPos(&mX, &mY)
+        
+        ; Only redraw if the mouse actually moved or the text changed
+        if (mX != lastX || mY != lastY || ActiveToolTipText != lastText)
+        {
+            ToolTip(ActiveToolTipText, mX + 15, mY + 15)
+            lastX := mX
+            lastY := mY
+            lastText := ActiveToolTipText
+        }
+    }
+}
+
+RemoveToolTip()
+{
+    Global ActiveToolTipText
+    ActiveToolTipText := ""
+    SetTimer(TrackToolTipPos, 0)
+    try ToolTip()
 }
