@@ -28,6 +28,10 @@
 #MaxThreadsBuffer True
 ProcessSetPriority "High"
 
+; Color Picker globals
+global cpGuiGlobal := ""
+global cSwatchGlobal := "", cHexGlobal := "", cRgbGlobal := "", cXyGlobal := ""
+global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal := 0
 
 ; =========================================================
 ; CONFIG: TRAY ICON VISIBILITY
@@ -536,24 +540,23 @@ ColorPickerMsgBox := true   ; Enabled: show summary MsgBox (default)
 #HotIf
 
 ToggleColorPicker() {
+    global cpGuiGlobal, cSwatchGlobal, cHexGlobal, cRgbGlobal, cXyGlobal
+    global lastHexGlobal, lastRgbGlobal, lastXGlobal, lastYGlobal
     static isPickerActive := false
-    static cpGui := ""
     static resGui := ""
-    static cSwatch := "", cHex := "", cRgb := "", cXy := ""
-    static lastHex := "", lastRgb := "", lastX := 0, lastY := 0
 
     if (isPickerActive) {
         SetTimer(UpdateColorPicker, 0)
 
-        if (cpGui) {
-            cpGui.Destroy()
-            cpGui := ""
+        if (cpGuiGlobal) {
+            cpGuiGlobal.Destroy()
+            cpGuiGlobal := ""
         }
         isPickerActive := false
 
         SetSystemCursor("restore")
 
-        clipText := "Hex: " lastHex "`nRGB: " lastRgb "`nX, Y: (" lastX ", " lastY ")"
+        clipText := "Hex: " lastHexGlobal "`nRGB: " lastRgbGlobal "`nX, Y: (" lastXGlobal ", " lastYGlobal ")"
         A_Clipboard := clipText
 
         if (ColorPickerMsgBox) {
@@ -586,54 +589,53 @@ ToggleColorPicker() {
 
         SetSystemCursor("crosshair")
 
-        cpGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
-        cpGui.BackColor := "202020"
-        
-        ; Shrink the outer right/bottom margins of the UI
-        cpGui.MarginX := 6
-        cpGui.MarginY := 6
+        cpGuiGlobal := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
+        cpGuiGlobal.BackColor := "202020"
 
-        ; Color swatch (tighter top/left padding, sized slightly taller to match text)
-        cSwatch := cpGui.Add("Text", "x6 y6 w44 h44 Background000000")
+        cpGuiGlobal.MarginX := 6
+        cpGuiGlobal.MarginY := 6
 
-        ; Text elements (moved closer to the swatch with tighter line spacing)
-        cpGui.SetFont("cWhite s10", "Consolas")
-        cHex := cpGui.Add("Text", "x56 y5 w140 BackgroundTrans", "hex: #000000")
-        cRgb := cpGui.Add("Text", "x56 y20 w140 BackgroundTrans", "rgb: 0, 0, 0")
-        cXy  := cpGui.Add("Text", "x56 y35 w140 BackgroundTrans", "(x, y): (0, 0)")
+        cSwatchGlobal := cpGuiGlobal.Add("Text", "x6 y6 w44 h44 Background000000")
 
-        cpGui.Show("NoActivate Hide")
+        cpGuiGlobal.SetFont("cWhite s10", "Consolas")
+        cHexGlobal := cpGuiGlobal.Add("Text", "x56 y5 w140 BackgroundTrans", "hex: #000000")
+        cRgbGlobal := cpGuiGlobal.Add("Text", "x56 y20 w140 BackgroundTrans", "rgb: 0, 0, 0")
+        cXyGlobal  := cpGuiGlobal.Add("Text", "x56 y35 w140 BackgroundTrans", "(x, y): (0, 0)")
+
+        cpGuiGlobal.Show("NoActivate Hide")
 
         UpdateColorPicker()
         SetTimer(UpdateColorPicker, 5)
     }
+}
 
-    UpdateColorPicker() {
-        try {
-            CoordMode("Mouse", "Screen")
-            CoordMode("Pixel", "Screen")
+UpdateColorPicker() {
+    global cpGuiGlobal, cSwatchGlobal, cHexGlobal, cRgbGlobal, cXyGlobal
+    global lastHexGlobal, lastRgbGlobal, lastXGlobal, lastYGlobal
+    try {
+        CoordMode("Mouse", "Screen")
+        CoordMode("Pixel", "Screen")
 
-            MouseGetPos(&mX, &mY)
-            colorHexRaw := PixelGetColor(mX, mY)
-            colorHex := StrLower(SubStr(colorHexRaw, 3))
+        MouseGetPos(&mX, &mY)
+        colorHexRaw := PixelGetColor(mX, mY)
+        colorHex := StrLower(SubStr(colorHexRaw, 3))
 
-            r := Integer("0x" SubStr(colorHex, 1, 2))
-            g := Integer("0x" SubStr(colorHex, 3, 2))
-            b := Integer("0x" SubStr(colorHex, 5, 2))
+        r := Integer("0x" SubStr(colorHex, 1, 2))
+        g := Integer("0x" SubStr(colorHex, 3, 2))
+        b := Integer("0x" SubStr(colorHex, 5, 2))
 
-            lastHex := "#" colorHex
-            lastRgb := r ", " g ", " b
-            lastX := mX
-            lastY := mY
+        lastHexGlobal := "#" colorHex
+        lastRgbGlobal := r ", " g ", " b
+        lastXGlobal := mX
+        lastYGlobal := mY
 
-            cSwatch.Opt("Background" colorHex)
-            cSwatch.Redraw()  ; <--- This forces the color to actually paint
-            cHex.Value := "hex: " lastHex
-            cRgb.Value := "rgb: " lastRgb
-            cXy.Value  := "(x, y): (" lastX ", " lastY ")"
+        cSwatchGlobal.Opt("Background" colorHex)
+        cSwatchGlobal.Redraw()
+        cHexGlobal.Value := "hex: " lastHexGlobal
+        cRgbGlobal.Value := "rgb: " lastRgbGlobal
+        cXyGlobal.Value  := "(x, y): (" lastXGlobal ", " lastYGlobal ")"
 
-            cpGui.Show("NoActivate x" (mX + 5) " y" (mY + 5))
-        }
+        cpGuiGlobal.Show("NoActivate x" (mX + 5) " y" (mY + 5))
     }
 }
 
