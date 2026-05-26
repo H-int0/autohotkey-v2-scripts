@@ -457,6 +457,31 @@ ColorPickerMsgBox := true   ; Enabled: show summary MsgBox (default)
 
 
 ; =========================================================
+; CONFIG: LINE NAVIGATION
+; =========================================================
+;
+; >> Ctrl+Alt+Left/Right moves to start/end of line.
+; >> Shift+Alt+Left/Right selects to start/end of line.
+; >> Shift+Alt+Backspace/Delete deletes to start/end of line.
+;
+;   Enabled  →  Line navigation hotkeys are active (default)
+;   Disabled →  Line navigation hotkeys do nothing
+;
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line.
+; 3. Save and reload the script.
+;
+; =========================================================
+;
+LineNavEnabled := true   ; Enabled: hotkeys are active (default)
+; LineNavEnabled := false  ; Disabled: hotkeys do nothing
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+
+
+; =========================================================
 ; FEATURE: FORCE KILL TASK
 ; =========================================================
 
@@ -528,6 +553,27 @@ ColorPickerMsgBox := true   ; Enabled: show summary MsgBox (default)
         }
     }
 }
+#HotIf
+
+
+; =========================================================
+; FEATURE: LINE NAVIGATION
+; =========================================================
+
+#HotIf LineNavEnabled
+
+; --- Move (Ctrl+Alt) ---
+^!Left::Send  "{Home}"
+^!Right::Send "{End}"
+
+; --- Select (Shift+Alt) ---
++!Left::Send  "+{Home}"
++!Right::Send "+{End}"
+
+; --- Delete (Alt) ---
+!Backspace::Send "+{Home}{Backspace}"
+!Delete::Send    "+{End}{Delete}"
+
 #HotIf
 
 
