@@ -21,6 +21,7 @@
 ; SOFTWARE.
 ;
 ; ===========================================================================================================================================================================
+;
 
 
 #Requires AutoHotkey v2.0
@@ -148,6 +149,91 @@ LineNavEnabled := true   ; Enabled: hotkeys are active (default)
         A_IconHidden := 0
     else
         A_IconHidden := 1
+}
+
+; =========================================================
+; FEATURE: HELP BOX (Win + `)
+; =========================================================
+
+
+#`::ToggleHelpBox()
+
+ToggleHelpBox() {
+    static isHelpActive := false
+    static helpGui := ""
+
+    if (isHelpActive) {
+        SetTimer(UpdateHelpBox, 0)
+        if (helpGui) {
+            helpGui.Destroy()
+            helpGui := ""
+        }
+        isHelpActive := false
+    } else {
+        isHelpActive := true
+        
+        helpGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
+        helpGui.BackColor := "000000"
+        
+        ; Set standard margins and crisp font matching the color picker
+        helpGui.MarginX := 12
+        helpGui.MarginY := 12
+        helpGui.SetFont("cWhite s10", "Consolas")
+        
+
+        helpText := "
+        (
+        >> STRAP HELP
+        ───────────────────────────────────────
+        > NUMPAD EMULATOR:
+            CapsLock OFF    →  num-row keys
+            CapsLock ON     →  numpad keys
+        ───────────────────────────────────────
+        > TIMEZONE SWITCHER:
+            Win+Alt+``       →  cycle TZ
+            Win+Ctrl+``      →  show current TZ
+        ───────────────────────────────────────
+        > FORCE KILL TASK:
+            Win+Ctrl+K      →  kill
+        ───────────────────────────────────────
+        > COLOR PICKER:
+            Win+Ctrl+C      →  toggle picker
+        ───────────────────────────────────────
+        > LINE NAVIGATION:
+            Ctrl+Alt+ ←/→   →  line start/end
+            Shift+Alt+ ←/→  →  select to edge
+            Alt+Bksp/Del    →  delete to edge
+        ───────────────────────────────────────
+        > HELPER:
+            Win+``           →  toggle this box
+        )"
+        
+        helpGui.Add("Text", "", helpText)
+        helpGui.Show("NoActivate Hide")
+        
+        ; Set window transparency opacity (225 out of 255)
+        WinSetTransparent(225, helpGui.Hwnd)
+        
+        UpdateHelpBox()
+        SetTimer(UpdateHelpBox, 10) ; Live updates every 10ms
+    }
+
+    UpdateHelpBox() {
+        try {
+            CoordMode("Mouse", "Screen")
+            MouseGetPos(&mX, &mY)
+            
+            ; Fetch UI size and screen boundaries for clamping
+            WinGetPos(, , &guiW, &guiH, helpGui.Hwnd)
+            MonitorGetWorkArea(1, , , &screenW, &screenH)
+            
+            ; Position bottom-right of cursor, matching color picker logic
+            guiX := Min(mX + 10, screenW - guiW - 2)
+            guiY := Min(mY + 10, screenH - guiH - 2)
+            
+            helpGui.Show("NoActivate x" guiX " y" guiY)
+        }
+    }
 }
 
 ; =========================================================
