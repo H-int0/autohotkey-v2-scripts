@@ -239,14 +239,14 @@ SetSystemCursor(mode) {
                    32649, 32650, 32651]
 
     if (mode = "restore") {
-            for id in cursorList {
-                if defaultCursors.Has(id) {
-                    DllCall("User32.dll\SetSystemCursor", "Ptr", defaultCursors[id], "UInt", id)
-                    defaultCursors.Delete(id)
-                }
+        for id in cursorList {
+            if defaultCursors.Has(id) {
+                DllCall("User32.dll\SetSystemCursor", "Ptr", defaultCursors[id], "UInt", id)
+                defaultCursors.Delete(id)
             }
-            return
         }
+        return
+    }
 
     if (mode = "crosshair") {
         hCrosshair := DllCall("User32.dll\LoadCursor", "Ptr", 0, "Ptr", crosshairID, "Ptr")
