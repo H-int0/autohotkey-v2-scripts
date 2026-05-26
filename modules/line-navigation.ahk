@@ -19,10 +19,8 @@
 ; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
-;
-; ===========================================================================================================================================================================
-;
 
+; ===========================================================================================================================================================================
 
 #Requires AutoHotkey v2.0
 #UseHook True
@@ -30,9 +28,11 @@
 ProcessSetPriority "High"
 
 
-; =========================================================
+; =====================================================================================
 ; CONFIG: TRAY ICON VISIBILITY
-; =========================================================
+; =====================================================================================
+;
+; >> Customize whether the tray icon is visible or hidden on script startup.
 ;
 ; INSTRUCTIONS:
 ; 1. Uncomment ONLY ONE of the lines below.
@@ -44,44 +44,8 @@ ProcessSetPriority "High"
 ;
 ; =========================================================
 ;
-A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
-; A_IconHidden := 0  ; Un-comment for the behavior to be = Visible
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
-
-
-; =========================================================
-; CONFIG: TOOLTIPS
-; =========================================================
-;
-; >> Customize tooltip display duration and individual messages.
-;
-; =========================================================
-;
-; INSTRUCTIONS:
-;
-; 1. EDIT THESE VALUES DIRECTLY:
-;    - Change Config_TooltipDuration (milliseconds) to alter how long tooltips stay on screen.
-;    - Change the message text inside the quotes "" to customize what each tooltip says.
-;
-; 2. ENABLE / DISABLE A TOOLTIP:
-;    - To turn a tooltip OFF, put a semicolon (;) at the beginning of its line.
-;    - To turn it ON, remove that semicolon.
-;
-; 3. Save the file and reload the script.
-;
-; =========================================================
-;
-; Duration in milliseconds (1000 = 1 sec)
-Global Config_TooltipDuration := 3000
-;                                ^ <-- Edit this number (in milliseconds) to change how long tooltips stay visible
-;
-; ---------------------------------------------------------
-;
-; ----- Force Kill Task tooltip -----
-Global Msg_EndTask := "Evaporated"
-;                     ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
+A_IconHidden := 1    ; Un-comment for the tray icon to be Hidden (default)
+; A_IconHidden := 0  ; Un-comment for the tray icon to be Visible
 ;
 ; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
 ;
@@ -91,11 +55,13 @@ Global Msg_EndTask := "Evaporated"
 ; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
 ; ===========================================================================================================================================================================
 
-; =========================================================
+; =====================================================================================
 ; CONFIG: LINE NAVIGATION
-; =========================================================
+; =====================================================================================
 ;
-; >> Controls whether the Line Navigation hotkeys are active.
+; >> Ctrl+Alt+Left/Right moves to start/end of line.
+; >> Shift+Alt+Left/Right selects to start/end of line.
+; >> Shift+Alt+Backspace/Delete deletes to start/end of line.
 ;
 ;   Enabled  →  Line navigation hotkeys are active (default)
 ;   Disabled →  Line navigation hotkeys do nothing
@@ -120,13 +86,13 @@ LineNavEnabled := true   ; Enabled: hotkeys are active (default)
 
 #HotIf LineNavEnabled
 
-; --- Move (Ctrl+Alt) ---
-^!Left::Send  "{Home}"
-^!Right::Send "{End}"
+; --- Move (shift+Alt) ---
++!Left::Send  "{Home}"
++!Right::Send "{End}"
 
-; --- Select (Shift+Alt) ---
-+!Left::Send  "+{Home}"
-+!Right::Send "+{End}"
+; --- Select (Shift+Win) ---
++#Left::Send  "+{Home}"
++#Right::Send "+{End}"
 
 ; --- Delete (Alt) ---
 !Backspace::Send "+{Home}{Backspace}"
@@ -143,6 +109,7 @@ LineNavEnabled := true   ; Enabled: hotkeys are active (default)
 ; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
 ; =========================================================
 
+#HotIf
 #^\::
 {
     if (A_IconHidden)
@@ -150,37 +117,42 @@ LineNavEnabled := true   ; Enabled: hotkeys are active (default)
     else
         A_IconHidden := 1
 }
+#HotIf
+
+; ===========================================================================================================================================================================
 
 ; =========================================================
-; FEATURE: HELP BOX (Win + `)
+; STRAP HELP BOX (Win + /)
 ; =========================================================
 
+global helpGuiGlobal := ""
 
-#`::ToggleHelpBox()
+#HotIf
+#/::ToggleHelpBox()
+#HotIf
 
 ToggleHelpBox() {
+    global helpGuiGlobal
     static isHelpActive := false
-    static helpGui := ""
 
     if (isHelpActive) {
         SetTimer(UpdateHelpBox, 0)
-        if (helpGui) {
-            helpGui.Destroy()
-            helpGui := ""
+        if (helpGuiGlobal) {
+            helpGuiGlobal.Destroy()
+            helpGuiGlobal := ""
         }
         isHelpActive := false
     } else {
         isHelpActive := true
         
-        helpGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
-        helpGui.BackColor := "000000"
+        helpGuiGlobal := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
+        helpGuiGlobal.BackColor := "000000"
         
         ; Set standard margins and crisp font matching the color picker
-        helpGui.MarginX := 12
-        helpGui.MarginY := 12
-        helpGui.SetFont("cWhite s10", "Consolas")
+        helpGuiGlobal.MarginX := 12
+        helpGuiGlobal.MarginY := 12
+        helpGuiGlobal.SetFont("cWhite s10", "Consolas")
         
-
         helpText := "
         (
         >> STRAP HELP
@@ -200,93 +172,39 @@ ToggleHelpBox() {
             Win+Ctrl+C      →  toggle picker
         ───────────────────────────────────────
         > LINE NAVIGATION:
-            Ctrl+Alt+ ←/→   →  line start/end
-            Shift+Alt+ ←/→  →  select to edge
+            Shift+Alt+ ←/→  →  line start/end
+            Shift+Win+ ←/→  →  select to edge
             Alt+Bksp/Del    →  delete to edge
         ───────────────────────────────────────
         > HELPER:
-            Win+``           →  toggle this box
+            Win+/           →  toggle this box
         )"
         
-        helpGui.Add("Text", "", helpText)
-        helpGui.Show("NoActivate Hide")
+        helpGuiGlobal.Add("Text", "", helpText)
+        helpGuiGlobal.Show("NoActivate Hide")
         
         ; Set window transparency opacity (225 out of 255)
-        WinSetTransparent(225, helpGui.Hwnd)
+        WinSetTransparent(225, helpGuiGlobal.Hwnd)
         
         UpdateHelpBox()
         SetTimer(UpdateHelpBox, 10) ; Live updates every 10ms
     }
-
-    UpdateHelpBox() {
-        try {
-            CoordMode("Mouse", "Screen")
-            MouseGetPos(&mX, &mY)
-            
-            ; Fetch UI size and screen boundaries for clamping
-            WinGetPos(, , &guiW, &guiH, helpGui.Hwnd)
-            MonitorGetWorkArea(1, , , &screenW, &screenH)
-            
-            ; Position bottom-right of cursor, matching color picker logic
-            guiX := Min(mX + 10, screenW - guiW - 2)
-            guiY := Min(mY + 10, screenH - guiH - 2)
-            
-            helpGui.Show("NoActivate x" guiX " y" guiY)
-        }
-    }
 }
 
-; =========================================================
-; GLOBAL HELPER FUNCTIONS
-; =========================================================
-
-Global ActiveToolTipText := ""
-
-ShowToolTip(text)
-{
-    if (text = "")
-        return
-        
-    Global ActiveToolTipText
-    ActiveToolTipText := text
-    
-    SetTimer(TrackToolTipPos, 10)
-    SetTimer(RemoveToolTip, -Config_TooltipDuration)
-}
-
-TrackToolTipPos()
-{
-    Global ActiveToolTipText
-    static lastX := -1, lastY := -1, lastText := ""
-    
-    if (ActiveToolTipText = "")
-    {
-        SetTimer(TrackToolTipPos, 0)
-        try ToolTip()
-        lastX := -1, lastY := -1, lastText := ""
-        return
-    }
-
+UpdateHelpBox() {
+    global helpGuiGlobal
     try {
         CoordMode("Mouse", "Screen")
-        CoordMode("ToolTip", "Screen")
         MouseGetPos(&mX, &mY)
         
-        ; Only redraw if the mouse actually moved or the text changed
-        if (mX != lastX || mY != lastY || ActiveToolTipText != lastText)
-        {
-            ToolTip(ActiveToolTipText, mX + 15, mY + 15)
-            lastX := mX
-            lastY := mY
-            lastText := ActiveToolTipText
-        }
+        ; Fetch UI size and screen boundaries for clamping
+        WinGetPos(, , &guiW, &guiH, helpGuiGlobal.Hwnd)
+        MonitorGetWorkArea(1, , , &screenW, &screenH)
+        
+        ; Position bottom-right of cursor, matching color picker logic
+        guiX := Min(mX + 10, screenW - guiW - 2)
+        guiY := Min(mY + 10, screenH - guiH - 2)
+        
+        helpGuiGlobal.Show("NoActivate x" guiX " y" guiY)
     }
-}
-
-RemoveToolTip()
-{
-    Global ActiveToolTipText
-    ActiveToolTipText := ""
-    SetTimer(TrackToolTipPos, 0)
-    try ToolTip()
 }

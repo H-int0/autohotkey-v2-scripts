@@ -19,10 +19,8 @@
 ; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
-;
-; ===========================================================================================================================================================================
-;
 
+; ===========================================================================================================================================================================
 
 #Requires AutoHotkey v2.0
 #UseHook True
@@ -30,9 +28,11 @@
 ProcessSetPriority "High"
 
 
-; =========================================================
+; =====================================================================================
 ; CONFIG: TRAY ICON VISIBILITY
-; =========================================================
+; =====================================================================================
+;
+; >> Customize whether the tray icon is visible or hidden on script startup.
 ;
 ; INSTRUCTIONS:
 ; 1. Uncomment ONLY ONE of the lines below.
@@ -44,20 +44,18 @@ ProcessSetPriority "High"
 ;
 ; =========================================================
 ;
-A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
-; A_IconHidden := 0  ; Un-comment for the behavior to be = Visible
+A_IconHidden := 1    ; Un-comment for the tray icon to be Hidden (default)
+; A_IconHidden := 0  ; Un-comment for the tray icon to be Visible
 ;
 ; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
 ;
 
 
-; =========================================================
+; =====================================================================================
 ; CONFIG: TOOLTIPS
-; =========================================================
+; =====================================================================================
 ;
 ; >> Customize tooltip display duration and individual messages.
-;
-; =========================================================
 ;
 ; INSTRUCTIONS:
 ;
@@ -73,21 +71,11 @@ A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
 ;
 ; =========================================================
 ;
-; Duration in milliseconds (1000 = 1 sec)
-Global Config_TooltipDuration := 3000
-;                                ^ <-- Edit this number (in milliseconds) to change how long tooltips stay visible
+; ------ Duration in milliseconds -------
 ;
-; ---------------------------------------------------------
-;
-;
-; ----- Color Picker tooltip -----
-Global Msg_ColorPicker := "Copied to Clipboard"
-;                         ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
-;
-; ----- Force Kill Task tooltip -----
-Global Msg_EndTask := "Evaporated"
-;                     ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
-;
+Global Config_TooltipDuration := 2500   ; (default: 2500 ms)
+;                                ^ <-- Edit this number (in milliseconds) to change how long tooltips stay visible   (1 sec = 1000 ms)
+
 ; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
 ;
 
@@ -104,136 +92,143 @@ Global Msg_EndTask := "Evaporated"
 TZData := Map()
 TZOrder := []
 
-; ===================== TIMEZONE LIST =====================
+; =========================================================
+; TIMEZONE LIST
+; =========================================================
+;
 ; >> Uncomment both lines to add to cycle
 ; >> comment both out to remove.
 ;
+;
+; ========================================================= TIMEZONE LIST =========================================================
 
 
-; UTC
-TZData["UTC"] := "(UTC +0) `"UTC`""
-TZOrder.Push("UTC")
+; -------------------- UTC --------------------
+; TZData["UTC"] := "(UTC +0) `"UTC`""
+; TZOrder.Push("UTC")
 
-; GMT / London
+; -------------------- GMT/London --------------------
 ; TZData["GMT Standard Time"] := "(UTC +0) `"London`""
 ; TZOrder.Push("GMT Standard Time")
 
-; Berlin / Paris
+; -------------------- Berlin/Paris--------------------
 TZData["W. Europe Standard Time"] := "(UTC +1) `"Berlin / Paris`""
 TZOrder.Push("W. Europe Standard Time")
 
-; Cairo
+; -------------------- Cairo --------------------
 ; TZData["Egypt Standard Time"] := "(UTC +2) `"Cairo`""
 ; TZOrder.Push("Egypt Standard Time")
 
-; Riyadh
+; -------------------- Riyadh --------------------
 ; TZData["Arab Standard Time"] := "(UTC +3) `"Riyadh`""
 ; TZOrder.Push("Arab Standard Time")
 
-; Moscow
+; -------------------- Moscow--------------------
 TZData["Russian Standard Time"] := "(UTC +3) `"Moscow`""
 TZOrder.Push("Russian Standard Time")
 
-; Tehran
+; -------------------- Tehran --------------------
 ; TZData["Iran Standard Time"] := "(UTC +3:30) `"Tehran`""
 ; TZOrder.Push("Iran Standard Time")
 
-; Dubai
+; -------------------- Dubai --------------------
 ; TZData["Arabian Standard Time"] := "(UTC +4) `"Dubai`""
 ; TZOrder.Push("Arabian Standard Time")
 
-; Kabul
+; -------------------- Kabul --------------------
 ; TZData["Afghanistan Standard Time"] := "(UTC +4:30) `"Kabul`""
 ; TZOrder.Push("Afghanistan Standard Time")
 
-; Karachi
+; -------------------- Karachi --------------------
 ; TZData["Pakistan Standard Time"] := "(UTC +5) `"Karachi`""
 ; TZOrder.Push("Pakistan Standard Time")
 
-; India
+; -------------------- India --------------------
 ; TZData["India Standard Time"] := "(UTC +5:30) `"India`""
 ; TZOrder.Push("India Standard Time")
 
-; Dhaka
+; -------------------- Dhaka --------------------
 ; TZData["Bangladesh Standard Time"] := "(UTC +6) `"Dhaka`""
 ; TZOrder.Push("Bangladesh Standard Time")
 
-; Bangkok / Jakarta
+; -------------------- Bangkok/Jakarta --------------------
 ; TZData["SE Asia Standard Time"] := "(UTC +7) `"Bangkok / Jakarta`""
 ; TZOrder.Push("SE Asia Standard Time")
 
-; Beijing
+; -------------------- Beijing --------------------
 ; TZData["China Standard Time"] := "(UTC +8) `"Beijing`""
 ; TZOrder.Push("China Standard Time")
 
-; Singapore
+; -------------------- Singapore --------------------
 ; TZData["Singapore Standard Time"] := "(UTC +8) `"Singapore`""
 ; TZOrder.Push("Singapore Standard Time")
 
-; Tokyo
+; -------------------- Tokyo--------------------
 TZData["Tokyo Standard Time"] := "(UTC +9) `"Tokyo`""
 TZOrder.Push("Tokyo Standard Time")
 
-; Sydney
+; -------------------- Sydney--------------------
 TZData["AUS Eastern Standard Time"] := "(UTC +10) `"Sydney`""
 TZOrder.Push("AUS Eastern Standard Time")
 
-; Auckland
+; -------------------- Auckland --------------------
 ; TZData["New Zealand Standard Time"] := "(UTC +12) `"Auckland`""
 ; TZOrder.Push("New Zealand Standard Time")
 
-; Azores
+; -------------------- Azores --------------------
 ; TZData["Azores Standard Time"] := "(UTC -1) `"Azores`""
 ; TZOrder.Push("Azores Standard Time")
 
-; Cape Verde
+; -------------------- Cape Verde --------------------
 ; TZData["Cape Verde Standard Time"] := "(UTC -1) `"Cape Verde`""
 ; TZOrder.Push("Cape Verde Standard Time")
 
-; Buenos Aires
+; -------------------- Buenos Aires --------------------
 ; TZData["SA Eastern Standard Time"] := "(UTC -3) `"Buenos Aires`""
 ; TZOrder.Push("SA Eastern Standard Time")
 
-; Brasilia
+; -------------------- Brasilia --------------------
 ; TZData["E. South America Standard Time"] := "(UTC -3) `"Brasilia`""
 ; TZOrder.Push("E. South America Standard Time")
 
-; Caracas
+; -------------------- Caracas --------------------
 ; TZData["Venezuela Standard Time"] := "(UTC -4) `"Caracas`""
 ; TZOrder.Push("Venezuela Standard Time")
 
-; La Paz
+; -------------------- La Paz--------------------
 ; TZData["SA Western Standard Time"] := "(UTC -4) `"La Paz`""
 ; TZOrder.Push("SA Western Standard Time")
 
-; Eastern Time
+; -------------------- Eastern Time--------------------
 TZData["Eastern Standard Time"] := "(UTC -5) `"Eastern Time`""
 TZOrder.Push("Eastern Standard Time")
 
-; Central Time
+; -------------------- Central Time --------------------
 ; TZData["Central Standard Time"] := "(UTC -6) `"Central Time`""
 ; TZOrder.Push("Central Standard Time")
 
-; Mountain Time
+; -------------------- Mountain Time --------------------
 ; TZData["Mountain Standard Time"] := "(UTC -7) `"Mountain Time`""
 ; TZOrder.Push("Mountain Standard Time")
 
-; Pacific Time
+; -------------------- Pacific Time --------------------
 ; TZData["Pacific Standard Time"] := "(UTC -8) `"Pacific Time`""
 ; TZOrder.Push("Pacific Standard Time")
 
-; Alaska
+; -------------------- Alaska --------------------
 ; TZData["Alaskan Standard Time"] := "(UTC -9) `"Alaska`""
 ; TZOrder.Push("Alaskan Standard Time")
 
-; Hawaii
+; -------------------- Hawaii --------------------
 ; TZData["Hawaiian Standard Time"] := "(UTC -10) `"Hawaii`""
 ; TZOrder.Push("Hawaiian Standard Time")
 
 
-; =========================================================
-; CONFIG: CUSTOM TIMEZONES
-; =========================================================
+; ===================================================================== USER CONFIGURATION SECTION 2/2 ======================================================================
+
+; =====================================================================================
+; CONFIG: ADD CUSTOM TIMEZONES
+; =====================================================================================
 ;
 ; Add your own timezones here. Each entry takes two lines.
 ;
@@ -267,9 +262,9 @@ TZOrder.Push("Eastern Standard Time")
 ;
 
 
-; =========================================================
+; =====================================================================================
 ; CONFIG: STARTUP TIMEZONE
-; =========================================================
+; =====================================================================================
 ;
 ; INSTRUCTIONS:
 ;   - Leave EVERY line commented → keep current Windows timezone.
@@ -312,9 +307,9 @@ TZOrder.Push("Eastern Standard Time")
 ;
 
 
-; =========================================================
-; ADD CUSTOM TIMEZONE FOR STARTUP
-; =========================================================
+; =====================================================================================
+; CONFIG: ADD CUSTOM TIMEZONE FOR STARTUP
+; =====================================================================================
 ;
 ; Use this section if the timezone you want is NOT in the list above.
 ;
@@ -334,10 +329,10 @@ TZOrder.Push("Eastern Standard Time")
 ; ^^^^^^^^^^^^^^^^^^^^^^ ABOVE HERE: ^^^^^^^^^^^^^^^^^^^^^^
 ;
 
+; =================================================================================================================================
 
 if IsSet(StartupTZID)
-    RunWait('tzutil /s "' StartupTZID '"',, "Hide")
-
+  RunWait('tzutil /s "' StartupTZID '"',, "Hide")
 
 ; =========================================================
 ; LOGIC
@@ -371,26 +366,6 @@ if IsSet(StartupTZID)
     ShowToolTip("Current TZ = " msgLabel)
 }
 
-; =========================================================
-; TIMEZONE SPECIFIC HELPER FUNCTION
-; =========================================================
-
-GetCurrentTimeZoneID()
-{
-    tempFile := A_Temp "\tzout.txt"
-    if FileExist(tempFile)
-        FileDelete(tempFile)
-
-    RunWait(A_ComSpec ' /c "tzutil /g > ' tempFile '"',, "Hide")
-
-    if FileExist(tempFile) {
-        out := FileRead(tempFile)
-        FileDelete(tempFile)
-        return Trim(out, " `t`r`n")
-    }
-    return ""
-}
-
 ; ===========================================================================================================================================================================
 ; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
 ; ===========================================================================================================================================================================
@@ -400,6 +375,7 @@ GetCurrentTimeZoneID()
 ; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
 ; =========================================================
 
+#HotIf
 #^\::
 {
     if (A_IconHidden)
@@ -407,37 +383,42 @@ GetCurrentTimeZoneID()
     else
         A_IconHidden := 1
 }
+#HotIf
+
+; ===========================================================================================================================================================================
 
 ; =========================================================
-; FEATURE: HELP BOX (Win + `)
+; STRAP HELP BOX (Win + /)
 ; =========================================================
 
+global helpGuiGlobal := ""
 
-#`::ToggleHelpBox()
+#HotIf
+#/::ToggleHelpBox()
+#HotIf
 
 ToggleHelpBox() {
+    global helpGuiGlobal
     static isHelpActive := false
-    static helpGui := ""
 
     if (isHelpActive) {
         SetTimer(UpdateHelpBox, 0)
-        if (helpGui) {
-            helpGui.Destroy()
-            helpGui := ""
+        if (helpGuiGlobal) {
+            helpGuiGlobal.Destroy()
+            helpGuiGlobal := ""
         }
         isHelpActive := false
     } else {
         isHelpActive := true
         
-        helpGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
-        helpGui.BackColor := "000000"
+        helpGuiGlobal := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
+        helpGuiGlobal.BackColor := "000000"
         
         ; Set standard margins and crisp font matching the color picker
-        helpGui.MarginX := 12
-        helpGui.MarginY := 12
-        helpGui.SetFont("cWhite s10", "Consolas")
+        helpGuiGlobal.MarginX := 12
+        helpGuiGlobal.MarginY := 12
+        helpGuiGlobal.SetFont("cWhite s10", "Consolas")
         
-
         helpText := "
         (
         >> STRAP HELP
@@ -457,41 +438,44 @@ ToggleHelpBox() {
             Win+Ctrl+C      →  toggle picker
         ───────────────────────────────────────
         > LINE NAVIGATION:
-            Ctrl+Alt+ ←/→   →  line start/end
-            Shift+Alt+ ←/→  →  select to edge
+            Shift+Alt+ ←/→  →  line start/end
+            Shift+Win+ ←/→  →  select to edge
             Alt+Bksp/Del    →  delete to edge
         ───────────────────────────────────────
         > HELPER:
-            Win+``           →  toggle this box
+            Win+/           →  toggle this box
         )"
         
-        helpGui.Add("Text", "", helpText)
-        helpGui.Show("NoActivate Hide")
+        helpGuiGlobal.Add("Text", "", helpText)
+        helpGuiGlobal.Show("NoActivate Hide")
         
         ; Set window transparency opacity (225 out of 255)
-        WinSetTransparent(225, helpGui.Hwnd)
+        WinSetTransparent(225, helpGuiGlobal.Hwnd)
         
         UpdateHelpBox()
         SetTimer(UpdateHelpBox, 10) ; Live updates every 10ms
     }
+}
 
-    UpdateHelpBox() {
-        try {
-            CoordMode("Mouse", "Screen")
-            MouseGetPos(&mX, &mY)
-            
-            ; Fetch UI size and screen boundaries for clamping
-            WinGetPos(, , &guiW, &guiH, helpGui.Hwnd)
-            MonitorGetWorkArea(1, , , &screenW, &screenH)
-            
-            ; Position bottom-right of cursor, matching color picker logic
-            guiX := Min(mX + 10, screenW - guiW - 2)
-            guiY := Min(mY + 10, screenH - guiH - 2)
-            
-            helpGui.Show("NoActivate x" guiX " y" guiY)
-        }
+UpdateHelpBox() {
+    global helpGuiGlobal
+    try {
+        CoordMode("Mouse", "Screen")
+        MouseGetPos(&mX, &mY)
+        
+        ; Fetch UI size and screen boundaries for clamping
+        WinGetPos(, , &guiW, &guiH, helpGuiGlobal.Hwnd)
+        MonitorGetWorkArea(1, , , &screenW, &screenH)
+        
+        ; Position bottom-right of cursor, matching color picker logic
+        guiX := Min(mX + 10, screenW - guiW - 2)
+        guiY := Min(mY + 10, screenH - guiH - 2)
+        
+        helpGuiGlobal.Show("NoActivate x" guiX " y" guiY)
     }
 }
+
+; ===========================================================================================================================================================================
 
 ; =========================================================
 ; GLOBAL HELPER FUNCTIONS
@@ -546,4 +530,20 @@ RemoveToolTip()
     ActiveToolTipText := ""
     SetTimer(TrackToolTipPos, 0)
     try ToolTip()
+}
+
+GetCurrentTimeZoneID()
+{
+    tempFile := A_Temp "\tzout.txt"
+    if FileExist(tempFile)
+        FileDelete(tempFile)
+
+    RunWait(A_ComSpec ' /c "tzutil /g > ' tempFile '"',, "Hide")
+
+    if FileExist(tempFile) {
+        out := FileRead(tempFile)
+        FileDelete(tempFile)
+        return Trim(out, " `t`r`n")
+    }
+    return ""
 }
