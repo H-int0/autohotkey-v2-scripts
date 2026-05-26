@@ -463,11 +463,16 @@ EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
         ; Window is frozen: use taskkill to forcefully terminate the process
         try {
             RunWait("taskkill /PID " pid " /F",, "Hide")
+            ToolTip("Evaporated")
+            SetTimer(() => ToolTip(), -2000)
         }
     } else {
         ; Window is healthy: ask it to close gracefully (Alt+F4 behavior)
         try {
             WinClose("ahk_id " activeHwnd)
+            WinWaitClose("ahk_id " activeHwnd,, 5)
+            ToolTip("Evaporated")
+            SetTimer(() => ToolTip(), -2000)
         }
     }
 }
