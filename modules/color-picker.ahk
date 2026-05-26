@@ -220,8 +220,14 @@ ToggleColorPicker() {
             cHex.Value := "hex: " lastHex
             cRgb.Value := "rgb: " lastRgb
             cXy.Value  := "(x, y): (" lastX ", " lastY ")"
+            
+            ; Clamp GUI position to stay within screen work area
+            WinGetPos(, , &guiW, &guiH, cpGui)
+            MonitorGetWorkArea(1, , , &screenW, &screenH)
+            guiX := Min(mX + 5, screenW - guiW - 2)
+            guiY := Min(mY + 5, screenH - guiH - 2)
 
-            cpGui.Show("NoActivate x" (mX + 5) " y" (mY + 5))
+            cpGui.Show("NoActivate x" guiX " y" guiY)
         }
     }
 }

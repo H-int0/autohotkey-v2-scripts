@@ -635,7 +635,13 @@ UpdateColorPicker() {
         cRgbGlobal.Value := "rgb: " lastRgbGlobal
         cXyGlobal.Value  := "(x, y): (" lastXGlobal ", " lastYGlobal ")"
 
-        cpGuiGlobal.Show("NoActivate x" (mX + 5) " y" (mY + 5))
+        ; Clamp GUI position to stay within screen work area
+        WinGetPos(, , &guiW, &guiH, cpGuiGlobal)
+        MonitorGetWorkArea(1, , , &screenW, &screenH)
+        guiX := Min(mX + 5, screenW - guiW - 2)
+        guiY := Min(mY + 5, screenH - guiH - 2)
+
+        cpGuiGlobal.Show("NoActivate x" guiX " y" guiY)
     }
 }
 
