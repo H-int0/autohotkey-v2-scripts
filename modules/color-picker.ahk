@@ -177,15 +177,19 @@ ToggleColorPicker() {
         ; Create GUI: Always on top, no title bar, tool window, click-through (+E0x20)
         cpGui := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
         cpGui.BackColor := "202020"
+        
+        ; Shrink the outer right/bottom margins of the UI
+        cpGui.MarginX := 6
+        cpGui.MarginY := 6
 
-        ; Color swatch
-        cSwatch := cpGui.Add("Progress", "x10 y10 w40 h40 c000000", 100)
+        ; Color swatch (tighter top/left padding, sized slightly taller to match text)
+        cSwatch := cpGui.Add("Text", "x6 y6 w44 h44 Background000000")
 
-        ; Text elements
+        ; Text elements (moved closer to the swatch with tighter line spacing)
         cpGui.SetFont("cWhite s10", "Consolas")
-        cHex := cpGui.Add("Text", "x60 y8 w150 BackgroundTrans", "hex: #000000")
-        cRgb := cpGui.Add("Text", "x60 y23 w150 BackgroundTrans", "rgb: 0, 0, 0")
-        cXy  := cpGui.Add("Text", "x60 y38 w150 BackgroundTrans", "(x, y): (0, 0)")
+        cHex := cpGui.Add("Text", "x56 y5 w140 BackgroundTrans", "hex: #000000")
+        cRgb := cpGui.Add("Text", "x56 y20 w140 BackgroundTrans", "rgb: 0, 0, 0")
+        cXy  := cpGui.Add("Text", "x56 y35 w140 BackgroundTrans", "(x, y): (0, 0)")
 
         cpGui.Show("NoActivate Hide")
 
@@ -211,7 +215,8 @@ ToggleColorPicker() {
             lastX := mX
             lastY := mY
 
-            cSwatch.Opt("c" colorHex)
+            cSwatch.Opt("Background" colorHex)
+            cSwatch.Redraw()  ; <--- This forces the color to actually paint
             cHex.Value := "hex: " lastHex
             cRgb.Value := "rgb: " lastRgb
             cXy.Value  := "(x, y): (" lastX ", " lastY ")"
