@@ -2,37 +2,138 @@
 
 This guide covers how to configure and customize Strap beyond its default behavior.
 
-- It focuses primarily on the combined `source/source.ahk` build, since that is the main version of the script.
-- Standalone scripts follow the same configuration principles whenever the feature exists in those files as well.
+- It focuses primarily on the scripts inside the `distribution/` and `modules/` directories.
+- You can configure the pre‑combined `distribution/source.ahk` directly via `config.ahk`, or build your own combination using `distribution/custom.ahk`.
+- Independent components inside `modules/` follow the same configuration principles inside their respective files.
 
 ---
 
 ## Table of Contents
 
+- [Enabling and Disabling Features](#enabling-and-disabling-features)
+- [Customizing Tooltips](#customizing-tooltips)
 - [Changing the Default Tray Icon Visibility](#changing-the-default-tray-icon-visibility)
 - [Changing CapsLock Numpad Shift Behavior](#changing-capslock-numpad-shift-behavior)
+- [Configuring the Color Picker Summary MsgBox](#configuring-the-color-picker-summary-msgbox)
 - [Adding a Timezone Not in the List](#adding-a-timezone-not-in-the-list)
 - [Setting a Startup Timezone](#setting-a-startup-timezone)
-- [Adding a Timezone Not in the List for Startup](#adding-a-custom-timezone-to-startup-not-in-the-list)
+- [Adding a Custom Timezone to Startup (not in the list)](#adding-a-custom-timezone-to-startup-not-in-the-list)
+- [Building a Custom Script](#building-a-custom-script)
+
+---
+
+## Enabling and Disabling Features
+
+You can completely disable specific features so their hotkeys revert to default Windows behavior.
+
+### Step 1: Open your configuration file
+
+- Combined script: Open `distribution/config.ahk`.
+- Standalone modules: Open the specific file in `modules/`.
+
+### Step 2: Find the specific feature config block+K does nothing
+
+### Step 3: Choose the active line
+
+To disable a feature, comment out the `true` line and uncomment the `false` line:
+
+### Step 4: Save and reload
+
+Right-click the tray icon and select **Reload** for changes to take effect.
+
+---
+
+## Customizing Tooltips
+
+Strap uses a custom tooltip system that tracks your cursor. You can change how long these tooltips stay on screen, alter their text, or disable them entirely.
+
+### Step 1: Open your Configuration file
+
+- Combined script: Open `distribution/config.ahk`.
+- Standalone modules: Open the specific file in `modules/`.
+
+### Step 2: Find the `CONFIG: TOOLTIPS` section
+
+```ahk
+; =====================================================================================
+; CONFIG: TOOLTIPS
+; =====================================================================================
+;
+; >> Customize tooltip display duration and individual messages.
+;
+; INSTRUCTIONS:
+;
+; 1. EDIT THESE VALUES DIRECTLY:
+;    - Change Config_TooltipDuration (milliseconds) to alter how long tooltips stay on screen.
+;    - Change the message text inside the quotes "" to customize what each tooltip says.
+;
+; 2. ENABLE / DISABLE A TOOLTIP:
+;    - To turn a tooltip OFF, put a semicolon (;) at the beginning of its line.
+;    - To turn it ON, remove that semicolon.
+;
+; 3. Save the file and reload the script.
+;
+; =========================================================
+;
+; ------ Duration in milliseconds -------
+;
+Global Config_TooltipDuration := 2500   ; (default: 2500 ms)
+;                                ^ <-- Edit this number (in milliseconds) to change how long tooltips stay visible   (1 sec = 1000 ms)
+
+
+; --------- Color Picker tooltip --------
+;
+Global Msg_ColorPicker := "Copied to Clipboard"   ; (default-text: "Copied to Clipboard")
+;                         ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
+
+
+; ------- Force Kill Task tooltip -------
+;
+Global Msg_EndTask := "EVAPORATED!"   ; (default-text: "EVAPORATED!")
+;                     ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
+
+
+
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+```
+
+### Step 3: Edit duration or text
+
+- Change `2500` to your desired duration in milliseconds
+- Change the text inside the quotes to change the message
+
+### Step 4: Disable a tooltip (Optional)
+
+If you don't want a tooltip to appear at all, simply add a semicolon (`;`) at the beginning of the message line:
+
+```ahk
+; --------- Color Picker tooltip --------
+;
+; Global Msg_ColorPicker := "Copied to Clipboard"   ; (default-text: "Copied to Clipboard")
+;                         ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
+
+```
 
 ---
 
 ## Changing the Default Tray Icon Visibility
 
-By default, Strap hides the tray icon on startup. To make it visible instead, switch which startup option is uncommented in the configuration block near the top of the script.
-
-**To configure this behavior follow the steps below:**
+By default, Strap hides the tray icon on startup.
 
 ### Step 1: Open the script in your text editor
 
-### Step 2: Find the tray icon block
+- Combined script: Open `distribution/config.ahk`.
+- Standalone modules: Open the specific file in `modules/`.
 
-It looks like this:
+### Step 2: Find the `CONFIG: TRAY ICON VISIBILITY` section
 
 ```ahk
-; =========================================================
+; =====================================================================================
 ; CONFIG: TRAY ICON VISIBILITY
-; =========================================================
+; =====================================================================================
+;
+; >> Customize whether the tray icon is visible or hidden on script startup.
 ;
 ; INSTRUCTIONS:
 ; 1. Uncomment ONLY ONE of the lines below.
@@ -44,35 +145,45 @@ It looks like this:
 ;
 ; =========================================================
 ;
-A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
-; A_IconHidden := 0  ; Un-comment for the behavior to be = Visible
+A_IconHidden := 1    ; Un-comment for the tray icon to be Hidden (default)
+; A_IconHidden := 0  ; Un-comment for the tray icon to be Visible
 ;
 ; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
 ;
 ```
 
-### Step 3: Choose the active line
+### Step 3: Choose the active Line
 
 - `A_IconHidden := 1` keeps the tray icon hidden on startup.
 - `A_IconHidden := 0` makes it visible on startup.
 
 Only one line should stay active.
 
-**To make the tray icon visible on startup:**
+- **To make the tray icon visible on startup:**
 
 ```ahk
-; A_IconHidden := 1  ; Un-comment for the behavior to be = Hidden (default)
-A_IconHidden := 0    ; Un-comment for the behavior to be = Visible
+; =========================================================
+;
+; A_IconHidden := 1    ; Un-comment for the tray icon to be Hidden (default)
+A_IconHidden := 0  ; Un-comment for the tray icon to be Visible
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
 ```
 
-**To go back to hidden on startup:**
+- **To go back to hidden on startup:**
 
 ```ahk
-A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
-; A_IconHidden := 0  ; Un-comment for the behavior to be = Visible
+; =========================================================
+;
+A_IconHidden := 1    ; Un-comment for the tray icon to be Hidden (default)
+; A_IconHidden := 0  ; Un-comment for the tray icon to be Visible
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
 ```
 
-### Step 4: Save and reload
+### Step 4: Save and Reload
 
 The change does not take effect until the script is restarted.
 
@@ -84,24 +195,19 @@ The change does not take effect until the script is restarted.
 
 ## Changing CapsLock Numpad Shift Behavior
 
-This applies to the numpad emulator.
+> By default, when CapsLock is on and you hold Shift, the number row keeps the usual shifted symbols: `! @ # $ % ^ & * ( )`.
 
-- By default, when CapsLock is on and you hold Shift, the number row keeps the usual shifted symbols: `! @ # $ % ^ & * ( )`.
+### Step 1: Open your configuration File
 
-**To configure this behavior follow the steps below:**
+- Combined script: Open `distribution/config.ahk`.
+- Standalone modules: Open the specific file in `modules/`.
 
-### Step 1: Open the numpad script
-
-Open `standalone-scripts/numpad-emulator.ahk` if you are using the standalone version, or edit the CapsLock numpad section in `source/source.ahk` if you are using the combined build.
-
-### Step 2: Find the Shift setting
-
-It looks like this:
+### Step 2: Find the `CONFIG: NUMPAD SHIFT SYMBOLS` section
 
 ```ahk
-; =========================================================
+; =====================================================================================
 ; CONFIG: NUMPAD SHIFT SYMBOLS
-; =========================================================
+; =====================================================================================
 ;
 ; >> What happens when Shift is held with CapsLock ON and a number key is pressed.
 ;
@@ -124,26 +230,109 @@ NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 
 ### Step 3: Choose the Active line
 
-- `NumpadShiftSymbols := true` keeps shifted symbols working normally while CapsLock is active.
-- `NumpadShiftSymbols := false` disables those shifted symbols while CapsLock is active.
+- `numpadShiftSymbols := true` → shifted symbols work normally (default)
+- `numpadShiftSymbols := false` → shifted symbols do nothing while CapsLock is on
 
 Only one line should stay active.
 
-**To keep shifted symbols enabled (default):**
+- **To keep shifted symbols enabled (default):**
 
 ```ahk
+; =========================================================
+;
 NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 ; NumpadShiftSymbols := false  ; Disabled: Shift does nothing
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
 ```
 
-**To disable shifted symbols:**
+- **To disable shifted symbols:**
 
 ```ahk
+; =========================================================
+;
 ; NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 NumpadShiftSymbols := false  ; Disabled: Shift does nothing
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
 ```
 
-### Step 4: Save and Reload
+### Step 4: save and reload
+
+Reload the script after saving your change. The new behavior applies immediately after restart or reload.
+
+---
+
+## Configuring the Color Picker Summary MsgBox
+
+By default, the Color Picker copies data silently to your clipboard. You can optionally have it pop up a Summary Message Box containing the Hex, RGB, and Coordinates.
+
+### Step 1: Open Your configuration file
+
+- Combined script: Open `distribution/config.ahk`.
+- Standalone modules: Open the specific file in `modules/`.
+
+### Step 2: Find the `CONFIG: COLOR PICKER SUMMARY MSGBOX` section
+
+```ahk
+; =====================================================================================
+; CONFIG: COLOR PICKER SUMMARY MSGBOX
+; =====================================================================================
+;
+; >> Controls whether a summary MsgBox appears after closing the picker.
+; >> Clipboard copy always happens regardless of this setting.
+;
+;   Disabled →  Picker closes silently, values are copied to clipboard (default)
+;   Enabled  →  MsgBox shows Hex, RGB, and coordinates after closing
+;
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line.
+; 3. Save and reload the script.
+;
+; =========================================================
+;
+ColorPickerMsgBox := false  ; Disabled: close silently (default)
+; ColorPickerMsgBox := true   ; Enabled: show summary MsgBox
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+```
+
+### Step 3: choose the active line
+
+- ColorPickerMsgBox := false  ; Disabled: close silently (default)
+- ColorPickerMsgBox := true   ; Enabled: show summary MsgBox
+
+Only one line should stay active.
+
+- **To keep shifted symbols enabled (default):**
+
+```ahk
+; =========================================================
+;
+ColorPickerMsgBox := false  ; Disabled: close silently (default)
+; ColorPickerMsgBox := true   ; Enabled: show summary MsgBox
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+```
+
+- **To disable shifted symbols:**
+
+```ahk
+; =========================================================
+;
+; ColorPickerMsgBox := false  ; Disabled: close silently (default)
+ColorPickerMsgBox := true   ; Enabled: show summary MsgBox
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+```
+
+### Step 4: Save And Reload
 
 Reload the script after saving your change. The new behavior applies immediately after restart or reload.
 
@@ -151,11 +340,11 @@ Reload the script after saving your change. The new behavior applies immediately
 
 ## Adding a Timezone Not in the List
 
-If the timezone you want is not already in the script, add it to the **CUSTOM TIMEZONES** section.
+If the timezone you want is not already in the script, add it to the **ADD CUSTOM TIMEZONES** section.
 
 ### Step 1: Find the Windows timezone ID
 
-Timezone changes go through `tzutil`, Windows' built-in timezone utility. Open Command Prompt and run:
+Open Command Prompt and run:
 
 ```cmd
 tzutil /l
@@ -168,20 +357,20 @@ This prints all timezones Windows knows about. Each entry looks like this:
 Tokyo Standard Time
 ```
 
-The second line is the Windows ID. That is what the script needs.
+The second line of each entry is the Windows ID (e.g., `Tokyo Standard Time`).
 
 ### Step 2: Open the script in a text editor
 
-Open `source/source.ahk` for the combined build, or `standalone-scripts/timezone-switcher.ahk` if you are only using the timezone feature.
+- Combined script: `distribution/source.ahk`
+- Timezone module: `modules/timezone-switcher.ahk`
+- Your custom build: `distribution/custom.ahk`
 
-### Step 3: Find the CUSTOM TIMEZONES section
-
-It looks like this:
+### Step 3: Find the `ADD CUSTOM TIMEZONES` section
 
 ```ahk
-; =========================================================
-; CONFIG: CUSTOM TIMEZONES
-; =========================================================
+; =====================================================================================
+; CONFIG: ADD CUSTOM TIMEZONES
+; =====================================================================================
 ;
 ; Add your own timezones here. Each entry takes two lines.
 ;
@@ -217,7 +406,7 @@ It looks like this:
 
 ### Step 4: Add your entry
 
-Each timezone takes two lines. Both lines must be uncommented:
+Each timezone takes two lines. Place them **above** the `ADD ABOVE HERE` line.
 
 ```ahk
 ; Your City or Label
@@ -233,16 +422,15 @@ TZData["Vladivostok Standard Time"] := "(UTC +10) `"Vladivostok`""
 TZOrder.Push("Vladivostok Standard Time")
 ```
 
-Place your entry **above** the `; ^^^^^^^^^^^^^^^^^^^^ ADD ABOVE HERE: ^^^^^^^^^^^^^^^^^^^^` line.
+> [!NOTE]
+> The order of enabled entries controls the cycle order. Put the new timezone where you want it to appear in the cycle.
 
-The order of enabled entries controls the cycle order. Put the new timezone where you want it to appear in the cycle.
-
-**An example of newly added timezones may look like:**
+**An example of how a newly added timezones might look like:**
 
 ```ahk
-; =========================================================
-; CONFIG: CUSTOM TIMEZONES
-; =========================================================
+; =====================================================================================
+; CONFIG: ADD CUSTOM TIMEZONES
+; =====================================================================================
 ;
 ; Add your own timezones here. Each entry takes two lines.
 ;
@@ -286,7 +474,7 @@ TZOrder.Push("Newfoundland Standard Time")
 ;
 ```
 
-### Step 5: Save and reload
+### Step 5: Save and Reload
 
 After saving, reload the script so the updated timezone list is loaded.
 
@@ -302,16 +490,16 @@ This controls what timezone Strap applies when it launches.
 
 ### Step 1: Open the script in a text editor
 
-Open `source/source.ahk` for the combined build, or `standalone-scripts/timezone-switcher.ahk` for the timezone-only version.
+- Combined script: `distribution/source.ahk`
+- Timezone module: `modules/timezone-switcher.ahk`
+- Your custom build: `distribution/custom.ahk`
 
-### Step 2: Find the startup timezone block
-
-It looks like this:
+### Step 2: Find the `STARTUP TIMEZONE` block
 
 ```ahk
-; =========================================================
+; =====================================================================================
 ; CONFIG: STARTUP TIMEZONE
-; =========================================================
+; =====================================================================================
 ;
 ; INSTRUCTIONS:
 ;   - Leave EVERY line commented → keep current Windows timezone.
@@ -354,19 +542,20 @@ It looks like this:
 ;
 ```
 
-### Step 3: Choose the timezone
+### Step 3: Choose the timezone and uncomment it
 
 - Leave every line commented to keep whatever timezone Windows already had.
 - Uncomment exactly one line to force that timezone on startup.
 
-If more than one line is uncommented, the most bottom uncommented timezone is applied on startup.
+> [!NOTE]
+> If more than one line is uncommented, the bottom-most uncommented timezone is applied on startup.
 
 **An example may look like this:**
 
 ```ahk
-; =========================================================
+; =====================================================================================
 ; CONFIG: STARTUP TIMEZONE
-; =========================================================
+; =====================================================================================
 ;
 ; INSTRUCTIONS:
 ;   - Leave EVERY line commented → keep current Windows timezone.
@@ -415,13 +604,13 @@ Save the file and restart the script. The selected timezone will be applied at l
 
 ---
 
-## Adding a Custom Timezone to Startup not in the list
+## Adding a Custom Timezone to Startup (not in the list)
 
-If the timezone you want is not already in the list of timezones available for startup, add it to the `ADD CUSTOM TIMEZONE FOR STARTUP` section under the `CONFIG: STARTUP TIMEZONE` section.
+If your desired startup timezone is not in the pre‑defined list, use the `ADD CUSTOM TIMEZONE FOR STARTUP` section.
 
 ### Step 1: Find the Windows Timezone ID
 
-Timezone changes go through `tzutil`, Windows' built-in timezone utility. Open Command Prompt and run:
+Open Command Prompt and run:
 
 ```cmd
 tzutil /l
@@ -434,20 +623,20 @@ This prints all timezones Windows knows about. Each entry looks like this:
 Tokyo Standard Time
 ```
 
-**The second line is the Windows ID. That is what we need.**
+The second line of each entry is the Windows ID (e.g., `Tokyo Standard Time`).
 
 ### Step 2: Open the script in your text editor
 
-Open `source/source.ahk` for the combined build, or `standalone-scripts/timezone-switcher.ahk` if you are only using the timezone feature.
+- Combined script: `distribution/source.ahk`
+- Timezone module: `modules/timezone-switcher.ahk`
+- Your custom build: `distribution/custom.ahk`
 
 ### Step 3: Find the `ADD CUSTOM TIMEZONE FOR STARTUP` section
 
-It looks like this:
-
 ```ahk
-; =========================================================
-; ADD CUSTOM TIMEZONE FOR STARTUP
-; =========================================================
+; =====================================================================================
+; CONFIG: ADD CUSTOM TIMEZONE FOR STARTUP
+; =====================================================================================
 ;
 ; Use this section if the timezone you want is NOT in the list above.
 ;
@@ -484,9 +673,9 @@ In the space marked with `ABOVE HERE`
 - Delete the semicolon (`;`) at the beginning of the line `; StartupTZID := "Your_Custom_Windows_ID_Here"`.
 - Replace `Your_Custom_Windows_ID_Here` with the actual Windows timezone ID.
 
-Make sure all other `StartupTZID` lines in the **CONFIG: STARTUP TIMEZONE** section remain commented out.
+> Make sure all other `StartupTZID` lines in the **CONFIG: STARTUP TIMEZONE** section remain commented out.
 
-**An example of it may look like:**
+**An example of how it might look like:**
 
 ```ahk
 ; =========================================================
@@ -497,10 +686,82 @@ StartupTZID := "Tokyo Standard Time"
 ;
 ```
 
-### Step 5: Save and Reload
+### Step 5: Save and reload
 
 After saving, reload the script so the updated timezone list is loaded.
 
 ---
 
-~*H-int*
+## Building a Custom Script
+
+> The `distribution/custom.ahk` file is a template that lets you combine the features you want.
+
+### Step 1: Open `distribution/custom.ahk` in a text editor
+
+### Step 2: Open the module(s) you want to include and find the markers
+
+Each module in `modules/` contains markers that tell you exactly what to copy:
+
+It looks like this:
+
+```ahk
+; ===========================================================================================================================================================================
+; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
+; ===========================================================================================================================================================================
+
+[feature code]
+
+; ===========================================================================================================================================================================
+; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
+; ===========================================================================================================================================================================
+```
+
+### Step 3: Copy the marked section
+
+- Select from `>> COPY BELOW THIS LINE` down to `>> COPY ABOVE THIS LINE` (excluding the marker lines themselves if you prefer, but including them is harmless).
+
+### Step 4: Paste into `custom.ahk`
+
+Inside `custom.ahk`, find the block, and paste the copied code between those two lines.
+
+```ahk
+; ===========================================================================================================================================================================
+; BLOCK: PASTE YOUR STANDALONE MODULES HERE
+; ===========================================================================================================================================================================
+;
+; >> Copy the marked sections from your standalone scripts
+;    and paste them directly inside this block.
+;
+; ========================================================= PASTE MODULES BELOW THIS LINE =========================================================
+
+
+
+
+
+
+
+
+
+
+; ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PASTE MODULES ABOVE THIS LINE ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+;
+```
+
+### Step 5 (optional): Repeat for other modules
+
+- You can paste multiple modules one after another.
+- The order does not matter because they use different hotkeys.
+
+### Step 6 (optional): Configure each feature as needed
+
+- Edit the configuration sections inside the pasted code as per your needs.
+
+### Step 7: Save and run `distribution/custom.ahk`
+
+- Save the file and restart the script.
+
+**Your customized script will now run with only the features you selected.**
+
+---
+
+~*[@H-int0](https://github.com/H-int0)*
