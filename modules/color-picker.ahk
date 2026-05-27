@@ -135,8 +135,8 @@ ColorPickerEnabled := true   ; Enabled: Win+Ctrl+C toggles color picker (default
 ; >> Controls whether a summary MsgBox appears after closing the picker.
 ; >> Clipboard copy always happens regardless of this setting.
 ;
-;   Enabled  →  MsgBox shows Hex, RGB, and coordinates after closing (default)
-;   Disabled →  Picker closes silently, values are copied to clipboard
+;   Disabled →  Picker closes silently, values are copied to clipboard (default)
+;   Enabled  →  MsgBox shows Hex, RGB, and coordinates after closing
 ;
 ; INSTRUCTIONS:
 ; 1. Uncomment ONLY ONE of the lines below.
@@ -145,8 +145,8 @@ ColorPickerEnabled := true   ; Enabled: Win+Ctrl+C toggles color picker (default
 ;
 ; =========================================================
 ;
-ColorPickerMsgBox := true   ; Enabled: show summary MsgBox (default)
-; ColorPickerMsgBox := false  ; Disabled: close silently
+ColorPickerMsgBox := false  ; Disabled: close silently (default)
+; ColorPickerMsgBox := true   ; Enabled: show summary MsgBox
 ;
 ; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
 ;
