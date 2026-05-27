@@ -19,9 +19,8 @@
 ; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
-;
-; ===========================================================================================================================================================================
 
+; ===========================================================================================================================================================================
 
 #Requires AutoHotkey v2.0
 #UseHook True
@@ -29,9 +28,11 @@
 ProcessSetPriority "High"
 
 
-; =========================================================
+; =====================================================================================
 ; CONFIG: TRAY ICON VISIBILITY
-; =========================================================
+; =====================================================================================
+;
+; >> Customize whether the tray icon is visible or hidden on script startup.
 ;
 ; INSTRUCTIONS:
 ; 1. Uncomment ONLY ONE of the lines below.
@@ -43,8 +44,8 @@ ProcessSetPriority "High"
 ;
 ; =========================================================
 ;
-A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
-; A_IconHidden := 0  ; Un-comment for the behavior to be = Visible
+A_IconHidden := 1    ; Un-comment for the tray icon to be Hidden (default)
+; A_IconHidden := 0  ; Un-comment for the tray icon to be Visible
 ;
 ; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
 ;
@@ -54,9 +55,18 @@ A_IconHidden := 1    ; Un-comment for the behavior to be = Hidden (default)
 ; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
 ; ===========================================================================================================================================================================
 
-; =========================================================
+if !IsSet(HelpEntries)
+    global HelpEntries := []
+HelpEntries.Push("
+(
+> NUMPAD EMULATOR:
+    CapsLock OFF    →  num-row keys
+    CapsLock ON     →  numpad keys
+)")
+
+; =====================================================================================
 ; CONFIG: NUMPAD SHIFT SYMBOLS
-; =========================================================
+; =====================================================================================
 ;
 ; >> What happens when Shift is held with CapsLock ON and a number key is pressed.
 ;
@@ -78,7 +88,7 @@ NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 
 
 ; =========================================================
-; FEATURE: CAPSLOCK NUMPAD
+; FEATURE: NUMPAD EMULATOR
 ; =========================================================
 
 #HotIf GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
@@ -115,13 +125,90 @@ NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 
 
 ; =========================================================
-; Accessibility: TOGGLE TRAY ICON (Win + Ctrl + \)
+; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
 ; =========================================================
 
+#HotIf
 #^\::
 {
     if (A_IconHidden)
         A_IconHidden := 0
     else
         A_IconHidden := 1
+}
+#HotIf
+
+; ===========================================================================================================================================================================
+
+; =========================================================
+; STRAP HELP BOX (Win + /)
+; =========================================================
+
+global helpGuiGlobal := ""
+
+#HotIf
+#/::ToggleHelpBox()
+#HotIf
+
+ToggleHelpBox() {
+    global helpGuiGlobal
+    static isHelpActive := false
+
+    if (isHelpActive) {
+        SetTimer(UpdateHelpBox, 0)
+        if (helpGuiGlobal) {
+            helpGuiGlobal.Destroy()
+            helpGuiGlobal := ""
+        }
+        isHelpActive := false
+    } else {
+        isHelpActive := true
+        
+        helpGuiGlobal := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
+        helpGuiGlobal.BackColor := "000000"
+        
+        ; Set standard margins and crisp font matching the color picker
+        helpGuiGlobal.MarginX := 12
+        helpGuiGlobal.MarginY := 12
+        helpGuiGlobal.SetFont("cWhite s10", "Consolas")
+        
+        helpText := "
+        (
+        >> STRAP HELP
+        ───────────────────────────────────────
+        > NUMPAD EMULATOR:
+            CapsLock OFF    →  num-row keys
+            CapsLock ON     →  numpad keys
+        ───────────────────────────────────────
+        > HELPER:
+            Win+/           →  toggle this box
+        )"
+        
+        helpGuiGlobal.Add("Text", "", helpText)
+        helpGuiGlobal.Show("NoActivate Hide")
+        
+        ; Set window transparency opacity (225 out of 255)
+        WinSetTransparent(225, helpGuiGlobal.Hwnd)
+        
+        UpdateHelpBox()
+        SetTimer(UpdateHelpBox, 10) ; Live updates every 10ms
+    }
+}
+
+UpdateHelpBox() {
+    global helpGuiGlobal
+    try {
+        CoordMode("Mouse", "Screen")
+        MouseGetPos(&mX, &mY)
+        
+        ; Fetch UI size and screen boundaries for clamping
+        WinGetPos(, , &guiW, &guiH, helpGuiGlobal.Hwnd)
+        MonitorGetWorkArea(1, , , &screenW, &screenH)
+        
+        ; Position bottom-right of cursor, matching color picker logic
+        guiX := Min(mX + 10, screenW - guiW - 2)
+        guiY := Min(mY + 10, screenH - guiH - 2)
+        
+        helpGuiGlobal.Show("NoActivate x" guiX " y" guiY)
+    }
 }

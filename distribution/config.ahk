@@ -23,10 +23,11 @@
 ; ===========================================================================================================================================================================
 
 #Requires AutoHotkey v2.0
-#UseHook True
-#MaxThreadsBuffer True
-ProcessSetPriority "High"
 
+if !IsSet(TZData)
+    TZData := Map()
+if !IsSet(TZOrder)
+    TZOrder := []
 
 ; =====================================================================================
 ; CONFIG: TRAY ICON VISIBILITY
@@ -76,33 +77,146 @@ A_IconHidden := 1    ; Un-comment for the tray icon to be Hidden (default)
 Global Config_TooltipDuration := 2500   ; (default: 2500 ms)
 ;                                ^ <-- Edit this number (in milliseconds) to change how long tooltips stay visible   (1 sec = 1000 ms)
 
+
+; --------- Color Picker tooltip --------
+;
+Global Msg_ColorPicker := "Copied to Clipboard"   ; (default-text: "Copied to Clipboard")
+;                         ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
+
+
+; ------- Force Kill Task tooltip -------
+;
+Global Msg_EndTask := "Evaporated"   ; (default-text: "Evaporated")
+;                     ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
+
+
+
 ; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
 ;
 
 
-; ===========================================================================================================================================================================
-; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
-; ===========================================================================================================================================================================
+; =====================================================================================
+; CONFIG: NUMPAD SHIFT SYMBOLS
+; =====================================================================================
+;
+; >> What happens when Shift is held with CapsLock ON and a number key is pressed.
+;
+;   Enabled  →  Shift+numrow types symbols normally: "! @ # $ % ^ & * ( )"  (default)
+;   Disabled →  Shift+numrow does nothing
+;
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line.
+; 3. Save and reload the script.
+;
+; =========================================================
+;
+NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
+; NumpadShiftSymbols := false  ; Disabled: Shift does nothing
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
 
-if !IsSet(HelpEntries)
-    global HelpEntries := []
-HelpEntries.Push("
-(
-> TIMEZONE SWITCHER:
-    Win+Alt+``       →  cycle TZ
-    Win+Ctrl+``      →  show current TZ
-)")
+
+; =====================================================================================
+; CONFIG: FORCE KILL TASK
+; =====================================================================================
+;
+; >> Press Win+Ctrl+K to close the active window (like Alt+F4).
+; >> If the window is frozen, it will force kill the process instead.
+;
+;   Enabled  →  Win+Ctrl+K closes/kills the active window (default)
+;   Disabled →  Win+Ctrl+K does nothing
+;
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line.
+; 3. Save and reload the script.
+;
+; =========================================================
+;
+EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
+; EndTaskEnabled := false  ; Disabled: Win+Ctrl+K does nothing
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+
+
+; =====================================================================================
+; CONFIG: COLOR PICKER
+; =====================================================================================
+;
+; >> Press Win+Ctrl+C to toggle a live color picker under your mouse.
+; >> Press it again to close it, copy Hex/RGB/coords to clipboard, and show a summary.
+;
+;   Enabled  →  Win+Ctrl+C toggles the color picker (default)
+;   Disabled →  Win+Ctrl+C does nothing
+;
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line.
+; 3. Save and reload the script.
+;
+; =========================================================
+;
+ColorPickerEnabled := true   ; Enabled: Win+Ctrl+C toggles color picker (default)
+; ColorPickerEnabled := false  ; Disabled: Win+Ctrl+C does nothing
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+
+
+; =====================================================================================
+; CONFIG: COLOR PICKER SUMMARY MSGBOX
+; =====================================================================================
+;
+; >> Controls whether a summary MsgBox appears after closing the picker.
+; >> Clipboard copy always happens regardless of this setting.
+;
+;   Enabled  →  MsgBox shows Hex, RGB, and coordinates after closing (default)
+;   Disabled →  Picker closes silently, values are copied to clipboard
+;
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line.
+; 3. Save and reload the script.
+;
+; =========================================================
+;
+ColorPickerMsgBox := true   ; Enabled: show summary MsgBox (default)
+; ColorPickerMsgBox := false  ; Disabled: close silently
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+
+
+; =====================================================================================
+; CONFIG: LINE NAVIGATION
+; =====================================================================================
+;
+; >> Ctrl+Alt+Left/Right moves to start/end of line.
+; >> Shift+Alt+Left/Right selects to start/end of line.
+; >> Shift+Alt+Backspace/Delete deletes to start/end of line.
+;
+;   Enabled  →  Line navigation hotkeys are active (default)
+;   Disabled →  Line navigation hotkeys do nothing
+;
+; INSTRUCTIONS:
+; 1. Uncomment ONLY ONE of the lines below.
+; 2. Comment out the other line.
+; 3. Save and reload the script.
+;
+; =========================================================
+;
+LineNavEnabled := true   ; Enabled: hotkeys are active (default)
+; LineNavEnabled := false  ; Disabled: hotkeys do nothing
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
 
 
 ; =========================================================
-; FEATURE: TIMEZONE SWITCHER
-; =========================================================
-
-TZData := Map()
-TZOrder := []
-
-; =========================================================
-; TIMEZONE LIST
+; CONFIG: TIMEZONE LIST
 ; =========================================================
 ;
 ; >> Uncomment both lines to add to cycle
@@ -233,8 +347,6 @@ TZOrder.Push("Eastern Standard Time")
 ; TZOrder.Push("Hawaiian Standard Time")
 
 
-; ===================================================================== USER CONFIGURATION SECTION 2/2 ======================================================================
-
 ; =====================================================================================
 ; CONFIG: ADD CUSTOM TIMEZONES
 ; =====================================================================================
@@ -338,204 +450,5 @@ TZOrder.Push("Eastern Standard Time")
 ; ^^^^^^^^^^^^^^^^^^^^^^ ABOVE HERE: ^^^^^^^^^^^^^^^^^^^^^^
 ;
 
-; =================================================================================================================================
-
 if IsSet(StartupTZID)
   RunWait('tzutil /s "' StartupTZID '"',, "Hide")
-
-; =========================================================
-; LOGIC
-; =========================================================
-
-#!`::
-{
-    currentID := GetCurrentTimeZoneID()
-    nextIndex := 1
-
-    Loop TZOrder.Length {
-        if (TZOrder[A_Index] = currentID) {
-            nextIndex := A_Index + 1
-            if (nextIndex > TZOrder.Length)
-                nextIndex := 1
-            break
-        }
-    }
-
-    nextID := TZOrder[nextIndex]
-    RunWait('tzutil /s "' nextID '"',, "Hide")
-
-    msgLabel := TZData.Has(nextID) ? TZData[nextID] : nextID
-    ShowToolTip("Switched TZ = " msgLabel)
-}
-
-#^`::
-{
-    currentID := GetCurrentTimeZoneID()
-    msgLabel := TZData.Has(currentID) ? TZData[currentID] : currentID
-    ShowToolTip("Current TZ = " msgLabel)
-}
-
-; ===========================================================================================================================================================================
-; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
-; ===========================================================================================================================================================================
-
-
-; =========================================================
-; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
-; =========================================================
-
-#HotIf
-#^\::
-{
-    if (A_IconHidden)
-        A_IconHidden := 0
-    else
-        A_IconHidden := 1
-}
-#HotIf
-
-; ===========================================================================================================================================================================
-
-; =========================================================
-; STRAP HELP BOX (Win + /)
-; =========================================================
-
-global helpGuiGlobal := ""
-
-#HotIf
-#/::ToggleHelpBox()
-#HotIf
-
-ToggleHelpBox() {
-    global helpGuiGlobal
-    static isHelpActive := false
-
-    if (isHelpActive) {
-        SetTimer(UpdateHelpBox, 0)
-        if (helpGuiGlobal) {
-            helpGuiGlobal.Destroy()
-            helpGuiGlobal := ""
-        }
-        isHelpActive := false
-    } else {
-        isHelpActive := true
-        
-        helpGuiGlobal := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
-        helpGuiGlobal.BackColor := "000000"
-        
-        ; Set standard margins and crisp font matching the color picker
-        helpGuiGlobal.MarginX := 12
-        helpGuiGlobal.MarginY := 12
-        helpGuiGlobal.SetFont("cWhite s10", "Consolas")
-        
-        helpText := "
-        (
-        >> STRAP HELP
-        ───────────────────────────────────────
-        > TIMEZONE SWITCHER:
-            Win+Alt+``       →  cycle TZ
-            Win+Ctrl+``      →  show current TZ
-        ───────────────────────────────────────
-        > HELPER:
-            Win+/           →  toggle this box
-        )"
-        
-        helpGuiGlobal.Add("Text", "", helpText)
-        helpGuiGlobal.Show("NoActivate Hide")
-        
-        ; Set window transparency opacity (225 out of 255)
-        WinSetTransparent(225, helpGuiGlobal.Hwnd)
-        
-        UpdateHelpBox()
-        SetTimer(UpdateHelpBox, 10) ; Live updates every 10ms
-    }
-}
-
-UpdateHelpBox() {
-    global helpGuiGlobal
-    try {
-        CoordMode("Mouse", "Screen")
-        MouseGetPos(&mX, &mY)
-        
-        ; Fetch UI size and screen boundaries for clamping
-        WinGetPos(, , &guiW, &guiH, helpGuiGlobal.Hwnd)
-        MonitorGetWorkArea(1, , , &screenW, &screenH)
-        
-        ; Position bottom-right of cursor, matching color picker logic
-        guiX := Min(mX + 10, screenW - guiW - 2)
-        guiY := Min(mY + 10, screenH - guiH - 2)
-        
-        helpGuiGlobal.Show("NoActivate x" guiX " y" guiY)
-    }
-}
-
-; =========================================================
-; GLOBAL HELPER FUNCTIONS
-; =========================================================
-
-Global ActiveToolTipText := ""
-
-ShowToolTip(text)
-{
-    if (text = "")
-        return
-        
-    Global ActiveToolTipText
-    ActiveToolTipText := text
-    
-    SetTimer(TrackToolTipPos, 10)
-    SetTimer(RemoveToolTip, -Config_TooltipDuration)
-}
-
-TrackToolTipPos()
-{
-    Global ActiveToolTipText
-    static lastX := -1, lastY := -1, lastText := ""
-    
-    if (ActiveToolTipText = "")
-    {
-        SetTimer(TrackToolTipPos, 0)
-        try ToolTip()
-        lastX := -1, lastY := -1, lastText := ""
-        return
-    }
-
-    try {
-        CoordMode("Mouse", "Screen")
-        CoordMode("ToolTip", "Screen")
-        MouseGetPos(&mX, &mY)
-        
-        ; Only redraw if the mouse actually moved or the text changed
-        if (mX != lastX || mY != lastY || ActiveToolTipText != lastText)
-        {
-            ToolTip(ActiveToolTipText, mX + 15, mY + 15)
-            lastX := mX
-            lastY := mY
-            lastText := ActiveToolTipText
-        }
-    }
-}
-
-RemoveToolTip()
-{
-    Global ActiveToolTipText
-    ActiveToolTipText := ""
-    SetTimer(TrackToolTipPos, 0)
-    try ToolTip()
-}
-
-GetCurrentTimeZoneID()
-{
-    tempFile := A_Temp "\tzout.txt"
-    if FileExist(tempFile)
-        FileDelete(tempFile)
-
-    RunWait(A_ComSpec ' /c "tzutil /g > ' tempFile '"',, "Hide")
-
-    if FileExist(tempFile) {
-        out := FileRead(tempFile)
-        FileDelete(tempFile)
-        return Trim(out, " `t`r`n")
-    }
-    return ""
-}
