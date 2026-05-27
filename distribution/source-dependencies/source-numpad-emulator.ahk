@@ -22,6 +22,8 @@
 
 ; ===========================================================================================================================================================================
 
+#Requires AutoHotkey v2.0
+
 if !IsSet(HelpEntries)
     global HelpEntries := []
 HelpEntries.Push("
@@ -30,28 +32,6 @@ HelpEntries.Push("
     CapsLock OFF    →  num-row keys
     CapsLock ON     →  numpad keys
 )")
-
-; =====================================================================================
-; CONFIG: NUMPAD SHIFT SYMBOLS
-; =====================================================================================
-;
-; >> What happens when Shift is held with CapsLock ON and a number key is pressed.
-;
-;   Enabled  →  Shift+numrow types symbols normally: "! @ # $ % ^ & * ( )"  (default)
-;   Disabled →  Shift+numrow does nothing
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
-; NumpadShiftSymbols := false  ; Disabled: Shift does nothing
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
 
 
 ; =========================================================

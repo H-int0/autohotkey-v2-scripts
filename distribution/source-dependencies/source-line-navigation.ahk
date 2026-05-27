@@ -22,6 +22,8 @@
 
 ; ===========================================================================================================================================================================
 
+#Requires AutoHotkey v2.0
+
 if !IsSet(HelpEntries)
     global HelpEntries := []
 HelpEntries.Push("
@@ -31,30 +33,6 @@ HelpEntries.Push("
     Shift+Win+ ←/→  →  select to edge
     Alt+Bksp/Del    →  delete to edge
 )")
-
-; =====================================================================================
-; CONFIG: LINE NAVIGATION
-; =====================================================================================
-;
-; >> Ctrl+Alt+Left/Right moves to start/end of line.
-; >> Shift+Alt+Left/Right selects to start/end of line.
-; >> Shift+Alt+Backspace/Delete deletes to start/end of line.
-;
-;   Enabled  →  Line navigation hotkeys are active (default)
-;   Disabled →  Line navigation hotkeys do nothing
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-LineNavEnabled := true   ; Enabled: hotkeys are active (default)
-; LineNavEnabled := false  ; Disabled: hotkeys do nothing
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
 
 
 ; =========================================================

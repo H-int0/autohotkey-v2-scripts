@@ -22,6 +22,8 @@
 
 ; ===========================================================================================================================================================================
 
+#Requires AutoHotkey v2.0
+
 if !IsSet(HelpEntries)
     global HelpEntries := []
 HelpEntries.Push("
@@ -29,53 +31,6 @@ HelpEntries.Push("
 > COLOR PICKER:
     Win+Ctrl+C      →  toggle picker
 )")
-
-; =====================================================================================
-; CONFIG: COLOR PICKER
-; =====================================================================================
-;
-; >> Press Win+Ctrl+C to toggle a live color picker under your mouse.
-; >> Press it again to close it, copy Hex/RGB/coords to clipboard, and show a summary.
-;
-;   Enabled  →  Win+Ctrl+C toggles the color picker (default)
-;   Disabled →  Win+Ctrl+C does nothing
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-ColorPickerEnabled := true   ; Enabled: Win+Ctrl+C toggles color picker (default)
-; ColorPickerEnabled := false  ; Disabled: Win+Ctrl+C does nothing
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
-
-
-; =====================================================================================
-; CONFIG: COLOR PICKER SUMMARY MSGBOX
-; =====================================================================================
-;
-; >> Controls whether a summary MsgBox appears after closing the picker.
-; >> Clipboard copy always happens regardless of this setting.
-;
-;   Enabled  →  MsgBox shows Hex, RGB, and coordinates after closing (default)
-;   Disabled →  Picker closes silently, values are copied to clipboard
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-ColorPickerMsgBox := true   ; Enabled: show summary MsgBox (default)
-; ColorPickerMsgBox := false  ; Disabled: close silently
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
 
 
 ; =========================================================
