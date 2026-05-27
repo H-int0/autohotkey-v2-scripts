@@ -86,7 +86,7 @@ Global Msg_ColorPicker := "Copied to Clipboard"   ; (default-text: "Copied to Cl
 
 ; ------- Force Kill Task tooltip -------
 ;
-Global Msg_EndTask := "Evaporated"   ; (default-text: "Evaporated")
+Global Msg_EndTask := "EVAPORATED!"   ; (default-text: "EVAPORATED!")
 ;                     ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
 
 
@@ -173,8 +173,8 @@ ColorPickerEnabled := true   ; Enabled: Win+Ctrl+C toggles color picker (default
 ; >> Controls whether a summary MsgBox appears after closing the picker.
 ; >> Clipboard copy always happens regardless of this setting.
 ;
-;   Enabled  →  MsgBox shows Hex, RGB, and coordinates after closing (default)
-;   Disabled →  Picker closes silently, values are copied to clipboard
+;   Disabled →  Picker closes silently, values are copied to clipboard (default)
+;   Enabled  →  MsgBox shows Hex, RGB, and coordinates after closing
 ;
 ; INSTRUCTIONS:
 ; 1. Uncomment ONLY ONE of the lines below.
@@ -183,8 +183,8 @@ ColorPickerEnabled := true   ; Enabled: Win+Ctrl+C toggles color picker (default
 ;
 ; =========================================================
 ;
-ColorPickerMsgBox := true   ; Enabled: show summary MsgBox (default)
-; ColorPickerMsgBox := false  ; Disabled: close silently
+ColorPickerMsgBox := false  ; Disabled: close silently (default)
+; ColorPickerMsgBox := true   ; Enabled: show summary MsgBox
 ;
 ; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
 ;

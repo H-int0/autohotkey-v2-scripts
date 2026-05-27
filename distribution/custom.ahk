@@ -91,7 +91,7 @@ Global Msg_ColorPicker := "Copied to Clipboard"   ; (default-text: "Copied to Cl
 
 ; ------- Force Kill Task tooltip -------
 ;
-Global Msg_EndTask := "Evaporated"   ; (default-text: "Evaporated")
+Global Msg_EndTask := "EVAPORATED!"   ; (default-text: "EVAPORATED!")
 ;                     ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
 
 
