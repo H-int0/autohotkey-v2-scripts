@@ -96,6 +96,14 @@ Global Msg_ColorPicker := "Copied to Clipboard"   ; (default-text: "Copied to Cl
 ; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
 ; ===========================================================================================================================================================================
 
+if !IsSet(HelpEntries)
+    global HelpEntries := []
+HelpEntries.Push("
+(
+> COLOR PICKER:
+    Win+Ctrl+C      →  toggle picker
+)")
+
 ; =====================================================================================
 ; CONFIG: COLOR PICKER
 ; =====================================================================================
@@ -353,20 +361,8 @@ ToggleHelpBox() {
             CapsLock OFF    →  num-row keys
             CapsLock ON     →  numpad keys
         ───────────────────────────────────────
-        > TIMEZONE SWITCHER:
-            Win+Alt+``       →  cycle TZ
-            Win+Ctrl+``      →  show current TZ
-        ───────────────────────────────────────
-        > FORCE KILL TASK:
-            Win+Ctrl+K      →  kill
-        ───────────────────────────────────────
         > COLOR PICKER:
             Win+Ctrl+C      →  toggle picker
-        ───────────────────────────────────────
-        > LINE NAVIGATION:
-            Shift+Alt+ ←/→  →  line start/end
-            Shift+Win+ ←/→  →  select to edge
-            Alt+Bksp/Del    →  delete to edge
         ───────────────────────────────────────
         > HELPER:
             Win+/           →  toggle this box

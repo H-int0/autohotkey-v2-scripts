@@ -84,6 +84,15 @@ Global Config_TooltipDuration := 2500   ; (default: 2500 ms)
 ; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
 ; ===========================================================================================================================================================================
 
+if !IsSet(HelpEntries)
+    global HelpEntries := []
+HelpEntries.Push("
+(
+> TIMEZONE SWITCHER:
+    Win+Alt+``       →  cycle TZ
+    Win+Ctrl+``      →  show current TZ
+)")
+
 
 ; =========================================================
 ; FEATURE: TIMEZONE SWITCHER
@@ -423,24 +432,9 @@ ToggleHelpBox() {
         (
         >> STRAP HELP
         ───────────────────────────────────────
-        > NUMPAD EMULATOR:
-            CapsLock OFF    →  num-row keys
-            CapsLock ON     →  numpad keys
-        ───────────────────────────────────────
         > TIMEZONE SWITCHER:
             Win+Alt+``       →  cycle TZ
             Win+Ctrl+``      →  show current TZ
-        ───────────────────────────────────────
-        > FORCE KILL TASK:
-            Win+Ctrl+K      →  kill
-        ───────────────────────────────────────
-        > COLOR PICKER:
-            Win+Ctrl+C      →  toggle picker
-        ───────────────────────────────────────
-        > LINE NAVIGATION:
-            Shift+Alt+ ←/→  →  line start/end
-            Shift+Win+ ←/→  →  select to edge
-            Alt+Bksp/Del    →  delete to edge
         ───────────────────────────────────────
         > HELPER:
             Win+/           →  toggle this box

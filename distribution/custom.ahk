@@ -31,6 +31,7 @@ ProcessSetPriority "High"
 global cpGuiGlobal := ""
 global cSwatchGlobal := "", cHexGlobal := "", cRgbGlobal := "", cXyGlobal := ""
 global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal := 0
+global HelpEntries := []
 
 
 ; =====================================================================================
@@ -169,32 +170,11 @@ ToggleHelpBox() {
         helpGuiGlobal.MarginY := 12
         helpGuiGlobal.SetFont("cWhite s10", "Consolas")
         
-        helpText := "
-        (
-        >> STRAP HELP
-        ───────────────────────────────────────
-        > NUMPAD EMULATOR:
-            CapsLock OFF    →  num-row keys
-            CapsLock ON     →  numpad keys
-        ───────────────────────────────────────
-        > TIMEZONE SWITCHER:
-            Win+Alt+``       →  cycle TZ
-            Win+Ctrl+``      →  show current TZ
-        ───────────────────────────────────────
-        > FORCE KILL TASK:
-            Win+Ctrl+K      →  kill
-        ───────────────────────────────────────
-        > COLOR PICKER:
-            Win+Ctrl+C      →  toggle picker
-        ───────────────────────────────────────
-        > LINE NAVIGATION:
-            Shift+Alt+ ←/→  →  line start/end
-            Shift+Win+ ←/→  →  select to edge
-            Alt+Bksp/Del    →  delete to edge
-        ───────────────────────────────────────
-        > HELPER:
-            Win+/           →  toggle this box
-        )"
+        helpText := ">> STRAP HELP`n"
+        helpText .= "───────────────────────────────────────`n"
+        for entry in HelpEntries
+        helpText .= entry . "`n───────────────────────────────────────`n"
+        helpText .= "> HELPER:`n    Win+/           →  toggle this box"
         
         helpGuiGlobal.Add("Text", "", helpText)
         helpGuiGlobal.Show("NoActivate Hide")
