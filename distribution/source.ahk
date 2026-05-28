@@ -32,7 +32,7 @@ global cpGuiGlobal := ""
 global cSwatchGlobal := "", cHexGlobal := "", cRgbGlobal := "", cXyGlobal := ""
 global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal := 0
 
-#Include config.ahk   ; Configuration file (edit this to customize features)
+#Include source-dependencies/config.ahk   ; Configuration file (edit this to customize features)
 
 #Include source-dependencies/source-numpad-emulator.ahk
 
