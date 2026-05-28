@@ -5,6 +5,20 @@ Format: [version]: release date, followed by what changed.
 
 ---
 
+## Unreleased
+
+- **Features**
+  - Battery Plan Switcher
+  - Vim Arrow Keys
+  - Move the Selected Word/Line
+  - System Temperatures & Fan Speed Monitor
+- **Utilities**
+  - Hotkeys to Reload the Script
+  - Hotkeys to Exit the Script
+  - CLI Interface
+
+---
+
 ## [v0.1.0] 2026-05-23
 
 ### Added in [v0.1.0]
@@ -72,6 +86,21 @@ Format: [version]: release date, followed by what changed.
   - Tooltips are now screen-bound and will not render outside the visible display area.
 - **Tooltips (Global)**
   - Tooltip behavior has been standardized across all features, existing tooltip timing and positioning may appear slightly different from v1.1.0.
+
+---
+
+## [v0.3.1] 2026-05-28
+
+### Changed in [v0.3.1]
+
+- Project license changed to GPL-3.0.
+- Added GPL-3.0 license header to every script (required in all scripts as is, going this point in time forward).
+- Restructured `distribution/` directory,
+  - users can now configure features directly in the source code, eliminating the need for a separate `custom.ahk`.
+
+### Fixed in [v0.3.1]
+
+- Corrected command-line instructions for adding Strap to auto-start on boot.
 
 ---
 
