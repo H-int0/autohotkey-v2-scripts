@@ -535,16 +535,9 @@ RemoveToolTip()
 
 GetCurrentTimeZoneID()
 {
-    tempFile := A_Temp "\tzout.txt"
-    if FileExist(tempFile)
-        FileDelete(tempFile)
-
-    RunWait(A_ComSpec ' /c "tzutil /g > ' tempFile '"',, "Hide")
-
-    if FileExist(tempFile) {
-        out := FileRead(tempFile)
-        FileDelete(tempFile)
-        return Trim(out, " `t`r`n")
-    }
+    try {
+        return RegRead("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation", "TimeZoneKeyName")
+    } catch {
         return ""
+    }
 }
