@@ -3,7 +3,7 @@
 This guide covers how to configure and customize Strap beyond its default behavior.
 
 - It focuses primarily on the scripts inside the `distribution/` and `modules/` directories.
-- You can configure the pre‑combined `distribution/source.ahk` directly via `config.ahk`, or build your own combination using `distribution/custom.ahk`.
+- You can configure the pre‑combined `distribution/source.ahk` directly via `source-dependencies/config.ahk`.
 - Independent components inside `modules/` follow the same configuration principles inside their respective files.
 
 ---
@@ -18,7 +18,6 @@ This guide covers how to configure and customize Strap beyond its default behavi
 - [Adding a Timezone Not in the List](#adding-a-timezone-not-in-the-list)
 - [Setting a Startup Timezone](#setting-a-startup-timezone)
 - [Adding a Custom Timezone to Startup (not in the list)](#adding-a-custom-timezone-to-startup-not-in-the-list)
-- [Building a Custom Script](#building-a-custom-script)
 
 ---
 
@@ -114,6 +113,14 @@ If you don't want a tooltip to appear at all, simply add a semicolon (`;`) at th
 ;                         ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
 
 ```
+
+### Step 5: Save and Reload
+
+The change does not take effect until the script is restarted.
+
+- If the tray icon is visible, right-click it and choose **Reload**.
+- If it is hidden, show it with `Win + Ctrl + \`, then reload it.
+- Or exit the script and run it again.
 
 ---
 
@@ -261,7 +268,11 @@ NumpadShiftSymbols := false  ; Disabled: Shift does nothing
 
 ### Step 4: save and reload
 
-Reload the script after saving your change. The new behavior applies immediately after restart or reload.
+The change does not take effect until the script is restarted.
+
+- If the tray icon is visible, right-click it and choose **Reload**.
+- If it is hidden, show it with `Win + Ctrl + \`, then reload it.
+- Or exit the script and run it again.
 
 ---
 
@@ -308,7 +319,7 @@ ColorPickerMsgBox := false  ; Disabled: close silently (default)
 
 Only one line should stay active.
 
-- **To keep shifted symbols enabled (default):**
+- **To hide the summary MsgBox: (default):**
 
 ```ahk
 ; =========================================================
@@ -320,7 +331,7 @@ ColorPickerMsgBox := false  ; Disabled: close silently (default)
 ;
 ```
 
-- **To disable shifted symbols:**
+- **To show the summary MsgBox:**
 
 ```ahk
 ; =========================================================
@@ -334,7 +345,11 @@ ColorPickerMsgBox := true   ; Enabled: show summary MsgBox
 
 ### Step 4: Save And Reload
 
-Reload the script after saving your change. The new behavior applies immediately after restart or reload.
+The change does not take effect until the script is restarted.
+
+- If the tray icon is visible, right-click it and choose **Reload**.
+- If it is hidden, show it with `Win + Ctrl + \`, then reload it.
+- Or exit the script and run it again.
 
 ---
 
@@ -363,7 +378,6 @@ The second line of each entry is the Windows ID (e.g., `Tokyo Standard Time`).
 
 - Combined script: `distribution/source.ahk`
 - Timezone module: `modules/timezone-switcher.ahk`
-- Your custom build: `distribution/custom.ahk`
 
 ### Step 3: Find the `ADD CUSTOM TIMEZONES` section
 
@@ -474,9 +488,13 @@ TZOrder.Push("Newfoundland Standard Time")
 ;
 ```
 
-### Step 5: Save and Reload
+### Step_5: Save and Reload
 
-After saving, reload the script so the updated timezone list is loaded.
+The change does not take effect until the script is restarted.
+
+- If the tray icon is visible, right-click it and choose **Reload**.
+- If it is hidden, show it with `Win + Ctrl + \`, then reload it.
+- Or exit the script and run it again.
 
 ---
 
@@ -492,7 +510,6 @@ This controls what timezone Strap applies when it launches.
 
 - Combined script: `distribution/source.ahk`
 - Timezone module: `modules/timezone-switcher.ahk`
-- Your custom build: `distribution/custom.ahk`
 
 ### Step 2: Find the `STARTUP TIMEZONE` block
 
@@ -600,7 +617,11 @@ StartupTZID := "New Zealand Standard Time"
 
 ### Step 4: Save and restart
 
-Save the file and restart the script. The selected timezone will be applied at launch.
+The change does not take effect until the script is restarted.
+
+- If the tray icon is visible, right-click it and choose **Reload**.
+- If it is hidden, show it with `Win + Ctrl + \`, then reload it.
+- Or exit the script and run it again.
 
 ---
 
@@ -629,7 +650,6 @@ The second line of each entry is the Windows ID (e.g., `Tokyo Standard Time`).
 
 - Combined script: `distribution/source.ahk`
 - Timezone module: `modules/timezone-switcher.ahk`
-- Your custom build: `distribution/custom.ahk`
 
 ### Step 3: Find the `ADD CUSTOM TIMEZONE FOR STARTUP` section
 
@@ -688,79 +708,11 @@ StartupTZID := "Tokyo Standard Time"
 
 ### Step 5: Save and reload
 
-After saving, reload the script so the updated timezone list is loaded.
+The change does not take effect until the script is restarted.
 
----
-
-## Building a Custom Script
-
-> The `distribution/custom.ahk` file is a template that lets you combine the features you want.
-
-### Step 1: Open `distribution/custom.ahk` in a text editor
-
-### Step 2: Open the module(s) you want to include and find the markers
-
-Each module in `modules/` contains markers that tell you exactly what to copy:
-
-It looks like this:
-
-```ahk
-; ===========================================================================================================================================================================
-; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
-; ===========================================================================================================================================================================
-
-[feature code]
-
-; ===========================================================================================================================================================================
-; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
-; ===========================================================================================================================================================================
-```
-
-### Step 3: Copy the marked section
-
-- Select from `>> COPY BELOW THIS LINE` down to `>> COPY ABOVE THIS LINE` (excluding the marker lines themselves if you prefer, but including them is harmless).
-
-### Step 4: Paste into `custom.ahk`
-
-Inside `custom.ahk`, find the block, and paste the copied code between those two lines.
-
-```ahk
-; ===========================================================================================================================================================================
-; BLOCK: PASTE YOUR STANDALONE MODULES HERE
-; ===========================================================================================================================================================================
-;
-; >> Copy the marked sections from your standalone scripts
-;    and paste them directly inside this block.
-;
-; ========================================================= PASTE MODULES BELOW THIS LINE =========================================================
-
-
-
-
-
-
-
-
-
-
-; ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PASTE MODULES ABOVE THIS LINE ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-;
-```
-
-### Step 5 (optional): Repeat for other modules
-
-- You can paste multiple modules one after another.
-- The order does not matter because they use different hotkeys.
-
-### Step 6 (optional): Configure each feature as needed
-
-- Edit the configuration sections inside the pasted code as per your needs.
-
-### Step 7: Save and run `distribution/custom.ahk`
-
-- Save the file and restart the script.
-
-**Your customized script will now run with only the features you selected.**
+- If the tray icon is visible, right-click it and choose **Reload**.
+- If it is hidden, show it with `Win + Ctrl + \`, then reload it.
+- Or exit the script and run it again.
 
 ---
 

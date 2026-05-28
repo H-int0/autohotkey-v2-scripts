@@ -31,7 +31,7 @@ A lightweight, semi-transparent (`Opacity: 225`) black overlay that follows your
 
 - **Dynamic Aggregation:**
 
-  - The Help Box is not hardcoded. Whenever a feature is enabled (or included in your `custom.ahk` build), it pushes its specific instructions into a global array called `HelpEntries`.
+  - The Help Box is not hardcoded. Whenever a feature is enabled, it pushes its specific instructions into a global array called `HelpEntries`.
   - The Help Box dynamically loops through this array to build the UI. If you disable a feature, it instantly disappears from the Help Box.
 - **Mouse Tracking:**
   - Like the Color Picker, the Help Box updates its position every 10ms and clamps to the edges of your screen.
