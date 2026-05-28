@@ -11,22 +11,43 @@ This document describes the end-to-end pipeline for adding a new feature to Stra
 
 ## Table of contents
 
+- [Commit Text](#commit-text)
 - [The Module Template](#the-module-template)
 - [Step-by-Step Pipeline](#step-by-step-pipeline)
-  - [Step 1: Write the Standalone Module](#step-1-write-the-standalone-module)
-  - [Step 2: Test the Standalone Module](#step-2-test-the-standalone-module)
-  - [Step 3: Update `custom.ahk` (if needed)](#step-3-update-customahk-if-needed)
-  - [Step 4: Test `custom.ahk` with Existing Modules Only](#step-4-test-customahk-with-existing-modules-only)
-  - [Step 5: Test `custom.ahk` with the New Module Alone](#step-5-test-customahk-with-the-new-module-alone)
-  - [Step 6: Test `custom.ahk` with New Module + All Existing Modules Together](#step-6-test-customahk-with-new-module--all-existing-modules-together)
-  - [Step 7: Add New Config Entries to `config.ahk`](#step-7-add-new-config-entries-to-configahk)
-  - [Step 8: Write the Source Dependency](#step-8-write-the-source-dependency)
-  - [Step 9: Integrate into `source.ahk`](#step-9-integrate-into-sourceahk)
-    - [9a. Add globals (if any)](#9a-add-globals-if-any)
-    - [9b. Add the `#Include` line](#9b-add-the-include-line)
-    - [9c. Update the help box (if `source.ahk` has a hardcoded help text)](#9c-update-the-help-box-if-sourceahk-has-a-hardcoded-help-text)
-  - [Step 10: Test `source.ahk`](#step-10-test-sourceahk)
-- [Merge the feature to `dev`](#merge-the-feature-to-dev)
+  - [STEP 1: Write the Standalone Module](#step-1-write-the-standalone-module)
+  - [STEP 2: Test the Standalone Module](#step-2-test-the-standalone-module)
+  - [STEP 3: Update `source.ahk` (if needed)](#step-3-update-sourceahk-if-needed)
+  - [STEP 4: Integration Testing in `source.ahk`](#step-4-integration-testing-in-sourceahk)
+  - [STEP 5: Add New Config Entries to `source-dependencies/config.ahk`](#step-5-add-new-config-entries-to-source-dependenciesconfigahk)
+  - [STEP 6: Write the Source Dependency](#step-6-write-the-source-dependency)
+  - [STEP 7: Integrate into `source.ahk`](#step-7-integrate-into-sourceahk)
+  - [STEP 8: Integration testing in `source.ahk`](#step-8-integration-testing-in-sourceahk)
+  - [STEP 9: Merge the feature to `dev`](#step-9-merge-the-feature-to-dev)
+
+---
+
+## Commit Text
+
+### Format
+
+Every commit text follows this structure:
+
+```cmd
+type: short description in lowercase
+```
+
+### Types
+
+| Type | Used for |
+| --- | --- |
+| `feat` | Adding something new like a new page, project, section, or file. |
+| `fix` | Correcting a bug, broken link, typo, or anything that was wrong. |
+| `docs` | Changes to documentation only. |
+| `refactor` | Restructuring or reorganizing existing code without changing what it does. |
+| `chore` | Maintenance work config changes, folder setup, `.gitignore` updates, perhaps adding files, etc. |
+| `style` | Formatting, whitespace, or styling changes that do not affect logic or content. |
+
+---
 
 ## The Module Template
 
@@ -112,22 +133,15 @@ FeatureEnabled := true
 ; ... ToggleHelpBox / UpdateHelpBox boilerplate ...
 ```
 
-Key rules extracted from existing modules:
-
-- Everything between the two `COPY BELOW/ABOVE` delimiter comments is what gets pasted into `custom.ahk`.
-- The `HelpEntries.Push(...)` block must always be the first thing after the delimiter, before any config or hotkeys.
-- Config variables are declared directly in the module, not in a separate file.
-- The tray icon toggle and help box boilerplate always appear below the `COPY ABOVE` delimiter they are standalone-only scaffolding and do **not** get copied into `custom.ahk`.
-
 ## Step-by-Step Pipeline
 
-### Step 1: Write the Standalone Module
+### STEP 1: Write the Standalone Module
 
 Create `modules/<feature-name>.ahk` following the module template above.
 
 ---
 
-### Step 2: Test the Standalone Module
+### STEP 2: Test the Standalone Module
 
 - Run `modules/<feature-name>.ahk` directly in AHK.
 
@@ -135,108 +149,79 @@ If any check fails: fix, re-run, and repeat until all pass. Then continue.
 
 ---
 
-### Step 3: Update `custom.ahk` (if needed)
+### STEP 3: Update `source.ahk` (if needed)
 
-Check whether the new feature requires any changes to `distribution/custom.ahk`. This is needed when the feature introduces:
+Check whether the new feature requires any changes to `distribution/source.ahk`. This is needed when the feature introduces:
 
 - New **global variables** that must be declared at the top of the script (e.g. the color picker required `cpGuiGlobal`, `cSwatchGlobal`, etc.).
 - New **tooltip message globals** (e.g. `Msg_EndTask`, `Msg_ColorPicker`).
 - New **config blocks** in the tooltips section or elsewhere in the preamble.
 
-If no new globals or preamble changes are needed, skip to Step 7.
+> If no changes are needed, skip to [STEP 5](#step-5-add-new-config-entries-to-source-dependenciesconfigahk).
 
 ---
 
-### Step 4: Test `custom.ahk` with Existing Modules Only
+### STEP 4: Integration Testing in `source.ahk`
 
-- Before touching anything new, verify that `custom.ahk` still works correctly with the existing modules pasted in.
+Before moving forward, you must verify that the new feature plays nicely with the rest of the ecosystem.
 
-This is your baseline. If this fails, something in Step 3 broke the file fix it before continuing.
+- Test `source.ahk` with Existing source-dependencies Only
+  - Before touching anything new, verify that `source.ahk` still works correctly with the existing source-dependencies enabled.
 
----
-
-### Step 5: Test `custom.ahk` with the New Module Alone
-
-- If this fails, the issue is in the module itself or in the `custom.ahk` preamble changes from Step 3. Fix, re-test.
+> This is your baseline. If this fails, something in [STEP 3](#step-3-update-sourceahk-if-needed) broke the file fix it before continuing.
 
 ---
 
-### Step 6: Test `custom.ahk` with New Module + All Existing Modules Together
+### STEP 5: Add New Config Entries to `source-dependencies/config.ahk`
 
-- This is the critical integration test. If it fails, there is likely a variable naming conflict or a `#HotIf` context leak. Fix, re-test.
-
----
-
-### Step 7: Add New Config Entries to `config.ahk`
-
-- If the new feature introduces config variables that users should be able to control from `config.ahk` (in `distribution/`), add them now.
+- If the new feature introduces config variables that users should be able to control from `source-dependencies/config.ahk` (in `distribution/`), add them now.
 
 ---
 
-### Step 8: Write the Source Dependency
+### STEP 6: Write the Source Dependency
 
 Create `distribution/source-dependencies/source-<feature-name>.ahk`.
 
 The source dependency is a **stripped-down** version of the module it contains only what is needed when running inside `source.ahk`.
 
-**What to keep:**
-
-- MIT license header.
-- `#Requires AutoHotkey v2.0` (no other directives `source.ahk` already sets them).
-- `HelpEntries.Push(...)` block.
-- The feature hotkeys and logic (wrapped in `#HotIf`).
-- Any helper functions unique to this feature.
-
-**What to remove:**
-
-- `#UseHook`, `#MaxThreadsBuffer`, `ProcessSetPriority` (already in `source.ahk`).
-- Tray icon config block.
-- `COPY BELOW / COPY ABOVE` delimiter comments.
-- Tray icon toggle hotkey.
-- Help box boilerplate (`ToggleHelpBox`, `UpdateHelpBox`).
-- Any config variable declarations those now live in `config.ahk`.
-
 ---
 
-### Step 9: Integrate into `source.ahk`
+### STEP 7: Integrate into `source.ahk`
 
 Open `distribution/source.ahk` and make the following changes:
 
-#### **9a. Add globals (if any)**
+- **Add globals (if any)**
+  - If the feature requires module-level globals, declare them near the top of `source.ahk`, before the `#Include` directives. Follow the existing pattern:
 
-- If the feature requires module-level globals, declare them near the top of `source.ahk`, before the `#Include` directives. Follow the existing pattern:
+- **Add the `#Include` line**
+  - Add a new `#Include` line after the existing includes:
 
-#### **9b. Add the `#Include` line**
-
-- Add a new `#Include` line in the include block, after the existing includes:
-
-```ahk
-#Include source-dependencies/source-<feature-name>.ahk
-```
-
-#### **9c. Update the help box (if `source.ahk` has a hardcoded help text)**
-
-- If `source.ahk` contains a hardcoded `helpText` string (as opposed to building it dynamically from `HelpEntries`), add the new feature's entry to it manually, following the same separator style:
-
-```ahk
-───────────────────────────────────────
-> MY FEATURE:
-    Win+Ctrl+X      →  do the thing
-```
+    ```ahk
+    #Include source-dependencies/source-<feature-name>.ahk
+    ```
 
 ---
 
-### Step 10: Test `source.ahk`
+### STEP 8: Integration testing in `source.ahk`
 
-- Run `distribution/source.ahk` directly.
+- **Test `source.ahk` with Existing source-dependencies Only**
+  - Before touching anything new, verify that `source.ahk` still works correctly with the existing source-dependencies enabled.
+  > This is your baseline. If this fails, something in [STEP 5](#step-5-add-new-config-entries-to-source-dependenciesconfigahk) or [STEP 7](#step-7-integrate-into-sourceahk) broke the `source.ahk`. Fix it before continuing.
 
-If any check fails: fix, re-test, and do not proceed until the full suite passes.
+- **Test `source.ahk` with the New `source-dependencies-*` Alone**
+  - Disable the other features in `source.ahk` and test only the new feature.
+  - If this fails, the issue is in the source-dependencies itself.
+  > It means something in [STEP 6](#step-6-write-the-source-dependency) broke the `source.ahk`. Fix it before continuing.
+
+- **Test `source.ahk` with New `source-dependencies-*` + All Existing source-dependencies Together**
+  - Enable other features in `source.ahk` and test if the `source.ahk` works as intended with the new feature.
+  - This is the critical integration test. If it fails, fix it before continuing.
 
 ---
 
-## Merge the feature to `dev`
+### STEP 9: Merge the feature to `dev`
 
-- Once all 10 steps pass, merge the feature into `dev`.
+- Once all the 8 steps pass, the feature is now ready to be merged into `dev`.
 
 ---
 
