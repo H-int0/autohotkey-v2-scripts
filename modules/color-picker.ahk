@@ -104,29 +104,6 @@ HelpEntries.Push("
     Win+Ctrl+C      →  toggle picker
 )")
 
-; =====================================================================================
-; CONFIG: COLOR PICKER
-; =====================================================================================
-;
-; >> Press Win+Ctrl+C to toggle a live color picker under your mouse.
-; >> Press it again to close it, copy Hex/RGB/coords to clipboard, and show a summary.
-;
-;   Enabled  →  Win+Ctrl+C toggles the color picker (default)
-;   Disabled →  Win+Ctrl+C does nothing
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-ColorPickerEnabled := true   ; Enabled: Win+Ctrl+C toggles color picker (default)
-; ColorPickerEnabled := false  ; Disabled: Win+Ctrl+C does nothing
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
-
 
 ; =====================================================================================
 ; CONFIG: COLOR PICKER SUMMARY MSGBOX
@@ -156,7 +133,7 @@ ColorPickerMsgBox := false  ; Disabled: close silently (default)
 ; FEATURE: COLOR PICKER (Win + Ctrl + C)
 ; =========================================================
 
-#HotIf ColorPickerEnabled
+#HotIf true
 #^c::ToggleColorPicker()
 #HotIf
 

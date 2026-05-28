@@ -34,7 +34,7 @@ HelpEntries.Push("
 ; FEATURE: FORCE KILL TASK (Win + Ctrl + K)
 ; =========================================================
 
-#HotIf EndTaskEnabled
+#HotIf true
 
 #^k:: {
     activeHwnd := 0

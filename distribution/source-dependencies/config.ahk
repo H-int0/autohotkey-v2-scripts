@@ -116,54 +116,6 @@ NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 
 
 ; =====================================================================================
-; CONFIG: FORCE KILL TASK
-; =====================================================================================
-;
-; >> Press Win+Ctrl+K to close the active window (like Alt+F4).
-; >> If the window is frozen, it will force kill the process instead.
-;
-;   Enabled  →  Win+Ctrl+K closes/kills the active window (default)
-;   Disabled →  Win+Ctrl+K does nothing
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
-; EndTaskEnabled := false  ; Disabled: Win+Ctrl+K does nothing
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
-
-
-; =====================================================================================
-; CONFIG: COLOR PICKER
-; =====================================================================================
-;
-; >> Press Win+Ctrl+C to toggle a live color picker under your mouse.
-; >> Press it again to close it, copy Hex/RGB/coords to clipboard, and show a summary.
-;
-;   Enabled  →  Win+Ctrl+C toggles the color picker (default)
-;   Disabled →  Win+Ctrl+C does nothing
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-ColorPickerEnabled := true   ; Enabled: Win+Ctrl+C toggles color picker (default)
-; ColorPickerEnabled := false  ; Disabled: Win+Ctrl+C does nothing
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
-
-
-; =====================================================================================
 ; CONFIG: COLOR PICKER SUMMARY MSGBOX
 ; =====================================================================================
 ;
@@ -182,31 +134,6 @@ ColorPickerEnabled := true   ; Enabled: Win+Ctrl+C toggles color picker (default
 ;
 ColorPickerMsgBox := false  ; Disabled: close silently (default)
 ; ColorPickerMsgBox := true   ; Enabled: show summary MsgBox
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
-
-
-; =====================================================================================
-; CONFIG: LINE NAVIGATION
-; =====================================================================================
-;
-; >> Ctrl+Alt+Left/Right moves to start/end of line.
-; >> Shift+Alt+Left/Right selects to start/end of line.
-; >> Shift+Alt+Backspace/Delete deletes to start/end of line.
-;
-;   Enabled  →  Line navigation hotkeys are active (default)
-;   Disabled →  Line navigation hotkeys do nothing
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-LineNavEnabled := true   ; Enabled: hotkeys are active (default)
-; LineNavEnabled := false  ; Disabled: hotkeys do nothing
 ;
 ; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
 ;

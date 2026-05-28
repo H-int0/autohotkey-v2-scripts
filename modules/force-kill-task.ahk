@@ -99,35 +99,11 @@ HelpEntries.Push("
     Win+Ctrl+K      →  kill
 )")
 
-; =====================================================================================
-; CONFIG: FORCE KILL TASK
-; =====================================================================================
-;
-; >> Press Win+Ctrl+K to close the active window (like Alt+F4).
-; >> If the window is frozen, it will force kill the process instead.
-;
-;   Enabled  →  Win+Ctrl+K closes/kills the active window (default)
-;   Disabled →  Win+Ctrl+K does nothing
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
-; EndTaskEnabled := false  ; Disabled: Win+Ctrl+K does nothing
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
-
-
 ; =========================================================
 ; FEATURE: FORCE KILL TASK (Win + Ctrl + K)
 ; =========================================================
 
-#HotIf EndTaskEnabled
+#HotIf true
 #^k:: {
     activeHwnd := 0
     try {

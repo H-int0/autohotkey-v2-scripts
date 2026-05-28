@@ -34,7 +34,7 @@ HelpEntries.Push("
 ; FEATURE: COLOR PICKER (Win + Ctrl + C)
 ; =========================================================
 
-#HotIf ColorPickerEnabled
+#HotIf true
 #^c::ToggleColorPicker()
 #HotIf
 
