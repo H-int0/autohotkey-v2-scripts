@@ -25,12 +25,13 @@ Follow the steps below to safely remove the script from the Startup.
 ## Step 2: Find and Kill the Script
 
 - In Task Manager, click the **Processes** tab from the top (if it isn't already selected).
-- Look for a process named **AutoHotkey** or **strap.ahk** in the list.
+- Look for a process named **AutoHotkey** or **source.ahk** in the list.
 - Click on it to select it.
 - Click the **End Task** button inside the Task Manager (usually at the top right or bottom right depending on your Windows version).
 - Alternatively, right-click the **AutoHotkey** process and click **End Task** from the menu that appears.
 
-> **Note:** If Task Manager looks tiny with no tabs, click "More details" at the bottom left first.
+> [!Note]
+> If Task Manager looks tiny with no tabs, click "More details" at the bottom left first.
 
 Your keyboard should return to normal immediately after this process ends.
 
@@ -43,7 +44,7 @@ If Strap was set to launch on startup, it will come back after the next restart 
 **If your keyboard is working again after Step 2**, the quickest way is:
 
 1. Press `Win + R`, type `shell:startup`, and press Enter.
-2. Find `strap.ahk` in the folder.
+2. Find the shortcut named **Strap** (or `Strap.lnk`) in the folder.
 3. Right-click it and select **Delete**.
 
 ---
@@ -59,7 +60,7 @@ If Strap was set to launch on startup, it will come back after the next restart 
 C:\Users\YourName\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
 ```
 
-- Find `strap.ahk` in the folder.
+- Find the shortcut named **Strap** (or `Strap.lnk`) in the folder.
 - Right-click it and select **Delete**.
 
 ---
@@ -85,7 +86,7 @@ Common causes of rogue behavior are:
 
 - Conflicting hotkeys with other running software.
 - Violating the single-threaded hook model (e.g., running multiple separate AHK scripts that conflict with the CapsLock hook).
-- Running an outdated version of AutoHotkey. Make sure you are running **AutoHotkey v2.0** or later.
+- Running an outdated version of AutoHotkey. Make sure you are running [AutoHotkey v2.0](https://www.autohotkey.com/) or later.
 
 If you want to re-add the script to startup after fixing the issue, refer to the **Auto-Start on Boot** section in [README.md](README.md).
 
