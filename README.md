@@ -35,9 +35,10 @@ With more planned for the future.
 - [Script Structure and Configuration](#script-structure-and-configuration)
 - [Configuration Guide](#configuration-guide)
 - [Auto-Start on Boot](#auto-start-on-boot)
-- [Updating the Startup Copy](#updating-the-startup-copy)
-- [Removing the Startup Copy](#removing-the-startup-copy)
+- [Updating the Script](#updating-the-script)
+- [Removing the Startup Shortcut](#removing-the-startup-shortcut)
 - [Troubleshooting](#troubleshooting)
+- [LICENSE](#license)
 
 ---
 
@@ -55,11 +56,10 @@ With more planned for the future.
 |   RECOVERY.md
 |
 +---distribution
-|   |   config.ahk
-|   |   custom.ahk
 |   |   source.ahk
 |   |
 |   \---source-dependencies
+|           config.ahk
 |           source-color-picker.ahk
 |           source-force-kill-task.ahk
 |           source-line-navigation.ahk
@@ -357,75 +357,58 @@ Refer to [CONFIGURE.md](CONFIGURE.md) for detailed step-by-step instructions on:
 
 > By default, you need to manually run the script every time your computer restarts.
 
-If you'd rather have Strap launch automatically on startup, add a copy of it to the Windows startup folder. A copy is safer than a shortcut because it won't break if you move the original folder.
+**To make Strap launch automatically on startup:**
 
 ### Option A: Command Prompt
 
-Open Command Prompt and run the following, replacing `YOUR_PATH` with the full path to your `distribution/source.ahk` or `distribution/custom.ahk`:
-
-- For the combined script (`distribution/source.ahk`):
+1. Open Command Prompt and run the following,
+2. Replacing `YOUR_PATH` with the full path to the root of your local fork of the repository. (e.g., `C:\Users\Layer\Desktop\autohotkey-v2-scripts-main`)
 
 ```cmd
-copy "YOUR_PATH\distribution\source.ahk" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
+cd YOUR_PATH
 ```
 
-- For a custom script (`distribution/custom.ahk`):
-
 ```cmd
-copy "YOUR_PATH\distribution\custom.ahk" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
+powershell -Command "$WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Strap.lnk'); $Shortcut.TargetPath = '%CD%\distribution\source.ahk'; $Shortcut.WorkingDirectory = '%CD%\distribution'; $Shortcut.Save()"
 ```
 
 ### Option B: Manual
 
-1. Press `Win + R`, type `shell:startup`, and press Enter.
-2. Copy your script (`source.ahk` or `custom.ahk`) into the folder that opens.
-3. Rename it to `strap.ahk`. *(optional, recommended for consistency)*
+1. Navigate to the `distribution` folder inside your local Strap repository.
+2. Right-click `source.ahk` and select **Create shortcut**.
+3. Copy or cut the newly created shortcut file (it will be named something like `source.ahk - Shortcut`).
+4. Press `Win + R`, type `shell:startup`, and press Enter to open the Windows Startup folder.
+5. Paste the shortcut file directly into that folder.
+6. *(Optional, recommended for consistency)* Rename the shortcut file to **Strap**.
 
 ---
 
-## Updating the Startup Copy
+## Updating the Script
 
-After editing your script or config, the copy in the startup folder does not update automatically.
+- Since, Strap runs via a native Windows shortcut pointing directly to your local repository, **no manual updates are required.**
+- Whenever you pull updates from Git or modify your local `config.ahk`or `source.ahk`, your changes are instantly active the next time the script loads.
 
-### Option-A: Command Prompt
-
-Run the following, replacing `YOUR_PATH` with the full path to your `distribution/source.ahk`:
-
-- For the combined script:
-
-```cmd
-copy /Y "YOUR_PATH\distribution\source.ahk" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
-```
-
-- For a custom build:
-
-```cmd
-copy /Y "YOUR_PATH\distribution\custom.ahk" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
-```
-
-### Option-B: Manual
-
-1. Press `Win + R`, type `shell:startup`, and press Enter.
-2. Delete the existing `strap.ahk` from the folder.
-3. Copy your updated `distribution/source.ahk` (or `distribution/custom.ahk` if you are using a personalized layout) into the same folder
-4. Rename it to `strap.ahk`. *(optional, recommended for consistency)*
-
----
-
-## Removing the Startup Copy
+## Removing the Startup Shortcut
 
 If you no longer want Strap to launch on startup:
 
-### Option_A: Command Prompt
+### Option A: Command prompt
+
+1. Open **Command Prompt** (any folder context is fine).
+2. Paste and run the following command:
 
 ```cmd
-del "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
+del "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Strap.lnk"
 ```
+
+> [!NOTE]
+> If you have named the shortcut to something other than `Strap.lnk` make sure to replace that in the command above.
 
 ### Option_B: Manual
 
 1. Press `Win + R`, type `shell:startup`, and press Enter.
-2. Find `strap.ahk` in the folder and delete it.
+2. Locate the shortcut named Strap (it may just look like a standard application link).
+3. Right-click it and select Delete.
 
 ---
 
@@ -436,6 +419,14 @@ del "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\strap.ahk"
 - **Script seems to be running but nothing works**: Right-click the tray icon (make it visible first with `Win + Ctrl + \`) and select **Reload**.
 
 > **Keyboard is behaving strangely after installing the script**: See [RECOVERY.md](RECOVERY.md) for step-by-step instructions to safely remove the script.
+
+---
+
+## LICENSE
+
+This [project](https://github.com/H-int0/autohotkey-v2-scripts) is licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.txt) - see the [LICENSE](LICENSE) file for more details.
+
+Copyright (C) 2026 [H-int0](https://github.com/H-int0)
 
 ---
 
