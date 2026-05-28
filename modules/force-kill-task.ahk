@@ -22,7 +22,10 @@
 #Requires AutoHotkey v2.0
 #UseHook True
 #MaxThreadsBuffer True
+
 ProcessSetPriority "High"
+#^/::Reload
+#+/::ExitApp
 
 
 ; =====================================================================================
@@ -85,7 +88,7 @@ Global Msg_EndTask := "Evaporated"   ; (default-text: "Evaporated")
 
 
 ; ===========================================================================================================================================================================
-; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 if !IsSet(HelpEntries)
@@ -193,7 +196,7 @@ EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
 #HotIf
 
 ; ===========================================================================================================================================================================
-; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 
@@ -243,19 +246,24 @@ ToggleHelpBox() {
         ; Set standard margins and crisp font matching the color picker
         helpGuiGlobal.MarginX := 12
         helpGuiGlobal.MarginY := 12
-        helpGuiGlobal.SetFont("cWhite s10", "Consolas")
+        helpGuiGlobal.SetFont("cWhite s8", "Consolas")
         
         helpText := "
         (
         >> STRAP HELP
-        ───────────────────────────────────────
-        > NUMPAD EMULATOR:
-            CapsLock OFF    →  num-row keys
-            CapsLock ON     →  numpad keys
-        ───────────────────────────────────────
+        ──────────────────────────────────────────
         > FORCE KILL TASK:
             Win+Ctrl+K      →  kill
-        ───────────────────────────────────────
+        ──────────────────────────────────────────
+        > TRAY ICON:
+            Win+Ctrl+\      →  toggle tray icon
+        ──────────────────────────────────────────
+        > RELOAD:
+            Win+Ctrl+/      →  reload script
+        ──────────────────────────────────────────
+        > EXIT:
+            Win+Shift+/     →  exit script
+        ──────────────────────────────────────────
         > HELPER:
             Win+/           →  toggle this box
         )"

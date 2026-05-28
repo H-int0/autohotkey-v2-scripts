@@ -22,7 +22,11 @@
 #Requires AutoHotkey v2.0
 #UseHook True
 #MaxThreadsBuffer True
+
+SetWorkingDir A_ScriptDir
 ProcessSetPriority "High"
+#^/::Reload
+#+/::ExitApp
 
 ; Color Picker globals
 global cpGuiGlobal := ""
@@ -53,7 +57,7 @@ global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal :
     else
         A_IconHidden := 1
 }
-#HotIf 
+#HotIf
 
 ; =========================================================
 ; STRAP HELP BOX (Win + /)
@@ -85,34 +89,19 @@ ToggleHelpBox() {
         ; Set standard margins and crisp font matching the color picker
         helpGuiGlobal.MarginX := 12
         helpGuiGlobal.MarginY := 12
-        helpGuiGlobal.SetFont("cWhite s10", "Consolas")
+        helpGuiGlobal.SetFont("cWhite s8", "Consolas")
         
-        helpText := "
-        (
-        >> STRAP HELP
-        ───────────────────────────────────────
-        > NUMPAD EMULATOR:
-            CapsLock OFF    →  num-row keys
-            CapsLock ON     →  numpad keys
-        ───────────────────────────────────────
-        > TIMEZONE SWITCHER:
-            Win+Alt+``       →  cycle TZ
-            Win+Ctrl+``      →  show current TZ
-        ───────────────────────────────────────
-        > FORCE KILL TASK:
-            Win+Ctrl+K      →  kill
-        ───────────────────────────────────────
-        > COLOR PICKER:
-            Win+Ctrl+C      →  toggle picker
-        ───────────────────────────────────────
-        > LINE NAVIGATION:
-            Shift+Alt+ ←/→  →  line start/end
-            Shift+Win+ ←/→  →  select to edge
-            Alt+Bksp/Del    →  delete to edge
-        ───────────────────────────────────────
-        > HELPER:
-            Win+/           →  toggle this box
-        )"
+        helpText := ">> STRAP HELP`n"
+        helpText .= "──────────────────────────────────────────`n"
+        for entry in HelpEntries
+        helpText .= entry . "`n──────────────────────────────────────────`n"
+        helpText .= "> TRAY ICON:`n    Win+Ctrl+\      →  toggle tray icon`n"
+        helpText .= "──────────────────────────────────────────`n"
+        helpText .= "> RELOAD:`n    Win+Ctrl+/      →  reload script`n"
+        helpText .= "──────────────────────────────────────────`n"
+        helpText .= "> EXIT:`n    Win+Shift+/     →  exit script`n"
+        helpText .= "──────────────────────────────────────────`n"
+        helpText .= "> HELPER:`n    Win+/           →  toggle STRAP HELP"
         
         helpGuiGlobal.Add("Text", "", helpText)
         helpGuiGlobal.Show("NoActivate Hide")
