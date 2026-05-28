@@ -78,10 +78,10 @@ With more planned for the future.
 
 ## OS Supported
 
-- Windows 7
-- Windows 8
+- Windows 7*
+- Windows 8*
 - Windows 10
-- Windows 11
+- Windows 11*
 
 ---
 
@@ -120,7 +120,7 @@ To stop it, make the tray icon visible first with `Win + Ctrl + \`, then right-c
 
 ## Modules
 
-The `modules/` folder contains each feature as a standalone script that you can run directly, or whose code you can copy into `distribution/custom.ahk` to build your own personalized combination.
+The `modules/` folder contains each feature as a standalone script that you can run directly
 
 | File | What it does |
 | --- | --- |
@@ -133,8 +133,6 @@ The `modules/` folder contains each feature as a standalone script that you can 
 - Run any module the same way as `distribution/source.ahk` just double‑click the file.
 - Each module includes the same tray icon toggle (`Win + Ctrl + \`) so you can exit it easily.
 - **Do not run a module at the same time as `distribution/source.ahk`** they share hotkeys and will conflict.
-
-> See [CONFIGURE.md](CONFIGURE.md#building-a-custom-script) to learn how to combine modules into your own `custom.ahk`.
 
 ---
 
@@ -306,38 +304,7 @@ Translates modern text-editor navigation shortcuts into standard Windows keystro
 
 The `distribution/` folder contains everything you need to run or customize Strap.
 
-### 1. `config.ahk` central configuration file
-
-**Edit this file to customize Strap** you never need to touch the feature files themselves.
-
-What you can change:
-
-- **[Enable/disable any feature](CONFIGURE.md#enabling-and-disabling-features)** entirely
-- **[Show/Hide Tray icon](CONFIGURE.md#changing-the-default-tray-icon-visibility)** on startup.
-- **[Tooltip system](CONFIGURE.md#customizing-tooltips)** Customize display duration and per‑feature messages.
-- **[Enable/disable Numpad emulator](CONFIGURE.md#changing-capslock-numpad-shift-behavior)** Shift behavior.
-- **[Enable/disable Color picker](CONFIGURE.md#configuring-the-color-picker-summary-msgbox)** summary MsgBox.
-- **[Add/remove Timezones](CONFIGURE.md#adding-a-custom-timezone-to-startup-not-in-the-list)** and set a **[Startup timezone](CONFIGURE.md#setting-a-startup-timezone)**.
-
-### 2. `source.ahk` main script
-
-- Double‑click this to run Strap with **all five features** enabled. It automatically includes `config.ahk` and every file inside `source-dependencies/`.
-
-### 3. `source-dependencies/` feature code
-
-Each `source-*.ahk` file implements one feature. They rely on the global helpers and settings defined in `source.ahk` and `config.ahk`.  
-
-> [!NOTE]
-> You normally **should NOT edit these files** use `config.ahk` instead.
-
-### 4. `custom.ahk` build your own script
-
-- If you want only one feature, run its module directly.
-- If you want a different combination (e.g., only numpad emulator and timezone switcher, but nothing else), you can build your own script using `distribution/custom.ahk` as a template.
-
----
-
-## Configuration Guide
+### Configuration Guide
 
 Refer to [CONFIGURE.md](CONFIGURE.md) for detailed step-by-step instructions on:
 
@@ -349,7 +316,17 @@ Refer to [CONFIGURE.md](CONFIGURE.md) for detailed step-by-step instructions on:
 - [Adding a Timezone Not in the List](CONFIGURE.md#adding-a-timezone-not-in-the-list)
 - [Setting a Startup Timezone](CONFIGURE.md#setting-a-startup-timezone)
 - [Adding a Custom Timezone to Startup (not in the list)](CONFIGURE.md#adding-a-custom-timezone-to-startup-not-in-the-list)
-- [Building a Custom Script](CONFIGURE.md#building-a-custom-script)
+
+### 1. `config.ahk` central configuration file
+
+**Edit this file to customize Strap** you never need to touch the feature files themselves.
+
+### 2. `source-dependencies/` feature code
+
+Each `source-dependencies-*.ahk` file implements one feature. They rely on the global helpers and settings defined in `source.ahk` and `config.ahk`.  
+
+> [!NOTE]
+> You normally **should NOT edit these files**, use `config.ahk` instead.
 
 ---
 
