@@ -418,7 +418,7 @@ TrackToolTipPos()
         ; Only redraw if the mouse actually moved or the text changed
         if (mX != lastX || mY != lastY || ActiveToolTipText != lastText)
         {
-            ToolTip(ActiveToolTipText, mX + 15, mY + 15)
+            ToolTip(ActiveToolTipText)
             lastX := mX
             lastY := mY
             lastText := ActiveToolTipText
