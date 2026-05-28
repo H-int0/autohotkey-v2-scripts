@@ -33,17 +33,29 @@ global cpGuiGlobal := ""
 global cSwatchGlobal := "", cHexGlobal := "", cRgbGlobal := "", cXyGlobal := ""
 global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal := 0
 
-#Include source-dependencies/config.ahk   ; Configuration file (edit this to customize features)
+; =====================================================================================
+; SELECT FEATURES TO LOAD
+; =====================================================================================
+;
+; >> Customize which features are loaded on script startup.
+;
+; INSTRUCTIONS:
+; 1. Uncomment the lines of the features you want to enable.
+; 2. Comment out any features you want to disable by adding a semicolon (;) at the beginning.
+; 3. Save the file and reload the script.
+;
+; =========================================================
+;
+#Include source-dependencies/config.ahk                  ; Core settings (Required)
 
-#Include source-dependencies/source-numpad-emulator.ahk
-
-#Include source-dependencies/source-timezone-switcher.ahk
-
-#Include source-dependencies/source-force-kill-task.ahk
-
-#Include source-dependencies/source-line-navigation.ahk
-
-#Include source-dependencies/source-color-picker.ahk
+#Include source-dependencies/source-numpad-emulator.ahk    ; Numpad Emulator feature
+#Include source-dependencies/source-timezone-switcher.ahk  ; Timezone Switcher feature
+#Include source-dependencies/source-force-kill-task.ahk    ; Force Kill Task feature
+#Include source-dependencies/source-color-picker.ahk       ; Color Picker feature
+#Include source-dependencies/source-line-navigation.ahk    ; Line Navigation feature
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
 
 ; =========================================================
 ; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
