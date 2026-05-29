@@ -22,7 +22,10 @@
 #Requires AutoHotkey v2.0
 #UseHook True
 #MaxThreadsBuffer True
+
 ProcessSetPriority "High"
+#^/::Reload
+#+/::ExitApp
 
 
 ; =====================================================================================
@@ -78,7 +81,7 @@ Global Config_TooltipDuration := 2500   ; (default: 2500 ms)
 
 
 ; ===========================================================================================================================================================================
-; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 if !IsSet(HelpEntries)
@@ -373,7 +376,7 @@ if IsSet(StartupTZID)
 }
 
 ; ===========================================================================================================================================================================
-; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 
@@ -423,16 +426,25 @@ ToggleHelpBox() {
         ; Set standard margins and crisp font matching the color picker
         helpGuiGlobal.MarginX := 12
         helpGuiGlobal.MarginY := 12
-        helpGuiGlobal.SetFont("cWhite s10", "Consolas")
+        helpGuiGlobal.SetFont("cWhite s8", "Consolas")
         
         helpText := "
         (
         >> STRAP HELP
-        ───────────────────────────────────────
+        ──────────────────────────────────────────
         > TIMEZONE SWITCHER:
             Win+Alt+``       →  cycle TZ
             Win+Ctrl+``      →  show current TZ
-        ───────────────────────────────────────
+        ──────────────────────────────────────────
+        > TRAY ICON:
+            Win+Ctrl+\      →  toggle tray icon
+        ──────────────────────────────────────────
+        > RELOAD:
+            Win+Ctrl+/      →  reload script
+        ──────────────────────────────────────────
+        > EXIT:
+            Win+Shift+/     →  exit script
+        ──────────────────────────────────────────
         > HELPER:
             Win+/           →  toggle this box
         )"
@@ -505,7 +517,7 @@ TrackToolTipPos()
         ; Only redraw if the mouse actually moved or the text changed
         if (mX != lastX || mY != lastY || ActiveToolTipText != lastText)
         {
-            ToolTip(ActiveToolTipText, mX + 15, mY + 15)
+            ToolTip(ActiveToolTipText)
             lastX := mX
             lastY := mY
             lastText := ActiveToolTipText
@@ -523,16 +535,9 @@ RemoveToolTip()
 
 GetCurrentTimeZoneID()
 {
-    tempFile := A_Temp "\tzout.txt"
-    if FileExist(tempFile)
-        FileDelete(tempFile)
-
-    RunWait(A_ComSpec ' /c "tzutil /g > ' tempFile '"',, "Hide")
-
-    if FileExist(tempFile) {
-        out := FileRead(tempFile)
-        FileDelete(tempFile)
-        return Trim(out, " `t`r`n")
+    try {
+        return RegRead("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation", "TimeZoneKeyName")
+    } catch {
+        return ""
     }
-    return ""
 }

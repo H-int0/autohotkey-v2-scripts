@@ -34,7 +34,7 @@ HelpEntries.Push("
 ; FEATURE: COLOR PICKER (Win + Ctrl + C)
 ; =========================================================
 
-#HotIf ColorPickerEnabled
+#HotIf true
 #^c::ToggleColorPicker()
 #HotIf
 
@@ -104,7 +104,7 @@ ToggleColorPicker() {
         cpGuiGlobal.Show("NoActivate Hide")
 
         UpdateColorPicker()
-        SetTimer(UpdateColorPicker, 5)
+        SetTimer(UpdateColorPicker, 20)
     }
 }
 
@@ -119,9 +119,10 @@ UpdateColorPicker() {
         colorHexRaw := PixelGetColor(mX, mY)
         colorHex := StrLower(SubStr(colorHexRaw, 3))
 
-        r := Integer("0x" SubStr(colorHex, 1, 2))
-        g := Integer("0x" SubStr(colorHex, 3, 2))
-        b := Integer("0x" SubStr(colorHex, 5, 2))
+        colorNum := Integer(colorHexRaw)
+        r := (colorNum >> 16) & 0xFF
+        g := (colorNum >> 8) & 0xFF
+        b := colorNum & 0xFF
 
         lastHexGlobal := "#" colorHex
         lastRgbGlobal := r ", " g ", " b
@@ -157,12 +158,8 @@ SetSystemCursor(mode) {
                    32649, 32650, 32651]
 
     if (mode = "restore") {
-        for id in cursorList {
-            if defaultCursors.Has(id) {
-                DllCall("User32.dll\SetSystemCursor", "Ptr", defaultCursors[id], "UInt", id)
-                defaultCursors.Delete(id)
-            }
-        }
+        DllCall("SystemParametersInfo", "UInt", 0x0057, "UInt", 0, "Ptr", 0, "UInt", 0) ; SPI_SETCURSORS
+        defaultCursors.Clear()
         return
     }
 

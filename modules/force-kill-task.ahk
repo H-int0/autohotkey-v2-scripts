@@ -22,7 +22,10 @@
 #Requires AutoHotkey v2.0
 #UseHook True
 #MaxThreadsBuffer True
+
 ProcessSetPriority "High"
+#^/::Reload
+#+/::ExitApp
 
 
 ; =====================================================================================
@@ -75,7 +78,7 @@ Global Config_TooltipDuration := 2500   ; (default: 2500 ms)
 
 ; ------- Force Kill Task tooltip -------
 ;
-Global Msg_EndTask := "Evaporated"   ; (default-text: "Evaporated")
+Global Msg_EndTask := "EVAPORATED!"   ; (default-text: "EVAPORATED!")
 ;                     ^ <-- Edit the text inside the quotes to change the message, or add a semicolon (;) at the beginning of the line to disable this tooltip
 
 
@@ -85,7 +88,7 @@ Global Msg_EndTask := "Evaporated"   ; (default-text: "Evaporated")
 
 
 ; ===========================================================================================================================================================================
-; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 if !IsSet(HelpEntries)
@@ -96,35 +99,11 @@ HelpEntries.Push("
     Win+Ctrl+K      →  kill
 )")
 
-; =====================================================================================
-; CONFIG: FORCE KILL TASK
-; =====================================================================================
-;
-; >> Press Win+Ctrl+K to close the active window (like Alt+F4).
-; >> If the window is frozen, it will force kill the process instead.
-;
-;   Enabled  →  Win+Ctrl+K closes/kills the active window (default)
-;   Disabled →  Win+Ctrl+K does nothing
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
-; EndTaskEnabled := false  ; Disabled: Win+Ctrl+K does nothing
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
-
-
 ; =========================================================
 ; FEATURE: FORCE KILL TASK (Win + Ctrl + K)
 ; =========================================================
 
-#HotIf EndTaskEnabled
+#HotIf true
 #^k:: {
     activeHwnd := 0
     try {
@@ -176,9 +155,9 @@ EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
     }
 
     if (!isResponding) {
-        ; Window is frozen: use taskkill to forcefully terminate the process
+        ; Window is frozen: use native ProcessClose to forcefully terminate
         try {
-            RunWait("taskkill /PID " pid " /F",, "Hide")
+            ProcessClose(pid)
             ShowToolTip(Msg_EndTask)
         }
     } else {
@@ -193,7 +172,7 @@ EndTaskEnabled := true   ; Enabled: Win+Ctrl+K closes active window (default)
 #HotIf
 
 ; ===========================================================================================================================================================================
-; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 
@@ -243,19 +222,24 @@ ToggleHelpBox() {
         ; Set standard margins and crisp font matching the color picker
         helpGuiGlobal.MarginX := 12
         helpGuiGlobal.MarginY := 12
-        helpGuiGlobal.SetFont("cWhite s10", "Consolas")
+        helpGuiGlobal.SetFont("cWhite s8", "Consolas")
         
         helpText := "
         (
         >> STRAP HELP
-        ───────────────────────────────────────
-        > NUMPAD EMULATOR:
-            CapsLock OFF    →  num-row keys
-            CapsLock ON     →  numpad keys
-        ───────────────────────────────────────
+        ──────────────────────────────────────────
         > FORCE KILL TASK:
             Win+Ctrl+K      →  kill
-        ───────────────────────────────────────
+        ──────────────────────────────────────────
+        > TRAY ICON:
+            Win+Ctrl+\      →  toggle tray icon
+        ──────────────────────────────────────────
+        > RELOAD:
+            Win+Ctrl+/      →  reload script
+        ──────────────────────────────────────────
+        > EXIT:
+            Win+Shift+/     →  exit script
+        ──────────────────────────────────────────
         > HELPER:
             Win+/           →  toggle this box
         )"
@@ -328,7 +312,7 @@ TrackToolTipPos()
         ; Only redraw if the mouse actually moved or the text changed
         if (mX != lastX || mY != lastY || ActiveToolTipText != lastText)
         {
-            ToolTip(ActiveToolTipText, mX + 15, mY + 15)
+            ToolTip(ActiveToolTipText)
             lastX := mX
             lastY := mY
             lastText := ActiveToolTipText

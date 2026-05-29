@@ -34,7 +34,7 @@ HelpEntries.Push("
 ; FEATURE: FORCE KILL TASK (Win + Ctrl + K)
 ; =========================================================
 
-#HotIf EndTaskEnabled
+#HotIf true
 
 #^k:: {
     activeHwnd := 0
@@ -87,9 +87,9 @@ HelpEntries.Push("
     }
 
     if (!isResponding) {
-        ; Window is frozen: use taskkill to forcefully terminate the process
+        ; Window is frozen: use native ProcessClose to forcefully terminate
         try {
-            RunWait("taskkill /PID " pid " /F",, "Hide")
+            ProcessClose(pid)
             ShowToolTip(Msg_EndTask)
         }
     } else {

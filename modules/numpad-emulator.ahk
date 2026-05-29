@@ -22,7 +22,10 @@
 #Requires AutoHotkey v2.0
 #UseHook True
 #MaxThreadsBuffer True
+
 ProcessSetPriority "High"
+#^/::Reload
+#+/::ExitApp
 
 
 ; =====================================================================================
@@ -49,7 +52,7 @@ A_IconHidden := 1    ; Un-comment for the tray icon to be Hidden (default)
 
 
 ; ===========================================================================================================================================================================
-; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 if !IsSet(HelpEntries)
@@ -117,7 +120,7 @@ NumpadShiftSymbols := true   ; Enabled: Shift types symbols (default)
 #HotIf
 
 ; ===========================================================================================================================================================================
-; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 
@@ -167,16 +170,25 @@ ToggleHelpBox() {
         ; Set standard margins and crisp font matching the color picker
         helpGuiGlobal.MarginX := 12
         helpGuiGlobal.MarginY := 12
-        helpGuiGlobal.SetFont("cWhite s10", "Consolas")
+        helpGuiGlobal.SetFont("cWhite s8", "Consolas")
         
         helpText := "
         (
         >> STRAP HELP
-        ───────────────────────────────────────
+        ──────────────────────────────────────────
         > NUMPAD EMULATOR:
             CapsLock OFF    →  num-row keys
             CapsLock ON     →  numpad keys
-        ───────────────────────────────────────
+        ──────────────────────────────────────────
+        > TRAY ICON:
+            Win+Ctrl+\      →  toggle tray icon
+        ──────────────────────────────────────────
+        > RELOAD:
+            Win+Ctrl+/      →  reload script
+        ──────────────────────────────────────────
+        > EXIT:
+            Win+Shift+/     →  exit script
+        ──────────────────────────────────────────
         > HELPER:
             Win+/           →  toggle this box
         )"
