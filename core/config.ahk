@@ -21,44 +21,39 @@
 
 #Requires AutoHotkey v2.0
 
-if !IsSet(HelpEntries)
-    global HelpEntries := []
-HelpEntries.Push("
-(
-> NUMPAD EMULATOR:
-    CapsLock OFF    →  num-row keys
-    CapsLock ON     →  numpad keys
-)")
+if !IsSet(TZData)
+    TZData := Map()
+if !IsSet(TZOrder)
+    TZOrder := []
+
+A_IconHidden := 1
+Global Config_TooltipDuration := 2500
+Global Msg_ColorPicker := "Copied to Clipboard"
+Global Msg_EndTask := "EVAPORATED!"
+NumpadShiftSymbols := true
+ColorPickerMsgBox := false
+
+TZData["W. Europe Standard Time"] := "(UTC +1) `"Berlin / Paris`""
+TZOrder.Push("W. Europe Standard Time")
+
+TZData["Russian Standard Time"] := "(UTC +3) `"Moscow`""
+TZOrder.Push("Russian Standard Time")
+
+TZData["Tokyo Standard Time"] := "(UTC +9) `"Tokyo`""
+TZOrder.Push("Tokyo Standard Time")
+
+TZData["AUS Eastern Standard Time"] := "(UTC +10) `"Sydney`""
+TZOrder.Push("AUS Eastern Standard Time")
+
+TZData["Eastern Standard Time"] := "(UTC -5) `"Eastern Time`""
+TZOrder.Push("Eastern Standard Time")
 
 
-; =========================================================
-; FEATURE: NUMPAD EMULATOR
-; =========================================================
+; the CLI tool should make copies of this and add values to it to add a new timezone
+TZData[""] := "() `"`""
+TZOrder.Push("")
 
-#HotIf GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
+StartupTZID := ""
 
-+1::SendText "!"
-+2::SendText "@"
-+3::SendText "#"
-+4::SendText "$"
-+5::SendText "%"
-+6::SendText "^"
-+7::SendText "&"
-+8::SendText "*"
-+9::SendText "("
-+0::SendText ")"
-
-#HotIf GetKeyState("CapsLock", "T") && (!NumpadShiftSymbols || !GetKeyState("Shift", "P"))
-
-*1::Send '{Blind}{Numpad1}'
-*2::Send '{Blind}{Numpad2}'
-*3::Send '{Blind}{Numpad3}'
-*4::Send '{Blind}{Numpad4}'
-*5::Send '{Blind}{Numpad5}'
-*6::Send '{Blind}{Numpad6}'
-*7::Send '{Blind}{Numpad7}'
-*8::Send '{Blind}{Numpad8}'
-*9::Send '{Blind}{Numpad9}'
-*0::Send '{Blind}{Numpad0}'
-
-#HotIf
+if IsSet(StartupTZID)
+  RunWait('tzutil /s "' StartupTZID '"',, "Hide")

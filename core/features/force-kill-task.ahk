@@ -29,11 +29,6 @@ HelpEntries.Push("
     Win+Ctrl+K      →  kill
 )")
 
-
-; =========================================================
-; FEATURE: FORCE KILL TASK (Win + Ctrl + K)
-; =========================================================
-
 #HotIf true
 
 #^k:: {
@@ -72,28 +67,22 @@ HelpEntries.Push("
 
     isResponding := true
     
-    ; 1. Check if the OS has already flagged it as hung
     if (DllCall("IsHungAppWindow", "Ptr", activeHwnd)) {
         isResponding := false
     } else {
-        ; 2. Ping the window to see if it's alive
         try {
-            ; Send WM_NULL (0x0). If the app's thread is frozen, this will time out.
             SendMessage(0x0, 0, 0,, "ahk_id " activeHwnd,,,, 250)
         } catch {
-            ; It failed to respond within 250ms (or closed unexpectedly)
             isResponding := false
         }
     }
 
     if (!isResponding) {
-        ; Window is frozen: use native ProcessClose to forcefully terminate
         try {
             ProcessClose(pid)
             ShowToolTip(Msg_EndTask)
         }
     } else {
-        ; Window is healthy: ask it to close gracefully (Alt+F4 behavior)
         try {
             WinClose("ahk_id " activeHwnd)
             WinWaitClose("ahk_id " activeHwnd,, 5)

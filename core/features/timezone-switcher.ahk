@@ -21,33 +21,44 @@
 
 #Requires AutoHotkey v2.0
 
+if !IsSet(TZData)
+    TZData := Map()
+if !IsSet(TZOrder)
+    TZOrder := []
+
 if !IsSet(HelpEntries)
     global HelpEntries := []
 HelpEntries.Push("
 (
-> LINE NAVIGATION:
-    Shift+Alt+ ←/→  →  line start/end
-    Shift+Win+ ←/→  →  select to edge
-    Alt+Bksp/Del    →  delete to edge
+> TIMEZONE SWITCHER:
+    Win+Alt+``       →  cycle TZ
+    Win+Ctrl+``      →  show current TZ
 )")
 
+#!`::
+{
+    currentID := GetCurrentTimeZoneID()
+    nextIndex := 1
 
-; =========================================================
-; FEATURE: LINE NAVIGATION
-; =========================================================
+    Loop TZOrder.Length {
+        if (TZOrder[A_Index] = currentID) {
+            nextIndex := A_Index + 1
+            if (nextIndex > TZOrder.Length)
+                nextIndex := 1
+            break
+        }
+    }
 
-#HotIf true
+    nextID := TZOrder[nextIndex]
+    RunWait('tzutil /s "' nextID '"',, "Hide")
 
-; --- Move (shift+Alt) ---
-+!Left::Send  "{Home}"
-+!Right::Send "{End}"
+    msgLabel := TZData.Has(nextID) ? TZData[nextID] : nextID
+    ShowToolTip("Switched TZ = " msgLabel)
+}
 
-; --- Select (Shift+Win) ---
-+#Left::Send  "+{Home}"
-+#Right::Send "+{End}"
-
-; --- Delete (Alt) ---
-!Backspace::Send "+{Home}{Backspace}"
-!Delete::Send    "+{End}{Delete}"
-
-#HotIf
+#^`::
+{
+    currentID := GetCurrentTimeZoneID()
+    msgLabel := TZData.Has(currentID) ? TZData[currentID] : currentID
+    ShowToolTip("Current TZ = " msgLabel)
+}

@@ -29,11 +29,6 @@ HelpEntries.Push("
     Win+Ctrl+C      →  toggle picker
 )")
 
-
-; =========================================================
-; FEATURE: COLOR PICKER (Win + Ctrl + C)
-; =========================================================
-
 #HotIf true
 #^c::ToggleColorPicker()
 #HotIf
@@ -135,7 +130,6 @@ UpdateColorPicker() {
         cRgbGlobal.Value := "rgb: " lastRgbGlobal
         cXyGlobal.Value  := "(x, y): (" lastXGlobal ", " lastYGlobal ")"
 
-        ; Clamp GUI position to stay within screen work area
         WinGetPos(, , &guiW, &guiH, cpGuiGlobal)
         MonitorGetWorkArea(1, , , &screenW, &screenH)
         guiX := Min(mX + 5, screenW - guiW - 2)
@@ -144,10 +138,6 @@ UpdateColorPicker() {
         cpGuiGlobal.Show("NoActivate x" guiX " y" guiY)
     }
 }
-
-; =========================================================
-; COLOR PICKER HELPER FUNCTION
-; =========================================================
 
 SetSystemCursor(mode) {
     static crosshairID := 32515
@@ -158,7 +148,7 @@ SetSystemCursor(mode) {
                    32649, 32650, 32651]
 
     if (mode = "restore") {
-        DllCall("SystemParametersInfo", "UInt", 0x0057, "UInt", 0, "Ptr", 0, "UInt", 0) ; SPI_SETCURSORS
+        DllCall("SystemParametersInfo", "UInt", 0x0057, "UInt", 0, "Ptr", 0, "UInt", 0)
         defaultCursors.Clear()
         return
     }

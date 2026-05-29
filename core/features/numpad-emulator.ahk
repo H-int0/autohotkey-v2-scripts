@@ -21,49 +21,39 @@
 
 #Requires AutoHotkey v2.0
 
-if !IsSet(TZData)
-    TZData := Map()
-if !IsSet(TZOrder)
-    TZOrder := []
-
 if !IsSet(HelpEntries)
     global HelpEntries := []
 HelpEntries.Push("
 (
-> TIMEZONE SWITCHER:
-    Win+Alt+``       →  cycle TZ
-    Win+Ctrl+``      →  show current TZ
+> NUMPAD EMULATOR:
+    CapsLock OFF    →  num-row keys
+    CapsLock ON     →  numpad keys
 )")
 
+#HotIf GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
 
-; =========================================================
-; LOGIC
-; =========================================================
++1::SendText "!"
++2::SendText "@"
++3::SendText "#"
++4::SendText "$"
++5::SendText "%"
++6::SendText "^"
++7::SendText "&"
++8::SendText "*"
++9::SendText "("
++0::SendText ")"
 
-#!`::
-{
-    currentID := GetCurrentTimeZoneID()
-    nextIndex := 1
+#HotIf GetKeyState("CapsLock", "T") && (!NumpadShiftSymbols || !GetKeyState("Shift", "P"))
 
-    Loop TZOrder.Length {
-        if (TZOrder[A_Index] = currentID) {
-            nextIndex := A_Index + 1
-            if (nextIndex > TZOrder.Length)
-                nextIndex := 1
-            break
-        }
-    }
+*1::Send '{Blind}{Numpad1}'
+*2::Send '{Blind}{Numpad2}'
+*3::Send '{Blind}{Numpad3}'
+*4::Send '{Blind}{Numpad4}'
+*5::Send '{Blind}{Numpad5}'
+*6::Send '{Blind}{Numpad6}'
+*7::Send '{Blind}{Numpad7}'
+*8::Send '{Blind}{Numpad8}'
+*9::Send '{Blind}{Numpad9}'
+*0::Send '{Blind}{Numpad0}'
 
-    nextID := TZOrder[nextIndex]
-    RunWait('tzutil /s "' nextID '"',, "Hide")
-
-    msgLabel := TZData.Has(nextID) ? TZData[nextID] : nextID
-    ShowToolTip("Switched TZ = " msgLabel)
-}
-
-#^`::
-{
-    currentID := GetCurrentTimeZoneID()
-    msgLabel := TZData.Has(currentID) ? TZData[currentID] : currentID
-    ShowToolTip("Current TZ = " msgLabel)
-}
+#HotIf

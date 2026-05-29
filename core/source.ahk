@@ -33,33 +33,13 @@ global cpGuiGlobal := ""
 global cSwatchGlobal := "", cHexGlobal := "", cRgbGlobal := "", cXyGlobal := ""
 global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal := 0
 
-; =====================================================================================
-; SELECT FEATURES TO LOAD
-; =====================================================================================
-;
-; >> Customize which features are loaded on script startup.
-;
-; INSTRUCTIONS:
-; 1. Uncomment the lines of the features you want to enable.
-; 2. Comment out any features you want to disable by adding a semicolon (;) at the beginning.
-; 3. Save the file and reload the script.
-;
-; =========================================================
-;
-#Include source-dependencies/config.ahk                  ; Core settings (Required)
+#Include config.ahk
 
-#Include source-dependencies/source-numpad-emulator.ahk    ; Numpad Emulator feature
-#Include source-dependencies/source-timezone-switcher.ahk  ; Timezone Switcher feature
-#Include source-dependencies/source-force-kill-task.ahk    ; Force Kill Task feature
-#Include source-dependencies/source-color-picker.ahk       ; Color Picker feature
-#Include source-dependencies/source-line-navigation.ahk    ; Line Navigation feature
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
-
-; =========================================================
-; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
-; =========================================================
+#Include features/numpad-emulator.ahk
+#Include features/timezone-switcher.ahk
+#Include features/force-kill-task.ahk
+#Include features/color-picker.ahk
+#Include features/line-navigation.ahk
 
 #HotIf
 #^\::
@@ -70,10 +50,6 @@ global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal :
         A_IconHidden := 1
 }
 #HotIf
-
-; =========================================================
-; STRAP HELP BOX (Win + /)
-; =========================================================
 
 global helpGuiGlobal := ""
 
@@ -98,7 +74,6 @@ ToggleHelpBox() {
         helpGuiGlobal := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
         helpGuiGlobal.BackColor := "000000"
         
-        ; Set standard margins and crisp font matching the color picker
         helpGuiGlobal.MarginX := 12
         helpGuiGlobal.MarginY := 12
         helpGuiGlobal.SetFont("cWhite s8", "Consolas")
@@ -118,11 +93,10 @@ ToggleHelpBox() {
         helpGuiGlobal.Add("Text", "", helpText)
         helpGuiGlobal.Show("NoActivate Hide")
         
-        ; Set window transparency opacity (225 out of 255)
         WinSetTransparent(225, helpGuiGlobal.Hwnd)
         
         UpdateHelpBox()
-        SetTimer(UpdateHelpBox, 10) ; Live updates every 10ms
+        SetTimer(UpdateHelpBox, 10)
     }
 }
 
@@ -132,21 +106,15 @@ UpdateHelpBox() {
         CoordMode("Mouse", "Screen")
         MouseGetPos(&mX, &mY)
         
-        ; Fetch UI size and screen boundaries for clamping
         WinGetPos(, , &guiW, &guiH, helpGuiGlobal.Hwnd)
         MonitorGetWorkArea(1, , , &screenW, &screenH)
         
-        ; Position bottom-right of cursor, matching color picker logic
         guiX := Min(mX + 10, screenW - guiW - 2)
         guiY := Min(mY + 10, screenH - guiH - 2)
         
         helpGuiGlobal.Show("NoActivate x" guiX " y" guiY)
     }
 }
-
-; =========================================================
-; GLOBAL HELPER FUNCTIONS
-; =========================================================
 
 Global ActiveToolTipText := ""
 
@@ -180,7 +148,6 @@ TrackToolTipPos()
         CoordMode("ToolTip", "Screen")
         MouseGetPos(&mX, &mY)
         
-        ; Only redraw if the mouse actually moved or the text changed
         if (mX != lastX || mY != lastY || ActiveToolTipText != lastText)
         {
             ToolTip(ActiveToolTipText)
