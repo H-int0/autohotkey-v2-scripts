@@ -1,16 +1,10 @@
-# Issue: Bug Report
-
-Create a report to help us improve
-
+---
+name: Bug Report
+about: Report something that isn't working correctly
+labels: bug
 ---
 
-- Name: Bug Report
-- About: Report something that isn't working correctly
-- Labels: bug
-
----
-
-## Description
+# Description
 
 A clear description of what the bug is.
 
@@ -30,9 +24,11 @@ What actually happened.
 
 ## Environment
 
-- Windows version:
-- AutoHotkey v2 version:
-- Strap version:
+Windows version:
+
+AutoHotkey v2 version:
+
+Strap version:
 
 ## Additional Context
 

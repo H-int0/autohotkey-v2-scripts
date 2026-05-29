@@ -22,7 +22,10 @@
 #Requires AutoHotkey v2.0
 #UseHook True
 #MaxThreadsBuffer True
+
 ProcessSetPriority "High"
+#^/::Reload
+#+/::ExitApp
 
 ; Color Picker globals
 global cpGuiGlobal := ""
@@ -90,7 +93,7 @@ Global Msg_ColorPicker := "Copied to Clipboard"   ; (default-text: "Copied to Cl
 
 
 ; ===========================================================================================================================================================================
-; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 if !IsSet(HelpEntries)
@@ -100,29 +103,6 @@ HelpEntries.Push("
 > COLOR PICKER:
     Win+Ctrl+C      →  toggle picker
 )")
-
-; =====================================================================================
-; CONFIG: COLOR PICKER
-; =====================================================================================
-;
-; >> Press Win+Ctrl+C to toggle a live color picker under your mouse.
-; >> Press it again to close it, copy Hex/RGB/coords to clipboard, and show a summary.
-;
-;   Enabled  →  Win+Ctrl+C toggles the color picker (default)
-;   Disabled →  Win+Ctrl+C does nothing
-;
-; INSTRUCTIONS:
-; 1. Uncomment ONLY ONE of the lines below.
-; 2. Comment out the other line.
-; 3. Save and reload the script.
-;
-; =========================================================
-;
-ColorPickerEnabled := true   ; Enabled: Win+Ctrl+C toggles color picker (default)
-; ColorPickerEnabled := false  ; Disabled: Win+Ctrl+C does nothing
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
 
 
 ; =====================================================================================
@@ -153,7 +133,7 @@ ColorPickerMsgBox := false  ; Disabled: close silently (default)
 ; FEATURE: COLOR PICKER (Win + Ctrl + C)
 ; =========================================================
 
-#HotIf ColorPickerEnabled
+#HotIf true
 #^c::ToggleColorPicker()
 #HotIf
 
@@ -223,7 +203,7 @@ ToggleColorPicker() {
         cpGuiGlobal.Show("NoActivate Hide")
 
         UpdateColorPicker()
-        SetTimer(UpdateColorPicker, 5)
+        SetTimer(UpdateColorPicker, 20)
     }
 }
 
@@ -238,9 +218,10 @@ UpdateColorPicker() {
         colorHexRaw := PixelGetColor(mX, mY)
         colorHex := StrLower(SubStr(colorHexRaw, 3))
 
-        r := Integer("0x" SubStr(colorHex, 1, 2))
-        g := Integer("0x" SubStr(colorHex, 3, 2))
-        b := Integer("0x" SubStr(colorHex, 5, 2))
+        colorNum := Integer(colorHexRaw)
+        r := (colorNum >> 16) & 0xFF
+        g := (colorNum >> 8) & 0xFF
+        b := colorNum & 0xFF
 
         lastHexGlobal := "#" colorHex
         lastRgbGlobal := r ", " g ", " b
@@ -276,12 +257,8 @@ SetSystemCursor(mode) {
                    32649, 32650, 32651]
 
     if (mode = "restore") {
-        for id in cursorList {
-            if defaultCursors.Has(id) {
-                DllCall("User32.dll\SetSystemCursor", "Ptr", defaultCursors[id], "UInt", id)
-                defaultCursors.Delete(id)
-            }
-        }
+        DllCall("SystemParametersInfo", "UInt", 0x0057, "UInt", 0, "Ptr", 0, "UInt", 0) ; SPI_SETCURSORS
+        defaultCursors.Clear()
         return
     }
 
@@ -298,7 +275,7 @@ SetSystemCursor(mode) {
 }
 
 ; ===========================================================================================================================================================================
-; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 
@@ -348,19 +325,24 @@ ToggleHelpBox() {
         ; Set standard margins and crisp font matching the color picker
         helpGuiGlobal.MarginX := 12
         helpGuiGlobal.MarginY := 12
-        helpGuiGlobal.SetFont("cWhite s10", "Consolas")
+        helpGuiGlobal.SetFont("cWhite s8", "Consolas")
         
         helpText := "
         (
         >> STRAP HELP
-        ───────────────────────────────────────
-        > NUMPAD EMULATOR:
-            CapsLock OFF    →  num-row keys
-            CapsLock ON     →  numpad keys
-        ───────────────────────────────────────
+        ──────────────────────────────────────────
         > COLOR PICKER:
             Win+Ctrl+C      →  toggle picker
-        ───────────────────────────────────────
+        ──────────────────────────────────────────
+        > TRAY ICON:
+            Win+Ctrl+\      →  toggle tray icon
+        ──────────────────────────────────────────
+        > RELOAD:
+            Win+Ctrl+/      →  reload script
+        ──────────────────────────────────────────
+        > EXIT:
+            Win+Shift+/     →  exit script
+        ──────────────────────────────────────────
         > HELPER:
             Win+/           →  toggle this box
         )"
@@ -433,7 +415,7 @@ TrackToolTipPos()
         ; Only redraw if the mouse actually moved or the text changed
         if (mX != lastX || mY != lastY || ActiveToolTipText != lastText)
         {
-            ToolTip(ActiveToolTipText, mX + 15, mY + 15)
+            ToolTip(ActiveToolTipText)
             lastX := mX
             lastY := mY
             lastText := ActiveToolTipText

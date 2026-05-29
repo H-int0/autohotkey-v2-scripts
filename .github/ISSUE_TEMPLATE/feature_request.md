@@ -1,16 +1,10 @@
-# Issue: Feature request
-
-Suggest an idea for this project
-
+---
+name: Feature Request
+about: Suggest a new feature or improvement
+labels: enhancement
 ---
 
-- Name: Feature Request
-- About: Suggest a new feature or improvement
-- Labels: enhancement
-
----
-
-## Summary
+# Summary
 
 A brief description of the feature you'd like.
 
@@ -18,9 +12,13 @@ A brief description of the feature you'd like.
 
 What problem or limitation does this address?
 
+---
+
 ## Proposed Solution
 
 How do you think it should work?
+
+---
 
 ## Alternatives Considered
 

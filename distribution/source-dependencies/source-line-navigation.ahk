@@ -36,7 +36,7 @@ HelpEntries.Push("
 ; FEATURE: LINE NAVIGATION
 ; =========================================================
 
-#HotIf LineNavEnabled
+#HotIf true
 
 ; --- Move (shift+Alt) ---
 +!Left::Send  "{Home}"
