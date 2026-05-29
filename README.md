@@ -23,9 +23,15 @@ With more planned for the future.
 
 - [Installation](#installation)
 - [Running the Script](#running-the-script)
-- [Features](#features)
+- [Auto-Start on Boot](#auto-start-on-boot)
+- [Updating the Script](#updating-the-script)
+- [All Hotkeys](#all-hotkeys)
+- [Utilities](#utilities)
   - [Tray Icon Toggle](#tray-icon-toggle)
+  - [Reloading the Script](#reloading-the-script)
+  - [Existing Script](#existing-script)
   - [Help Box](#help-box)
+- [Features](#features)
   - [1. Numpad Emulator](#1-numpad-emulator)
   - [2. Timezone Switcher](#2-timezone-switcher)
   - [3. Force Kill Task](#3-force-kill-task)
@@ -34,8 +40,6 @@ With more planned for the future.
 - [Modules](#modules)
 - [Script Structure and Configuration](#script-structure-and-configuration)
 - [Configuration Guide](#configuration-guide)
-- [Auto-Start on Boot](#auto-start-on-boot)
-- [Updating the Script](#updating-the-script)
 - [Removing the Startup Shortcut](#removing-the-startup-shortcut)
 - [Troubleshooting](#troubleshooting)
 - [LICENSE](#license)
@@ -54,6 +58,11 @@ With more planned for the future.
 |   LICENSE
 |   README.md
 |   RECOVERY.md
+|
++---.github
+|   \---ISSUE_TEMPLATE
+|           bug_report.md
+|           feature_request.md
 |
 +---distribution
 |   |   source.ahk
@@ -118,6 +127,65 @@ To stop it, make the tray icon visible first with `Win + Ctrl + \`, then right-c
 
 ---
 
+## Auto-Start on Boot
+
+> By default, you need to manually run the script every time your computer restarts.
+
+**To make Strap launch automatically on startup:**
+
+### Option A: Command Prompt
+
+1. Open Command Prompt and run the following,
+2. Replacing `YOUR_PATH` with the full path to the root of your local fork of the repository. (e.g., `C:\Users\Layer\Desktop\autohotkey-v2-scripts-main`)
+
+```cmd
+cd YOUR_PATH
+```
+
+```cmd
+powershell -Command "$WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Strap.lnk'); $Shortcut.TargetPath = '%CD%\distribution\source.ahk'; $Shortcut.WorkingDirectory = '%CD%\distribution'; $Shortcut.Save()"
+```
+
+### Option B: Manual
+
+1. Navigate to the `distribution` folder inside your local Strap repository.
+2. Right-click `source.ahk` and select **Create shortcut**.
+3. Copy or cut the newly created shortcut file (it will be named something like `source.ahk - Shortcut`).
+4. Press `Win + R`, type `shell:startup`, and press Enter to open the Windows Startup folder.
+5. Paste the shortcut file directly into that folder.
+6. *(Optional, recommended for consistency)* Rename the shortcut file to **Strap**.
+
+---
+
+## Updating the Script
+
+- Since, Strap runs via a native Windows shortcut pointing directly to your local repository, **no manual updates are required.**
+- Whenever you pull updates from Git or modify your local `config.ahk`or `source.ahk`, your changes are instantly active the next time the script loads.
+
+## Removing the Startup Shortcut
+
+If you no longer want Strap to launch on startup:
+
+### Option A: Command prompt
+
+1. Open **Command Prompt** (any folder context is fine).
+2. Paste and run the following command:
+
+```cmd
+del "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Strap.lnk"
+```
+
+> [!NOTE]
+> If you have named the shortcut to something other than `Strap.lnk` make sure to replace that in the command above.
+
+### Option_B: Manual
+
+1. Press `Win + R`, type `shell:startup`, and press Enter.
+2. Locate the shortcut named Strap (it may just look like a standard application link).
+3. Right-click it and select Delete.
+
+---
+
 ## Modules
 
 The `modules/` folder contains each feature as a standalone script that you can run directly
@@ -136,7 +204,35 @@ The `modules/` folder contains each feature as a standalone script that you can 
 
 ---
 
-## Features
+## All Hotkeys
+
+- **Utilities:**
+
+  | *Hotkey* | *Description* |
+  | :--- | :--- |
+  | `Win + Ctrl + \` | Toggle Tray Icon visibility |
+  | `Win + Ctrl + /` | Reload script |
+  | `Win + Shift + /` | Exit script |
+  | `Win + /` | Toggle Dynamic Help Box |
+
+- **Features:**
+
+  | *Hotkey* | *Description* |
+  | :--- | :--- |
+  | `CapsLock` | Toggle Numpad Emulator |
+  | `0` - `9` | Type Numpad digits *(with CapsLock ON)* |
+  | `Shift` + `0` - `9` | Type standard symbols *(with CapsLock ON)* |
+  | `Win + Alt + `` ` | Switch to next timezone |
+  | `Win + Ctrl + `` ` | Show current timezone |
+  | `Win + Ctrl + K` | Force kill active task |
+  | `Win + Ctrl + C` | Toggle Color Picker |
+  | `Shift + Alt + Left / Right` | Move cursor to start/end of line |
+  | `Shift + Win + Left / Right` | Select text to start/end of line |
+  | `Alt + Backspace / Delete` | Delete text to start/end of line |
+
+---
+
+## Utilities
 
 ### Tray Icon Toggle
 
@@ -148,6 +244,18 @@ The `modules/` folder contains each feature as a standalone script that you can 
 When visible, right‑clicking it lets you reload or exit the script.
 
 > To know more about this feature, checkout [FEATURES.md](FEATURES.md#3-tray-icon-toggle).
+
+---
+
+### Reloading the Script
+
+To reload your script, use the **Hotkey:** `Win+Ctrl+/`
+
+---
+
+### Existing Script
+
+To Exit your script, use the **Hotkey:** `Win+Shift+/`
 
 ---
 
@@ -164,6 +272,8 @@ A lightweight, semi-transparent help box that follows your mouse and lists your 
 > To know more about this feature, checkout [FEATURES.md](FEATURES.md#1-dynamic-help-box).
 
 ---
+
+## Features
 
 ### 1. Numpad Emulator
 
@@ -308,84 +418,34 @@ The `distribution/` folder contains everything you need to run or customize Stra
 
 Refer to [CONFIGURE.md](CONFIGURE.md) for detailed step-by-step instructions on:
 
-- [Enabling and Disabling Features](CONFIGURE.md#enabling-and-disabling-features)
-- [Customizing Tooltips](CONFIGURE.md#customizing-tooltips)
-- [Changing the Default Tray Icon Visibility](CONFIGURE.md#changing-the-default-tray-icon-visibility)
-- [Changing CapsLock Numpad Shift Behavior](CONFIGURE.md#changing-capslock-numpad-shift-behavior)
-- [Configuring the Color Picker Summary MsgBox](CONFIGURE.md#configuring-the-color-picker-summary-msgbox)
-- [Adding a Timezone Not in the List](CONFIGURE.md#adding-a-timezone-not-in-the-list)
-- [Setting a Startup Timezone](CONFIGURE.md#setting-a-startup-timezone)
-- [Adding a Custom Timezone to Startup (not in the list)](CONFIGURE.md#adding-a-custom-timezone-to-startup-not-in-the-list)
+- Inside `source.ahk`
+  - [Enabling and Disabling Features](CONFIGURE.md#enabling-and-disabling-features)
+- Inside `config.ahk`
+  - [Changing the Default Tray Icon Visibility](CONFIGURE.md#changing-the-default-tray-icon-visibility)
+  - [Customizing Tooltips](CONFIGURE.md#customizing-tooltips)
+  - [Changing CapsLock Numpad Shift Behavior](CONFIGURE.md#changing-capslock-numpad-shift-behavior)
+  - [Configuring the Color Picker Summary MsgBox](CONFIGURE.md#configuring-the-color-picker-summary-msgbox)
+  - [Adding a Timezone Not in the List](CONFIGURE.md#adding-a-timezone-not-in-the-list)
+  - [Setting a Startup Timezone](CONFIGURE.md#setting-a-startup-timezone)
+  - [Adding a Custom Timezone to Startup (not in the list)](CONFIGURE.md#adding-a-custom-timezone-to-startup-not-in-the-list)
 
 ### 1. `config.ahk` central configuration file
 
 **Edit this file to customize Strap** you never need to touch the feature files themselves.
 
-### 2. `source-dependencies/` feature code
+### 2. `source.ahk` main script
+
+- Double‑click this to run Strap. It automatically includes `config.ahk` and every file inside `source-dependencies/`.
+- From `source.ahk` you can **[Enable/disable any feature](CONFIGURE.md#enabling-and-disabling-features)** entirely
+
+> See [CONFIGURE.md](CONFIGURE.md#enabling-and-disabling-features), for exact steps.
+
+### 3. `source-dependencies/` feature code
 
 Each `source-dependencies-*.ahk` file implements one feature. They rely on the global helpers and settings defined in `source.ahk` and `config.ahk`.  
 
 > [!NOTE]
 > You normally **should NOT edit these files**, use `config.ahk` instead.
-
----
-
-## Auto-Start on Boot
-
-> By default, you need to manually run the script every time your computer restarts.
-
-**To make Strap launch automatically on startup:**
-
-### Option A: Command Prompt
-
-1. Open Command Prompt and run the following,
-2. Replacing `YOUR_PATH` with the full path to the root of your local fork of the repository. (e.g., `C:\Users\Layer\Desktop\autohotkey-v2-scripts-main`)
-
-```cmd
-cd YOUR_PATH
-```
-
-```cmd
-powershell -Command "$WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Strap.lnk'); $Shortcut.TargetPath = '%CD%\distribution\source.ahk'; $Shortcut.WorkingDirectory = '%CD%\distribution'; $Shortcut.Save()"
-```
-
-### Option B: Manual
-
-1. Navigate to the `distribution` folder inside your local Strap repository.
-2. Right-click `source.ahk` and select **Create shortcut**.
-3. Copy or cut the newly created shortcut file (it will be named something like `source.ahk - Shortcut`).
-4. Press `Win + R`, type `shell:startup`, and press Enter to open the Windows Startup folder.
-5. Paste the shortcut file directly into that folder.
-6. *(Optional, recommended for consistency)* Rename the shortcut file to **Strap**.
-
----
-
-## Updating the Script
-
-- Since, Strap runs via a native Windows shortcut pointing directly to your local repository, **no manual updates are required.**
-- Whenever you pull updates from Git or modify your local `config.ahk`or `source.ahk`, your changes are instantly active the next time the script loads.
-
-## Removing the Startup Shortcut
-
-If you no longer want Strap to launch on startup:
-
-### Option A: Command prompt
-
-1. Open **Command Prompt** (any folder context is fine).
-2. Paste and run the following command:
-
-```cmd
-del "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Strap.lnk"
-```
-
-> [!NOTE]
-> If you have named the shortcut to something other than `Strap.lnk` make sure to replace that in the command above.
-
-### Option_B: Manual
-
-1. Press `Win + R`, type `shell:startup`, and press Enter.
-2. Locate the shortcut named Strap (it may just look like a standard application link).
-3. Right-click it and select Delete.
 
 ---
 
