@@ -10,14 +10,16 @@ This guide covers how to configure and customize Strap beyond its default behavi
 
 ## Table of Contents
 
-- [Enabling and Disabling Features](#enabling-and-disabling-features)
-- [Customizing Tooltips](#customizing-tooltips)
-- [Changing the Default Tray Icon Visibility](#changing-the-default-tray-icon-visibility)
-- [Changing CapsLock Numpad Shift Behavior](#changing-capslock-numpad-shift-behavior)
-- [Configuring the Color Picker Summary MsgBox](#configuring-the-color-picker-summary-msgbox)
-- [Adding a Timezone Not in the List](#adding-a-timezone-not-in-the-list)
-- [Setting a Startup Timezone](#setting-a-startup-timezone)
-- [Adding a Custom Timezone to Startup (not in the list)](#adding-a-custom-timezone-to-startup-not-in-the-list)
+- Inside `source.ahk`
+  - [Enabling and Disabling Features](#enabling-and-disabling-features)
+- Inside `source-dependencies/config.ahk`
+  - [Changing the Default Tray Icon Visibility](#changing-the-default-tray-icon-visibility)
+  - [Customizing Tooltips](#customizing-tooltips)
+  - [Changing CapsLock Numpad Shift Behavior](#changing-capslock-numpad-shift-behavior)
+  - [Configuring the Color Picker Summary MsgBox](#configuring-the-color-picker-summary-msgbox)
+  - [Adding a Timezone Not in the List](#adding-a-timezone-not-in-the-list)
+  - [Setting a Startup Timezone](#setting-a-startup-timezone)
+  - [Adding a Custom Timezone to Startup (not in the list)](#adding-a-custom-timezone-to-startup-not-in-the-list)
 
 ---
 
@@ -25,20 +27,86 @@ This guide covers how to configure and customize Strap beyond its default behavi
 
 You can completely disable specific features so their hotkeys revert to default Windows behavior.
 
-### Step 1: Open your configuration file
+- For the `source.ahk`, features are toggled by commenting or uncommenting their `#Include` lines.
 
-- Combined script: Open `distribution/config.ahk`.
-- Standalone modules: Open the specific file in `modules/`.
+### Step 1: Open the source script
 
-### Step 2: Find the specific feature config block+K does nothing
+Open `distribution/source.ahk` in your text editor.
 
-### Step 3: Choose the active line
+### Step 2: Find the `SELECT FEATURES TO LOAD` section
 
-To disable a feature, comment out the `true` line and uncomment the `false` line:
+```ahk
+; =====================================================================================
+; SELECT FEATURES TO LOAD
+; =====================================================================================
+;
+; >> Customize which features are loaded on script startup.
+;
+; INSTRUCTIONS:
+; 1. Uncomment the lines of the features you want to enable.
+; 2. Comment out any features you want to disable by adding a semicolon (;) at the beginning.
+; 3. Save the file and reload the script.
+;
+; =========================================================
+;
+#Include source-dependencies/config.ahk                  ; Core settings (Required)
 
-### Step 4: Save and reload
+#Include source-dependencies/source-numpad-emulator.ahk    ; Numpad Emulator feature
+#Include source-dependencies/source-timezone-switcher.ahk  ; Timezone Switcher feature
+#Include source-dependencies/sour...
 
-Right-click the tray icon and select **Reload** for changes to take effect.
+...
+
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+```
+
+### Step 3: Toggle the features
+
+- To enable a feature, remove the semicolon (;) at the beginning of its line.
+- To disable a feature, add a semicolon (;) at the beginning of its line.
+
+> [!NOTE]
+> Make sure #Include source-dependencies/config.ahk always remains uncommented!
+
+```ahk
+; =====================================================================================
+; SELECT FEATURES TO LOAD
+; =====================================================================================
+;
+; >> Customize which features are loaded on script startup.
+;
+; INSTRUCTIONS:
+; 1. Uncomment the lines of the features you want to enable.
+; 2. Comment out any features you want to disable by adding a semicolon (;) at the beginning.
+; 3. Save the file and reload the script.
+;
+; =========================================================
+;
+#Include source-dependencies/config.ahk                  ; Core settings (Required)
+
+#Include source-dependencies/source-numpad-emulator.ahk    ; Numpad Emulator feature
+; #Include source-dependencies/source-timezone-switcher.ahk  ; Timezone Switcher feature
+#Include source-dependencies/sour...
+
+...
+
+;
+; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
+;
+```
+
+### Step_4: Save and Reload
+
+The change does not take effect until the script is restarted.
+
+- If the tray icon is visible, right-click it and choose **Reload**.
+- If it is hidden, show it with `Win + Ctrl + \`, then reload it.
+- Or exit the script and run it again.
+
+> [!NOTE]
+> You can also use the hotkey `Win+Shift+/` to Reload the script.
 
 ---
 
@@ -122,6 +190,9 @@ The change does not take effect until the script is restarted.
 - If it is hidden, show it with `Win + Ctrl + \`, then reload it.
 - Or exit the script and run it again.
 
+> [!NOTE]
+> You can also use the hotkey `Win+Shift+/` to Reload the script.
+
 ---
 
 ## Changing the Default Tray Icon Visibility
@@ -197,6 +268,9 @@ The change does not take effect until the script is restarted.
 - If the tray icon is visible, right-click it and choose **Reload**.
 - If it is hidden, show it with `Win + Ctrl + \`, then reload it.
 - Or exit the script and run it again.
+
+> [!NOTE]
+> You can also use the hotkey `Win+Shift+/` to Reload the script.
 
 ---
 
@@ -274,6 +348,9 @@ The change does not take effect until the script is restarted.
 - If it is hidden, show it with `Win + Ctrl + \`, then reload it.
 - Or exit the script and run it again.
 
+> [!NOTE]
+> You can also use the hotkey `Win+Shift+/` to Reload the script.
+
 ---
 
 ## Configuring the Color Picker Summary MsgBox
@@ -350,6 +427,9 @@ The change does not take effect until the script is restarted.
 - If the tray icon is visible, right-click it and choose **Reload**.
 - If it is hidden, show it with `Win + Ctrl + \`, then reload it.
 - Or exit the script and run it again.
+
+> [!NOTE]
+> You can also use the hotkey `Win+Shift+/` to Reload the script.
 
 ---
 
@@ -496,6 +576,9 @@ The change does not take effect until the script is restarted.
 - If it is hidden, show it with `Win + Ctrl + \`, then reload it.
 - Or exit the script and run it again.
 
+> [!NOTE]
+> You can also use the hotkey `Win+Shift+/` to Reload the script.
+
 ---
 
 ## Setting a Startup Timezone
@@ -623,6 +706,9 @@ The change does not take effect until the script is restarted.
 - If it is hidden, show it with `Win + Ctrl + \`, then reload it.
 - Or exit the script and run it again.
 
+> [!NOTE]
+> You can also use the hotkey `Win+Shift+/` to Reload the script.
+
 ---
 
 ## Adding a Custom Timezone to Startup (not in the list)
@@ -713,6 +799,9 @@ The change does not take effect until the script is restarted.
 - If the tray icon is visible, right-click it and choose **Reload**.
 - If it is hidden, show it with `Win + Ctrl + \`, then reload it.
 - Or exit the script and run it again.
+
+> [!NOTE]
+> You can also use the hotkey `Win+Shift+/` to Reload the script.
 
 ---
 

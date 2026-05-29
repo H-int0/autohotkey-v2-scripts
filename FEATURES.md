@@ -7,9 +7,10 @@ This document provides an in-depth look at each feature included in Strap. It ex
 ## Table of Contents
 
 - [Utilities](#utilities)
-  - [1. Dynamic Help Box](#1-dynamic-help-box)
-  - [2. Cursor-Tracking Tooltips](#2-cursor-tracking-tooltips)
-  - [3. Tray Icon Toggle](#3-tray-icon-toggle)
+  - [1. Tray Icon Toggle](#1-tray-icon-toggle)
+  - [2. Reloading the Script](#2-reloading-the-script)
+  - [3. Exiting the Script](#3-exiting-the-script)
+  - [4. Dynamic Help Box](#4-dynamic-help-box)
 - [Features](#features)
   - [1. Numpad Emulator](#1-numpad-emulator)
   - [2. Timezone Switcher](#2-timezone-switcher)
@@ -23,7 +24,29 @@ This document provides an in-depth look at each feature included in Strap. It ex
 
 Strap includes built-in quality-of-life utilities that manage how the script interacts with you.
 
-### 1. Dynamic Help Box
+### 1. Tray Icon Toggle
+
+To keep your taskbar clean, Strap hides its AutoHotkey tray icon by default.
+
+**Hotkey:** `Win + Ctrl + \`
+
+- This hotkey flips the `A_IconHidden` state, allowing you to reveal the icon temporarily if you need to right-click it to Suspend, Reload, or Exit the script.
+
+---
+
+### 2. Reloading the Script
+
+To reload your script, Use the **Hotkey:** `Win+Ctrl+/`
+
+---
+
+### 3. Exiting the Script
+
+To Exit your script, use the **Hotkey:** `Win+Shift+/`
+
+---
+
+### 4. Dynamic Help Box
 
 A lightweight, semi-transparent (`Opacity: 225`) black overlay that follows your mouse and lists your active shortcuts.
 
@@ -35,21 +58,6 @@ A lightweight, semi-transparent (`Opacity: 225`) black overlay that follows your
   - The Help Box dynamically loops through this array to build the UI. If you disable a feature, it instantly disappears from the Help Box.
 - **Mouse Tracking:**
   - Like the Color Picker, the Help Box updates its position every 10ms and clamps to the edges of your screen.
-
-### 2. Cursor-Tracking Tooltips
-
-Instead of static tray notifications, Strap uses a custom `ShowToolTip()` function.
-
-- When a tooltip is triggered (e.g., "EVAPORATED!" or "Copied to Clipboard"), a 10ms timer starts tracking your mouse position (`mX + 15`, `mY + 15`).
-- The tooltip follows your cursor smoothly across the screen until the configured `Config_TooltipDuration` expires, ensuring the visual feedback is always exactly where your eyes are focused.
-
-### 3. Tray Icon Toggle
-
-To keep your taskbar clean, Strap hides its AutoHotkey tray icon by default.
-
-**Hotkey:** `Win + Ctrl + \`
-
-- This hotkey flips the `A_IconHidden` state, allowing you to reveal the icon temporarily if you need to right-click it to Suspend, Reload, or Exit the script.
 
 ---
 
@@ -93,7 +101,9 @@ A system-level utility to instantly cycle your Windows clock between different g
 Strap bypasses the UI entirely and interacts directly with the Windows command-line utility `tzutil.exe`.
 
 - **State Reading:**
-  - When checking the timezone, Strap pipes the output of `tzutil /g` into a temporary file (`A_Temp\tzout.txt`), reads the Windows Timezone ID, deletes the file, and maps it to your human-readable label.
+  - When checking the current timezone, Strap reads the Windows Timezone ID directly from the registry key:  
+    `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation\TimeZoneKeyName`  
+  - This is instant, avoids creating temporary files, and is mapped to your human-readable label.
 - **Sequential Cycling:**
   - The script maintains an ordered array (`TZOrder`) and a dictionary (`TZData`).
   - It identifies your current timezone, calculates the next one in the array, and executes `tzutil /s "Next Timezone"`.
@@ -139,13 +149,15 @@ The Color Picker operates in a continuous, high-priority 5ms loop while active.
 - **Cursor Override:**
   - Upon activation, it uses a deep Windows API call (`User32.dll\SetSystemCursor`) to replace your standard mouse pointers with a precise precision crosshair (`id: 32515`), copying and storing your original cursors in memory to restore them later.
 - **Live GUI:**
-  - It spawns a border-less, always-on-top GUI containing a live color swatch. It continuously polls `PixelGetColor` and `MouseGetPos` relative to your screen.
+  - It spawns a border-less, always-on-top GUI containing a live color swatch.  
+  - A high‑priority timer (`SetTimer`, **20 ms interval**) continuously polls `PixelGetColor` and `MouseGetPos` relative to your screen, giving smooth, real‑time updates.
 - **Math & Formatting:**
   - It strips the `0x` from the raw color string, formats it to lowercase Hex, and runs Integer conversions to calculate the exact `R`, `G`, and `B` values.
 - **Boundary Clamping:**
   - The script actively reads your monitor's Work Area (`MonitorGetWorkArea`) and recalculates the GUI's `X` and `Y` coordinates on the fly. If you move your mouse to the absolute bottom-right edge of your screen, the GUI will push itself upward and leftward so it never clips off-screen.
 - **Capture:**
   - On the second press, the GUI is destroyed, original cursors are restored, and the data is piped to `A_Clipboard`.
+  - If `ColorPickerMsgBox` is enabled in `config.ahk`, a summary window will appear displaying the Hex, RGB, and coordinates before closing. Otherwise, it closes silently.
 
 ---
 
