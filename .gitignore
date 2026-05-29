@@ -2,3 +2,9 @@
 .secrets/
 .misc/
 .vscode/
+
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
