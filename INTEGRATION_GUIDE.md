@@ -70,7 +70,9 @@ If your feature uses `CoordMode`, `MouseGetPos`, or `PixelGetColor` inside a tim
 | Statics in timer closures | Not thread-safe | Use global variables |
 | Code inside Numpad block | Breaks condition routing | Move to end of file |
 
-> **Summary:** If it uses a timer, use a top-level function. If it uses a hotkey, wrap it in a clean `#HotIf` block. Keep all new code after the Numpad Emulator block to ensure stability.
+---
+
+**Summary:** If it uses a timer, use a top-level function. If it uses a hotkey, wrap it in a clean `#HotIf` block. Keep all new code after the Numpad Emulator block to ensure stability.
 
 ---
 

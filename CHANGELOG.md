@@ -12,9 +12,9 @@ Format: [version]: release date, followed by what changed.
   - Vim Arrow Keys
   - Move the Selected Word/Line
   - System Temperatures & Fan Speed Monitor
+  - Printscreen to Menu button
+  - Select Multiple CLipboard
 - **Utilities**
-  - Hotkeys to Reload the Script
-  - Hotkeys to Exit the Script
   - CLI Interface
 
 ---
@@ -101,6 +101,33 @@ Format: [version]: release date, followed by what changed.
 ### Fixed in [v0.3.1]
 
 - Corrected command-line instructions for adding Strap to auto-start on boot.
+
+---
+
+## [v0.3.2] 2026-05-28
+
+### Added in [v0.3.2]
+
+- **Utilities:**
+  1. Reload Script
+      - reload the script with a single hotkey.
+  2. Exit Script
+      - exit the script with a single hotkey.
+- `source.ahk` now includes inline instructions for selecting which features to load on startup.
+
+### Changed in [v0.3.2]
+
+- **Force Kill**
+  - Switched to native `ProcessClose()` for closing the active window.
+- **Color Picker**
+  - Reduced CPU usage.
+  - RGB values are now extracted using bitwise operators.
+  - Cursor is now restored via a native `Win32 SPI_SETCURSORS` call.
+- **Timezone Switcher**
+  - Timezone ID is now read directly from the registry instead of relying on temp files, reducing latency on startup.
+- Tooltips now position themselves beside the cursor automatically instead of using a fixed offset.
+- Reduced the size of the `>> STRAP HELP` box.
+- Removed unused config sections.
 
 ---
 

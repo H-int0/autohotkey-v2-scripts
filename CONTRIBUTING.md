@@ -62,7 +62,10 @@ Every standalone module in `modules/` follows the same structure. Here it is as 
 #Requires AutoHotkey v2.0
 #UseHook True
 #MaxThreadsBuffer True
+
 ProcessSetPriority "High"
+#^/::Reload
+#+/::ExitApp
 
 
 ; =====================================================================================
@@ -74,7 +77,7 @@ A_IconHidden := 1
 
 
 ; ===========================================================================================================================================================================
-; >> COPY BELOW THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 if !IsSet(HelpEntries)
@@ -106,7 +109,7 @@ FeatureEnabled := true
 #HotIf
 
 ; ===========================================================================================================================================================================
-; >> COPY ABOVE THIS LINE INTO YOUR CUSTOM SCRIPT
+; >> SECTION
 ; ===========================================================================================================================================================================
 
 
@@ -194,7 +197,7 @@ Open `distribution/source.ahk` and make the following changes:
   - If the feature requires module-level globals, declare them near the top of `source.ahk`, before the `#Include` directives. Follow the existing pattern:
 
 - **Add the `#Include` line**
-  - Add a new `#Include` line after the existing includes:
+  - Add a new `#Include` line in the `SELECT FEATURES TO LOAD`, after the existing includes:
 
     ```ahk
     #Include source-dependencies/source-<feature-name>.ahk
