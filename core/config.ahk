@@ -50,8 +50,8 @@ TZOrder.Push("Eastern Standard Time")
 
 
 ; the CLI tool should make copies of this and add values to it to add a new timezone
-TZData[""] := "() `"`""
-TZOrder.Push("")
+; TZData[""] := "() `"`""
+; TZOrder.Push("")
 
 StartupTZID := ""
 
