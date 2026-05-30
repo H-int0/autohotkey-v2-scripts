@@ -5,8 +5,6 @@
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 
 def _print_help() -> None:
     print(
@@ -19,8 +17,37 @@ def _print_help() -> None:
         "strap /exit     Exit immediately\n"
     )
 
+def cli_install():
+    from ops.installer import run as install_run
+    INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
+    
+    reinstall = False
+    if os.path.exists(INSTALL_DIR):
+        ans = input(f"Strap is already installed at {INSTALL_DIR}.\nDo you want to reinstall and overwrite it? (yes/no): ").strip().lower()
+        if ans not in {"yes", "ya", "yeah", "y", "yep", "yup"}:
+            print("Installation aborted.")
+            return
+        reinstall = True
+        
+    ans2 = input("Do you want Strap to automatically start on boot? (yes/no): ").strip().lower()
+    enable_startup = ans2 in {"yes", "ya", "yeah", "y", "yep", "yup"}
+    
+    install_run(reinstall=reinstall, enable_startup_flag=enable_startup)
+
+def cli_update():
+    from ops.updater import run as update_run
+    from ops.startup import is_startup_enabled
+    
+    enable_startup = False
+    if not is_startup_enabled():
+        ans = input("Strap isn't configured to start on boot.\nDo you want to enable it now? (yes/no): ").strip().lower()
+        enable_startup = ans in {"yes", "ya", "yeah", "y", "yep", "yup"}
+        
+    update_run(enable_startup_flag=enable_startup)
 
 def main() -> None:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
     # If the user typed an argument in the terminal (e.g., strap /install)
     if len(sys.argv) > 1:
         raw_arg = sys.argv[1].strip()
@@ -30,17 +57,15 @@ def main() -> None:
         if not cmd.startswith("/"):
             cmd = "/" + cmd
 
-        # We route these directly into the TUI now!
-        from tui.app import StrapApp
-
+        # Terminal execution without TUI
         if cmd == "/install":
-            StrapApp(start_screen="install").run()
+            cli_install()
             
         elif cmd == "/update":
-            StrapApp(start_screen="update").run()
+            cli_update()
             
         elif cmd == "/config":
-            StrapApp(start_screen="config").run()
+            print("Phase 2: /config coming soon.")
 
         elif cmd == "/help":
             _print_help()
@@ -54,10 +79,14 @@ def main() -> None:
             sys.exit(1)
 
     else:
-        # No argument passed launch the TUI home screen
-        from tui.app import StrapApp
-        StrapApp(start_screen="home").run()
-
+        # No argument passed launch the TUI
+        while True:
+            from tui.app import StrapApp
+            app = StrapApp(start_screen="home")
+            result = app.run()
+            # If the user requested /reload, loop restart. Otherwise, fully break.
+            if result != "reload":
+                break
 
 if __name__ == "__main__":
     main()
