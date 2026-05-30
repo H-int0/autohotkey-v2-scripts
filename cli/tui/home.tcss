@@ -1,0 +1,37 @@
+#status-panel {
+    width: 30%;
+    border-right: solid $primary;
+    padding: 1 2;
+}
+
+#output-panel {
+    width: 70%;
+    padding: 1 2;
+}
+
+.panel-title {
+    text-style: bold;
+    color: $accent;
+    margin-bottom: 1;
+}
+
+/* Prompt row: ">>" label sits flush left, input fills the rest */
+#prompt-row {
+    dock: bottom;
+    border-top: solid $primary;
+    height: 3;
+    align: left middle;
+}
+
+#prompt-prefix {
+    width: auto;
+    padding: 0 1;
+    color: $accent;
+    text-style: bold;
+}
+
+#prompt {
+    width: 1fr;
+    border: none;
+    background: transparent;
+}
