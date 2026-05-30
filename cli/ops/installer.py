@@ -74,7 +74,7 @@ def run(reinstall: bool = False, enable_startup_flag: bool = False) -> None:
         with open(source_ahk_path, "r", encoding="utf-8") as f:
             cfg["features"].update(parse_source_ahk(f.read()))
 
-    # Apply the startup choice passed from the TUI
+    # Apply the startup choice passed from the TUI / CLI
     if enable_startup_flag:
         print("Creating startup shortcut...")
         enable_startup()
@@ -88,10 +88,20 @@ def run(reinstall: bool = False, enable_startup_flag: bool = False) -> None:
 
 def _add_to_user_path(new_path: str) -> None:
     try:
+        import ctypes
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Environment", 0, winreg.KEY_ALL_ACCESS)
         current_path, _ = winreg.QueryValueEx(key, "Path")
+        
         if new_path.lower() not in current_path.lower():
-            winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, current_path + ";" + new_path)
+            if not current_path.endswith(";"):
+                current_path += ";"
+            winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, current_path + new_path)
+            
+            # Broadcast the change globally so existing explorer sessions fetch the updated path
+            HWND_BROADCAST = 0xFFFF
+            WM_SETTINGCHANGE = 0x001A
+            ctypes.windll.user32.SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, 0, "Environment", 2, 5000, None)
+            
         winreg.CloseKey(key)
     except Exception as e:
         print(f"\nWarning: Could not add to PATH automatically. ({e})")
