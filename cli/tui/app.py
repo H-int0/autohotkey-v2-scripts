@@ -1,10 +1,5 @@
 from textual.app import App
-from .home    import HomeScreen
-from .install import InstallScreen
-from .update  import UpdateScreen
-from .config  import ConfigScreen
-from .help    import HelpScreen
-
+from .home import HomeScreen
 
 class StrapApp(App):
     CSS = """
@@ -13,12 +8,10 @@ class StrapApp(App):
     }
     """
 
+    BINDINGS = [("escape", "exit_app", "Exit")]
+
     SCREENS = {
-        "home":    HomeScreen,
-        "install": InstallScreen,
-        "update":  UpdateScreen,
-        "config":  ConfigScreen,
-        "help":    HelpScreen,
+        "home": HomeScreen,
     }
 
     def __init__(self, start_screen="home", **kwargs):
@@ -27,3 +20,6 @@ class StrapApp(App):
 
     def on_mount(self) -> None:
         self.push_screen(self.start_screen)
+
+    def action_exit_app(self) -> None:
+        self.exit(result="exit")
