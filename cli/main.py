@@ -5,6 +5,7 @@
 
 import sys
 import os
+import subprocess
 
 def _print_help() -> None:
     print(
@@ -14,6 +15,10 @@ def _print_help() -> None:
         "strap /update   Check for and apply updates from GitHub\n"
         "strap /config   Configure Strap settings (Phase 2)\n"
         "strap /help     Show this help message\n"
+        "strap /run      Launch Startup\n"
+        "strap /stop     Stop running AHK scripts\n"
+        "strap /clear    Clear terminal\n"
+        "strap /restart  Restart TUI\n"
         "strap /exit     Exit immediately\n"
     )
 
@@ -70,6 +75,28 @@ def main() -> None:
         elif cmd == "/help":
             _print_help()
 
+        elif cmd == "/run":
+            target = os.path.join(os.environ["APPDATA"], "Strap", "core", "source.ahk")
+            if os.path.exists(target):
+                print(f"Executing system shortcut: {target}")
+                try:
+                    os.startfile(target)
+                except Exception as e:
+                    print(f"Error executing file: {e}")
+            else:
+                print("Strap does not appear to be installed properly. Cannot run.")
+
+        elif cmd == "/stop":
+            subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print("AHK scripts terminated.")
+
+        elif cmd == "/clear":
+            # Clears the native console window
+            os.system('cls' if os.name == 'nt' else 'clear')
+
+        elif cmd == "/restart":
+            print("TUI is not currently running.")
+
         elif cmd == "/exit":
             sys.exit(0)
 
@@ -79,12 +106,13 @@ def main() -> None:
             sys.exit(1)
 
     else:
-        # No argument passed launch the TUI
+        # No argument passed - launch the TUI
         while True:
             from tui.app import StrapApp
             app = StrapApp(start_screen="home")
             result = app.run()
-            # If the user requested /reload, loop restart. Otherwise, fully break.
+            # If the user requested /restart (which exits with "reload"), loop restart. 
+            # Otherwise, fully break.
             if result != "reload":
                 break
 
