@@ -20,8 +20,9 @@ COMMANDS_TEXT = (
     "/config    Configure (WIP)\n"
     "/help      Show commands\n"
     "/run       Launch Startup\n"
+    "/stop      Stop AHK script\n"
     "/clear     Clear terminal\n"
-    "/reload    Restart TUI\n"
+    "/restart   Restart TUI\n"
     "/exit      Quit application"
 )
 
@@ -51,6 +52,7 @@ class HomeScreen(Screen):
         installed = "YES" if os.path.exists(INSTALL_DIR) else "NO"
         startup = "ENABLED" if is_startup_enabled() else "DISABLED"
         ahk = "YES" if self._is_ahk_running() else "NO"
+        auto_start = "Yes" if is_startup_enabled() else "No"
 
         status_text = (
             f"[b]STATUS[/b]\n"
@@ -58,6 +60,7 @@ class HomeScreen(Screen):
             f"Installed:   {installed}\n"
             f"Version:     v{version}\n"
             f"Startup:     {startup}\n"
+            f"Auto start:  {auto_start}\n"
             f"AHK running: {ahk}\n"
         )
         # Update text dynamically
@@ -80,7 +83,7 @@ class HomeScreen(Screen):
         self.log_widget = self.query_one("#term-log", RichLog)
         self.input_widget = self.query_one("#prompt", Input)
         self.update_status()
-        self.log_widget.write("Welcome to Strap CLI!")
+        self.log_widget.write("[bold blue]Welcome to Strap CLI![/bold blue]")
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         raw = event.value.strip()
@@ -106,6 +109,9 @@ class HomeScreen(Screen):
 
         cmd = self.command_queue.pop(0)
         
+        if cmd.lower().startswith("strap "):
+            cmd = cmd[6:].strip()
+            
         # Handle strict format constraint
         if not cmd.startswith("/"):
             self.log_widget.write(f">> {cmd}")
@@ -130,23 +136,36 @@ class HomeScreen(Screen):
             self._handle_update_start()
         elif c == "/config":
             self.log_widget.write("/config is coming in Phase 2.\nStay tuned.")
+            self.log_widget.write("") # Blank line
             self.process_next_command()
         elif c == "/help":
-            self.log_widget.write("Available Commands:\n/install, /update, /config, /help, /run, /clear, /reload, /exit")
+            self.log_widget.write("Available Commands:\n/install, /update, /config, /help, /run, /stop, /clear, /restart, /exit")
+            self.log_widget.write("") # Blank line
             self.process_next_command()
         elif c == "/run":
             self.run_strap_shortcut()
+            self.log_widget.write("") # Blank line
+        elif c == "/stop":
+            try:
+                subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                self.log_widget.write("AHK scripts terminated.")
+            except Exception as e:
+                self.log_widget.write(f"Failed to stop scripts: {e}")
+            self.log_widget.write("") # Blank line
+            self.process_next_command()
         elif c == "/clear":
             self.log_widget.clear()
-            self.log_widget.write("Welcome to Strap CLI!")
-            delattr(self, 'welcome_cleared')  # Reset the tracker
+            self.log_widget.write("[bold blue]Welcome to Strap CLI![/bold blue]")
+            delattr(self, 'welcome_cleared')
+            self.log_widget.write("") # Blank line
             self.process_next_command()
-        elif c == "/reload":
-            self.app.exit(result="reload")
+        elif c == "/restart":
+            self.app.exit(result="reload") # keep "reload" string so main.py catches it
         elif c == "/exit":
             self.app.exit(result="exit")
         else:
             self.log_widget.write(f'Unknown command: "{cmd}"\nType /help for available commands.')
+            self.log_widget.write("") # Blank line
             self.process_next_command()
 
     def run_strap_shortcut(self):
@@ -253,6 +272,7 @@ class HomeScreen(Screen):
         self.app.call_from_thread(self.finish_worker)
 
     def finish_worker(self):
+        self.log_widget.write("") # Add blank line here
         self.input_widget.disabled = False
         self.input_widget.focus()
         self.state = "idle"
