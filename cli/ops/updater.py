@@ -90,4 +90,13 @@ def run(enable_startup_flag: bool = False) -> None:
         print("Refreshing existing startup shortcut...")
         disable_startup()
         enable_startup()
-        cfg["startupEnabled"]
+        cfg["startupEnabled"] = True
+    elif enable_startup_flag:
+        print("Creating startup shortcut...")
+        enable_startup()
+        cfg["startupEnabled"] = True
+    else:
+        cfg["startupEnabled"] = False
+
+    save_user_config(cfg)
+    print("\n[✔] Update complete!")
