@@ -1,12 +1,13 @@
-#status-panel {
+#left-panel {
     width: 30%;
     border-right: solid $primary;
+    height: 100%;
     padding: 1 2;
 }
 
-#output-panel {
+#right-panel {
     width: 70%;
-    padding: 1 2;
+    height: 100%;
 }
 
 .panel-title {
@@ -15,7 +16,30 @@
     margin-bottom: 1;
 }
 
-/* Prompt row: ">>" label sits flush left, input fills the rest */
+#status-text {
+    height: auto;
+    margin-bottom: 2;
+}
+
+#commands-text {
+    height: 1fr;
+}
+
+#footer-text {
+    dock: bottom;
+    color: $text-muted;
+    height: 2;
+    content-align: left bottom;
+}
+
+RichLog {
+    width: 1fr;
+    height: 1fr;
+    padding: 1 2;
+    background: transparent;
+    border: none;
+}
+
 #prompt-row {
     dock: bottom;
     border-top: solid $primary;
