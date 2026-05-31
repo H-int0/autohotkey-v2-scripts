@@ -38,7 +38,6 @@ Global Config_TooltipDuration  := 2500
 Global Msg_ColorPicker         := "Copied to Clipboard"
 Global Msg_EndTask             := "EVAPORATED!"
 
-Global NumpadShiftSymbols      := true
 Global ColorPickerMsgBox       := false
 
 ; -------------------- UTC --------------------
@@ -168,5 +167,5 @@ TZOrder.Push("Eastern Standard Time")
 
 StartupTZID := ""
 
-if IsSet(StartupTZID)
+if (IsSet(StartupTZID) && StartupTZID != "")
   RunWait('tzutil /s "' StartupTZID '"',, "Hide")
