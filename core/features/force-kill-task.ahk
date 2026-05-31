@@ -23,7 +23,8 @@
 
 if !IsSet(HelpEntries)
     global HelpEntries := []
-HelpEntries.Push("
+if (ForceKillEnabled)
+    HelpEntries.Push("
 (
 > FORCE KILL TASK:
     Win+Ctrl+K      →  kill

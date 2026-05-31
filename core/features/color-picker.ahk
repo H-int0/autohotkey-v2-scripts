@@ -23,7 +23,8 @@
 
 if !IsSet(HelpEntries)
     global HelpEntries := []
-HelpEntries.Push("
+if (ColorPickerEnabled)
+    HelpEntries.Push("
 (
 > COLOR PICKER:
     Win+Ctrl+C      →  toggle picker

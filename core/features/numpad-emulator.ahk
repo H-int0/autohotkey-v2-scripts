@@ -24,6 +24,16 @@
 #MaxThreadsPerHotkey 1
 #MaxThreadsBuffer True
 
+if !IsSet(HelpEntries)
+    global HelpEntries := []
+if (NumpadEmulatorEnabled)
+    HelpEntries.Push("
+(
+> NUMPAD EMULATOR:
+    CapsLock OFF    →  num-row keys
+    CapsLock ON     →  numpad keys
+)")
+
 global _numpadOn := false
 _numpadOn := GetKeyState("CapsLock", "T")
 

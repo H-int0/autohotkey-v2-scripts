@@ -23,7 +23,8 @@
 
 if !IsSet(HelpEntries)
     global HelpEntries := []
-HelpEntries.Push("
+if (LineNavEnabled)
+    HelpEntries.Push("
 (
 > LINE NAVIGATION:
     Shift+Alt+ ←/→  →  line start/end

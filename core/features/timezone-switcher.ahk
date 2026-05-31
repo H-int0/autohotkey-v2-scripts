@@ -28,7 +28,8 @@ if !IsSet(TZOrder)
 
 if !IsSet(HelpEntries)
     global HelpEntries := []
-HelpEntries.Push("
+if (TimezoneSwitcherEnabled)
+    HelpEntries.Push("
 (
 > TIMEZONE SWITCHER:
     Win+Alt+``       →  cycle TZ
