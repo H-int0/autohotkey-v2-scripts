@@ -17,13 +17,14 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-; ===========================================================================================================================================================================
+; ====================================================================================
 
 #Requires AutoHotkey v2.0
 
 if !IsSet(HelpEntries)
     global HelpEntries := []
-HelpEntries.Push("
+if (LineNavEnabled)
+    HelpEntries.Push("
 (
 > LINE NAVIGATION:
     Shift+Alt+ ←/→  →  line start/end
@@ -31,12 +32,7 @@ HelpEntries.Push("
     Alt+Bksp/Del    →  delete to edge
 )")
 
-
-; =========================================================
-; FEATURE: LINE NAVIGATION
-; =========================================================
-
-#HotIf true
+#HotIf LineNavEnabled
 
 ; --- Move (shift+Alt) ---
 +!Left::Send  "{Home}"

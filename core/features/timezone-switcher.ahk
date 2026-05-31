@@ -17,7 +17,7 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-; ===========================================================================================================================================================================
+; ====================================================================================
 
 #Requires AutoHotkey v2.0
 
@@ -28,17 +28,15 @@ if !IsSet(TZOrder)
 
 if !IsSet(HelpEntries)
     global HelpEntries := []
-HelpEntries.Push("
+if (TimezoneSwitcherEnabled)
+    HelpEntries.Push("
 (
 > TIMEZONE SWITCHER:
     Win+Alt+``       →  cycle TZ
     Win+Ctrl+``      →  show current TZ
 )")
 
-
-; =========================================================
-; LOGIC
-; =========================================================
+#HotIf TimezoneSwitcherEnabled
 
 #!`::
 {
@@ -67,3 +65,5 @@ HelpEntries.Push("
     msgLabel := TZData.Has(currentID) ? TZData[currentID] : currentID
     ShowToolTip("Current TZ = " msgLabel)
 }
+
+#HotIf

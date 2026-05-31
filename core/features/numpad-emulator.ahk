@@ -17,48 +17,43 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-; ===========================================================================================================================================================================
+; ====================================================================================
 
 #Requires AutoHotkey v2.0
+#SingleInstance Force
+#MaxThreadsPerHotkey 1
+#MaxThreadsBuffer True
 
 if !IsSet(HelpEntries)
     global HelpEntries := []
-HelpEntries.Push("
+if (NumpadEmulatorEnabled)
+    HelpEntries.Push("
 (
 > NUMPAD EMULATOR:
     CapsLock OFF    →  num-row keys
     CapsLock ON     →  numpad keys
 )")
 
+global _numpadOn := false
+_numpadOn := GetKeyState("CapsLock", "T")
 
-; =========================================================
-; FEATURE: NUMPAD EMULATOR
-; =========================================================
+~CapsLock:: {
+    global _numpadOn
+    _numpadOn := !_numpadOn
+}
 
-#HotIf GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
+; Activate only when Caps Lock is ON.
+#HotIf _numpadOn && NumpadEmulatorEnabled
 
-+1::SendText "!"
-+2::SendText "@"
-+3::SendText "#"
-+4::SendText "$"
-+5::SendText "%"
-+6::SendText "^"
-+7::SendText "&"
-+8::SendText "*"
-+9::SendText "("
-+0::SendText ")"
-
-#HotIf GetKeyState("CapsLock", "T") && (!NumpadShiftSymbols || !GetKeyState("Shift", "P"))
-
-*1::Send '{Blind}{Numpad1}'
-*2::Send '{Blind}{Numpad2}'
-*3::Send '{Blind}{Numpad3}'
-*4::Send '{Blind}{Numpad4}'
-*5::Send '{Blind}{Numpad5}'
-*6::Send '{Blind}{Numpad6}'
-*7::Send '{Blind}{Numpad7}'
-*8::Send '{Blind}{Numpad8}'
-*9::Send '{Blind}{Numpad9}'
-*0::Send '{Blind}{Numpad0}'
+1::SendEvent "{Blind}{Numpad1}"
+2::SendEvent "{Blind}{Numpad2}"
+3::SendEvent "{Blind}{Numpad3}"
+4::SendEvent "{Blind}{Numpad4}"
+5::SendEvent "{Blind}{Numpad5}"
+6::SendEvent "{Blind}{Numpad6}"
+7::SendEvent "{Blind}{Numpad7}"
+8::SendEvent "{Blind}{Numpad8}"
+9::SendEvent "{Blind}{Numpad9}"
+0::SendEvent "{Blind}{Numpad0}"
 
 #HotIf

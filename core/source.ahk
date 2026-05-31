@@ -17,7 +17,7 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-; ===========================================================================================================================================================================
+; ====================================================================================
 
 #Requires AutoHotkey v2.0
 #UseHook True
@@ -33,33 +33,22 @@ global cpGuiGlobal := ""
 global cSwatchGlobal := "", cHexGlobal := "", cRgbGlobal := "", cXyGlobal := ""
 global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal := 0
 
-; =====================================================================================
-; SELECT FEATURES TO LOAD
-; =====================================================================================
-;
-; >> Customize which features are loaded on script startup.
-;
-; INSTRUCTIONS:
-; 1. Uncomment the lines of the features you want to enable.
-; 2. Comment out any features you want to disable by adding a semicolon (;) at the beginning.
-; 3. Save the file and reload the script.
-;
-; =========================================================
-;
-#Include source-dependencies/config.ahk                  ; Core settings (Required)
+if !IsSet(TZData)
+    TZData := Map()
+if !IsSet(TZOrder)
+    TZOrder := []
 
-#Include source-dependencies/source-numpad-emulator.ahk    ; Numpad Emulator feature
-#Include source-dependencies/source-timezone-switcher.ahk  ; Timezone Switcher feature
-#Include source-dependencies/source-force-kill-task.ahk    ; Force Kill Task feature
-#Include source-dependencies/source-color-picker.ahk       ; Color Picker feature
-#Include source-dependencies/source-line-navigation.ahk    ; Line Navigation feature
-;
-; ^^^^^^^^^^^^^^^ Edit THE LINES HERE ABOVE ^^^^^^^^^^^^^^^
-;
+#Include config.ahk
 
-; =========================================================
-; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
-; =========================================================
+if (IsSet(StartupTZID) && StartupTZID != "")
+    SetTimer(() => RunWait('tzutil /s "' StartupTZID '"',, "Hide"), -1)
+
+#Include features/numpad-emulator.ahk
+#Include features/alt-codes.ahk
+#Include features/timezone-switcher.ahk
+#Include features/force-kill-task.ahk
+#Include features/color-picker.ahk
+#Include features/line-navigation.ahk
 
 #HotIf
 #^\::
@@ -71,10 +60,7 @@ global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal :
 }
 #HotIf
 
-; =========================================================
 ; STRAP HELP BOX (Win + /)
-; =========================================================
-
 global helpGuiGlobal := ""
 
 #HotIf
@@ -144,10 +130,7 @@ UpdateHelpBox() {
     }
 }
 
-; =========================================================
 ; GLOBAL HELPER FUNCTIONS
-; =========================================================
-
 Global ActiveToolTipText := ""
 
 ShowToolTip(text)
