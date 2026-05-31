@@ -17,20 +17,23 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-; ===========================================================================================================================================================================
+; ====================================================================================
 
 #Requires AutoHotkey v2.0
 
 if !IsSet(HelpEntries)
     global HelpEntries := []
-HelpEntries.Push("
+if (ColorPickerEnabled)
+    HelpEntries.Push("
 (
 > COLOR PICKER:
     Win+Ctrl+C      →  toggle picker
 )")
 
-#HotIf true
+#HotIf ColorPickerEnabled
+
 #^c::ToggleColorPicker()
+
 #HotIf
 
 ToggleColorPicker() {
@@ -139,6 +142,7 @@ UpdateColorPicker() {
     }
 }
 
+; COLOR PICKER HELPER FUNCTION
 SetSystemCursor(mode) {
     static crosshairID := 32515
     static defaultCursors := Map()

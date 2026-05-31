@@ -17,7 +17,7 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-; ===========================================================================================================================================================================
+; ====================================================================================
 
 #Requires AutoHotkey v2.0
 #UseHook True
@@ -33,9 +33,18 @@ global cpGuiGlobal := ""
 global cSwatchGlobal := "", cHexGlobal := "", cRgbGlobal := "", cXyGlobal := ""
 global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal := 0
 
+if !IsSet(TZData)
+    TZData := Map()
+if !IsSet(TZOrder)
+    TZOrder := []
+
 #Include config.ahk
 
+if (IsSet(StartupTZID) && StartupTZID != "")
+    SetTimer(() => RunWait('tzutil /s "' StartupTZID '"',, "Hide"), -1)
+
 #Include features/numpad-emulator.ahk
+#Include features/alt-codes.ahk
 #Include features/timezone-switcher.ahk
 #Include features/force-kill-task.ahk
 #Include features/color-picker.ahk
@@ -51,6 +60,7 @@ global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal :
 }
 #HotIf
 
+; STRAP HELP BOX (Win + /)
 global helpGuiGlobal := ""
 
 #HotIf
@@ -116,6 +126,7 @@ UpdateHelpBox() {
     }
 }
 
+; GLOBAL HELPER FUNCTIONS
 Global ActiveToolTipText := ""
 
 ShowToolTip(text)

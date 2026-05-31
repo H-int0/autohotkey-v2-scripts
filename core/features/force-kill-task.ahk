@@ -17,19 +17,20 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-; ===========================================================================================================================================================================
+; ====================================================================================
 
 #Requires AutoHotkey v2.0
 
 if !IsSet(HelpEntries)
     global HelpEntries := []
-HelpEntries.Push("
+if (ForceKillEnabled)
+    HelpEntries.Push("
 (
 > FORCE KILL TASK:
     Win+Ctrl+K      →  kill
 )")
 
-#HotIf true
+#HotIf ForceKillEnabled
 
 #^k:: {
     activeHwnd := 0
@@ -67,9 +68,11 @@ HelpEntries.Push("
 
     isResponding := true
     
+    ; Check if the OS has already flagged it as hung
     if (DllCall("IsHungAppWindow", "Ptr", activeHwnd)) {
         isResponding := false
     } else {
+        ; Ping the window to see if it's alive
         try {
             SendMessage(0x0, 0, 0,, "ahk_id " activeHwnd,,,, 250)
         } catch {
@@ -90,4 +93,5 @@ HelpEntries.Push("
         }
     }
 }
+
 #HotIf
