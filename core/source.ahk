@@ -36,6 +36,7 @@ global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal :
 #Include config.ahk
 
 #Include features/numpad-emulator.ahk
+#Include features/alt-codes.ahk
 #Include features/timezone-switcher.ahk
 #Include features/force-kill-task.ahk
 #Include features/color-picker.ahk

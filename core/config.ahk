@@ -29,6 +29,7 @@ if !IsSet(TZOrder)
 A_IconHidden := 1
 
 Global NumpadEmulatorEnabled   := true
+Global AltCodesEnabled         := true
 Global TimezoneSwitcherEnabled := true
 Global ForceKillEnabled        := true
 Global ColorPickerEnabled      := true

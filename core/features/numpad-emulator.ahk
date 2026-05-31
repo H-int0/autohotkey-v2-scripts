@@ -23,7 +23,7 @@
 #SingleInstance Force
 
 ; Activate only when Caps Lock is ON.
-#HotIf GetKeyState("CapsLock", "T")
+#HotIf GetKeyState("CapsLock", "T") && NumpadEmulatorEnabled
 
 1::Send "{Numpad1}"
 2::Send "{Numpad2}"

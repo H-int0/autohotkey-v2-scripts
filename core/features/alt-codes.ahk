@@ -24,6 +24,9 @@
 
 global altBuffer := ""
 
+if (!AltCodesEnabled)
+    return
+
 ; Clear the buffer whenever Alt is initially pressed
 ~*LAlt::
 ~*RAlt:: {
