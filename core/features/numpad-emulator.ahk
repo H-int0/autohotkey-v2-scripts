@@ -21,19 +21,29 @@
 
 #Requires AutoHotkey v2.0
 #SingleInstance Force
+#MaxThreadsPerHotkey 1
+#MaxThreadsBuffer True
+
+global _numpadOn := false
+_numpadOn := GetKeyState("CapsLock", "T")
+
+~CapsLock:: {
+    global _numpadOn
+    _numpadOn := !_numpadOn
+}
 
 ; Activate only when Caps Lock is ON.
-#HotIf GetKeyState("CapsLock", "T") && NumpadEmulatorEnabled
+#HotIf _numpadOn && NumpadEmulatorEnabled
 
-1::Send "{Numpad1}"
-2::Send "{Numpad2}"
-3::Send "{Numpad3}"
-4::Send "{Numpad4}"
-5::Send "{Numpad5}"
-6::Send "{Numpad6}"
-7::Send "{Numpad7}"
-8::Send "{Numpad8}"
-9::Send "{Numpad9}"
-0::Send "{Numpad0}"
+1::SendEvent "{Blind}{Numpad1}"
+2::SendEvent "{Blind}{Numpad2}"
+3::SendEvent "{Blind}{Numpad3}"
+4::SendEvent "{Blind}{Numpad4}"
+5::SendEvent "{Blind}{Numpad5}"
+6::SendEvent "{Blind}{Numpad6}"
+7::SendEvent "{Blind}{Numpad7}"
+8::SendEvent "{Blind}{Numpad8}"
+9::SendEvent "{Blind}{Numpad9}"
+0::SendEvent "{Blind}{Numpad0}"
 
 #HotIf
