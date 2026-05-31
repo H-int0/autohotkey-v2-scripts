@@ -35,10 +35,7 @@ HelpEntries.Push("
     Win+Ctrl+``      →  show current TZ
 )")
 
-
-; =========================================================
-; LOGIC
-; =========================================================
+#HotIf TimezoneSwitcherEnabled
 
 #!`::
 {
@@ -67,3 +64,5 @@ HelpEntries.Push("
     msgLabel := TZData.Has(currentID) ? TZData[currentID] : currentID
     ShowToolTip("Current TZ = " msgLabel)
 }
+
+#HotIf

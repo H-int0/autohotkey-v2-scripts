@@ -31,12 +31,7 @@ HelpEntries.Push("
     Alt+Bksp/Del    →  delete to edge
 )")
 
-
-; =========================================================
-; FEATURE: LINE NAVIGATION
-; =========================================================
-
-#HotIf true
+#HotIf LineNavEnabled
 
 ; --- Move (shift+Alt) ---
 +!Left::Send  "{Home}"

@@ -30,12 +30,7 @@ HelpEntries.Push("
     CapsLock ON     →  numpad keys
 )")
 
-
-; =========================================================
-; FEATURE: NUMPAD EMULATOR
-; =========================================================
-
-#HotIf GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
+#HotIf NumpadEmulatorEnabled && GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
 
 +1::SendText "!"
 +2::SendText "@"
@@ -48,7 +43,7 @@ HelpEntries.Push("
 +9::SendText "("
 +0::SendText ")"
 
-#HotIf GetKeyState("CapsLock", "T") && (!NumpadShiftSymbols || !GetKeyState("Shift", "P"))
+#HotIf NumpadEmulatorEnabled && GetKeyState("CapsLock", "T") && (!NumpadShiftSymbols || !GetKeyState("Shift", "P"))
 
 *1::Send '{Blind}{Numpad1}'
 *2::Send '{Blind}{Numpad2}'
