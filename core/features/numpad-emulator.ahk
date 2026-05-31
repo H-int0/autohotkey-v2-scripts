@@ -20,40 +20,20 @@
 ; ===========================================================================================================================================================================
 
 #Requires AutoHotkey v2.0
+#SingleInstance Force
 
-if !IsSet(HelpEntries)
-    global HelpEntries := []
-HelpEntries.Push("
-(
-> NUMPAD EMULATOR:
-    CapsLock OFF    →  num-row keys
-    CapsLock ON     →  numpad keys
-)")
+; Activate only when Caps Lock is ON.
+#HotIf GetKeyState("CapsLock", "T")
 
-#HotIf NumpadEmulatorEnabled && GetKeyState("CapsLock", "T") && NumpadShiftSymbols && GetKeyState("Shift", "P")
-
-+1::SendText "!"
-+2::SendText "@"
-+3::SendText "#"
-+4::SendText "$"
-+5::SendText "%"
-+6::SendText "^"
-+7::SendText "&"
-+8::SendText "*"
-+9::SendText "("
-+0::SendText ")"
-
-#HotIf NumpadEmulatorEnabled && GetKeyState("CapsLock", "T") && (!NumpadShiftSymbols || !GetKeyState("Shift", "P"))
-
-*1::Send '{Blind}{Numpad1}'
-*2::Send '{Blind}{Numpad2}'
-*3::Send '{Blind}{Numpad3}'
-*4::Send '{Blind}{Numpad4}'
-*5::Send '{Blind}{Numpad5}'
-*6::Send '{Blind}{Numpad6}'
-*7::Send '{Blind}{Numpad7}'
-*8::Send '{Blind}{Numpad8}'
-*9::Send '{Blind}{Numpad9}'
-*0::Send '{Blind}{Numpad0}'
+1::Send "{Numpad1}"
+2::Send "{Numpad2}"
+3::Send "{Numpad3}"
+4::Send "{Numpad4}"
+5::Send "{Numpad5}"
+6::Send "{Numpad6}"
+7::Send "{Numpad7}"
+8::Send "{Numpad8}"
+9::Send "{Numpad9}"
+0::Send "{Numpad0}"
 
 #HotIf
