@@ -21,11 +21,6 @@
 
 #Requires AutoHotkey v2.0
 
-if !IsSet(TZData)
-    TZData := Map()
-if !IsSet(TZOrder)
-    TZOrder := []
-
 A_IconHidden := 1
 
 Global NumpadEmulatorEnabled   := true
@@ -167,6 +162,3 @@ TZOrder.Push("Eastern Standard Time")
 ; TZOrder.Push("")
 
 StartupTZID := ""
-
-if (IsSet(StartupTZID) && StartupTZID != "")
-  RunWait('tzutil /s "' StartupTZID '"',, "Hide")

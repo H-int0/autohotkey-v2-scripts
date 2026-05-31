@@ -33,7 +33,15 @@ global cpGuiGlobal := ""
 global cSwatchGlobal := "", cHexGlobal := "", cRgbGlobal := "", cXyGlobal := ""
 global lastHexGlobal := "", lastRgbGlobal := "", lastXGlobal := 0, lastYGlobal := 0
 
+if !IsSet(TZData)
+    TZData := Map()
+if !IsSet(TZOrder)
+    TZOrder := []
+
 #Include config.ahk
+
+if (IsSet(StartupTZID) && StartupTZID != "")
+    SetTimer(() => RunWait('tzutil /s "' StartupTZID '"',, "Hide"), -1)
 
 #Include features/numpad-emulator.ahk
 #Include features/alt-codes.ahk
