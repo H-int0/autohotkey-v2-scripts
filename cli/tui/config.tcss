@@ -30,12 +30,18 @@ ConfigScreen #right-panel {
     margin-bottom: 1;
 }
 
-#config-hints-text {
+#config-left-content {
     height: 1fr;
+    overflow-y: auto;
+    overflow-x: hidden; /* Forces text to adjust/wrap when terminal resizes */
+}
+
+#config-hints-text {
+    height: auto;
 }
 
 #config-footer-text {
-    dock: bottom;
+    dock: bottom; /* Pins it to the bottom */
     color: $text-muted;
     height: 2;
     content-align: left bottom;

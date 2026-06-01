@@ -4,7 +4,7 @@ from contextlib import redirect_stdout
 from textual import work
 from textual.screen import Screen
 from textual.app import ComposeResult
-from textual.containers import Horizontal, Vertical
+from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.widgets import Static, Input, RichLog
 from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
@@ -78,9 +78,11 @@ class HomeScreen(Screen):
     def compose(self) -> ComposeResult:
         with Horizontal():
             with Vertical(id="left-panel"):
-                yield Static("", id="status-text")
-                yield Static("", id="commands-text")
-                yield Static("", id="hints-text")
+                # Wraps the text so it scrolls, but leaves the footer outside to pin it
+                with ScrollableContainer(id="home-left-content"):
+                    yield Static("", id="status-text")
+                    yield Static("", id="commands-text")
+                    yield Static("", id="hints-text")
                 yield Static("SPDX-License-Identifier: GPL-3.0-or-later\nCopyright (C) 2026 H-int0", id="footer-text")
             
             with Vertical(id="right-panel"):

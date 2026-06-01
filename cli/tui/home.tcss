@@ -26,12 +26,18 @@
     margin-bottom: 1;
 }
 
-#hints-text {
+#home-left-content {
     height: 1fr;
+    overflow-y: auto;
+    overflow-x: hidden; /* Forces text to adjust/wrap when terminal resizes */
+}
+
+#hints-text {
+    height: auto;
 }
 
 #footer-text {
-    dock: bottom;
+    dock: bottom; /* Pins it to the bottom */
     color: $text-muted;
     height: 2;
     content-align: left bottom;
