@@ -3,7 +3,7 @@ import shutil
 import zipfile
 import requests
 from config.manager import load_user_config, save_user_config, sync_schema
-from ops.file_editor import update_config_ahk, update_source_ahk
+from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
 from ops.startup     import is_startup_enabled, enable_startup, disable_startup
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
@@ -83,7 +83,10 @@ def run(enable_startup_flag: bool = False) -> None:
     cfg = sync_schema(cfg)
     cfg["version"] = latest_ver
     update_config_ahk(cfg, os.path.join(INSTALL_DIR, "core", "config.ahk"))
-    update_source_ahk(cfg["features"], os.path.join(INSTALL_DIR, "core", "source.ahk"))
+    update_timezones_variables_ahk(
+        cfg["timezones"],
+        os.path.join(INSTALL_DIR, "core", "config-dependencies", "timezones-variables.ahk")
+    )
 
     # --- Interactive/Refresh Startup Flow ---
     if is_startup_enabled():

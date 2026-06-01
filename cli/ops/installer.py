@@ -2,7 +2,7 @@ import os
 import shutil
 import winreg
 from config.manager import load_user_config, save_user_config
-from config.parser  import parse_config_ahk, parse_source_ahk
+from config.parser  import parse_config_ahk, parse_timezones_variables_ahk
 from ops.startup    import enable_startup
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
@@ -62,17 +62,17 @@ def run(reinstall: bool = False, enable_startup_flag: bool = False) -> None:
     _add_to_user_path(BIN_DIR)
 
     print("Bootstrapping configurations...")
-    config_ahk_path  = os.path.join(INSTALL_DIR, "core", "config.ahk")
-    source_ahk_path  = os.path.join(INSTALL_DIR, "core", "source.ahk")
+    config_ahk_path = os.path.join(INSTALL_DIR, "core", "config.ahk")
     cfg = load_user_config()
 
     if os.path.exists(config_ahk_path):
         with open(config_ahk_path, "r", encoding="utf-8") as f:
             cfg.update(parse_config_ahk(f.read()))
 
-    if os.path.exists(source_ahk_path):
-        with open(source_ahk_path, "r", encoding="utf-8") as f:
-            cfg["features"].update(parse_source_ahk(f.read()))
+    tz_vars_path = os.path.join(INSTALL_DIR, "core", "config-dependencies", "timezones-variables.ahk")
+    if os.path.exists(tz_vars_path):
+        with open(tz_vars_path, "r", encoding="utf-8") as f:
+            cfg["timezones"] = parse_timezones_variables_ahk(f.read())
 
     # Apply the startup choice passed from the TUI / CLI
     if enable_startup_flag:
