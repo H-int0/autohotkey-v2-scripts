@@ -1,0 +1,203 @@
+/* =============================================================================
+   config.tcss
+   Styles for ConfigScreen, ConfigPanel, and all config popups.
+   ============================================================================= */
+
+/* ---------------------------------------------------------------------------
+   Config screen layout — mirrors home.tcss panels
+   --------------------------------------------------------------------------- */
+
+ConfigScreen #left-panel {
+    width: 30%;
+    border-right: solid $primary;
+    height: 100%;
+    padding: 1 2;
+}
+
+ConfigScreen #right-panel {
+    width: 70%;
+    height: 100%;
+    padding: 1 2;
+}
+
+#config-status-text {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#config-commands-text {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#config-hints-text {
+    height: 1fr;
+}
+
+#config-footer-text {
+    dock: bottom;
+    color: $text-muted;
+    height: 2;
+    content-align: left bottom;
+}
+
+/* ---------------------------------------------------------------------------
+   Config panel (right side — the settings list)
+   --------------------------------------------------------------------------- */
+
+#config-title {
+    text-style: bold;
+    color: $accent;
+    margin-bottom: 1;
+}
+
+#config-list {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+#config-prompt-row {
+    dock: bottom;
+    border-top: solid $primary;
+    height: 3;
+    align: left middle;
+}
+
+#config-prompt-prefix {
+    width: auto;
+    padding: 0 1;
+    color: $accent;
+    text-style: bold;
+}
+
+#config-prompt {
+    width: 1fr;
+    border: none;
+    background: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   Popup base — all popups share this
+   --------------------------------------------------------------------------- */
+
+.config-popup {
+    background: $surface;
+    border: solid $primary;
+    padding: 1 2;
+    /* Width/height set per-popup or auto */
+}
+
+.popup-title {
+    text-style: bold;
+    color: $accent;
+    margin-bottom: 1;
+}
+
+.popup-divider {
+    color: $text-muted;
+    margin-bottom: 1;
+}
+
+/* Scrollable content area inside popups */
+.popup-scroll {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+/* Pinned help section — always at bottom, never scrolls */
+.popup-help {
+    border-top: solid $primary;
+    padding-top: 1;
+    margin-top: 1;
+    height: auto;
+    color: $text-muted;
+}
+
+/* ---------------------------------------------------------------------------
+   Timezone popup extras
+   --------------------------------------------------------------------------- */
+
+#tz-saved-section {
+    height: auto;
+    margin-bottom: 1;
+    border-bottom: dashed $primary;
+    padding-bottom: 1;
+}
+
+#tz-saved-title {
+    text-style: bold;
+    color: $accent;
+    margin-bottom: 1;
+}
+
+#tz-search-row {
+    height: 3;
+    align: left middle;
+    margin-bottom: 1;
+}
+
+#tz-search-input {
+    width: 1fr;
+    border: solid $primary;
+    background: transparent;
+}
+
+#tz-filter-btn {
+    width: auto;
+    margin-left: 1;
+}
+
+#tz-filter-tags {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#tz-filter-dropdown {
+    background: $surface;
+    border: solid $primary;
+    width: 20;
+    height: auto;
+    max-height: 12;
+    overflow-y: auto;
+    display: none;  /* shown programmatically */
+}
+
+#tz-list {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+/* ---------------------------------------------------------------------------
+   Unsaved changes popup
+   --------------------------------------------------------------------------- */
+
+#unsaved-popup {
+    width: 60%;
+    height: auto;
+    max-height: 80%;
+}
+
+#unsaved-changes-list {
+    height: auto;
+    max-height: 20;
+    overflow-y: auto;
+    margin-bottom: 1;
+}
+
+/* ---------------------------------------------------------------------------
+   Boolean popup option rows — highlight on hover/focus
+   --------------------------------------------------------------------------- */
+
+.option-row {
+    height: 1;
+    padding: 0 1;
+}
+
+.option-row:hover {
+    background: $primary 20%;
+}
+
+.option-row.--selected {
+    color: $accent;
+    text-style: bold;
+}
