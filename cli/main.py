@@ -70,7 +70,15 @@ def main() -> None:
             cli_update()
             
         elif cmd == "/config":
-            print("Phase 2: /config coming soon.")
+            # Open TUI on config page, pass any trailing args as the initial popup command
+            rest = raw_arg[7:].strip() if len(raw_arg) > 7 else ""
+            while True:
+                from tui.app import StrapApp
+                from tui.config import ConfigScreen
+                app = StrapApp(start_screen=ConfigScreen(open_popup=rest if rest else None))
+                result = app.run()
+                if result != "reload":
+                    break
 
         elif cmd == "/help":
             _print_help()
