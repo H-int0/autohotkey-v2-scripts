@@ -34,31 +34,39 @@ def save_user_config(config_data: dict) -> None:
 def sync_schema(current_config: dict) -> dict:
     """
     Bring current_config in line with DEFAULT_CONFIG:
-      1. Apply any renames from MIGRATIONS
+      1. Apply any renames/deletions from MIGRATIONS
       2. Add keys present in DEFAULT_CONFIG but missing from current_config
       3. Drop keys present in current_config but no longer in DEFAULT_CONFIG
       4. Deep-merge one level for dict values (e.g. "features")
-    Returns the synced config dict (does NOT save to disk caller does that).
+    Returns the synced config dict (does NOT save to disk   caller does that).
+
+    Migration values of None mean the key was deleted   it is dropped outright.
     """
     # --- 1. Apply migrations ---
     for old_key, new_key in MIGRATIONS.items():
         if "." in old_key:
-            # Nested key: "features.oldName" -> "features.newName"
+            # Nested key: "features.oldName" -> "features.newName" (or None = delete)
             parent, child_old = old_key.split(".", 1)
-            _, child_new = new_key.split(".", 1)
             if parent in current_config and isinstance(current_config[parent], dict):
                 if child_old in current_config[parent]:
-                    current_config[parent][child_new] = current_config[parent].pop(child_old)
+                    if new_key is None:
+                        del current_config[parent][child_old]
+                    else:
+                        _, child_new = new_key.split(".", 1)
+                        current_config[parent][child_new] = current_config[parent].pop(child_old)
         else:
             if old_key in current_config:
-                current_config[new_key] = current_config.pop(old_key)
+                if new_key is None:
+                    del current_config[old_key]
+                else:
+                    current_config[new_key] = current_config.pop(old_key)
 
     # --- 2 & 3. Add new keys, drop removed keys ---
     synced = {}
     for key, default_val in DEFAULT_CONFIG.items():
         if key in current_config:
             if isinstance(default_val, dict) and isinstance(current_config[key], dict):
-                # Deep merge one level (handles "features" sub-dict)
+                # Deep-merge one level (handles "features" sub-dict)
                 synced[key] = {
                     k: current_config[key].get(k, v)
                     for k, v in default_val.items()
@@ -66,7 +74,7 @@ def sync_schema(current_config: dict) -> dict:
             else:
                 synced[key] = current_config[key]
         else:
-            # New key added in a newer Strap version use default
+            # New key added in a newer Strap version   use default
             synced[key] = default_val
 
     return synced
