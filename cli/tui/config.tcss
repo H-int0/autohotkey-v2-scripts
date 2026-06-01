@@ -4,7 +4,7 @@
    ============================================================================= */
 
 /* ---------------------------------------------------------------------------
-   Config screen layout — mirrors home.tcss panels
+   Config screen layout mirrors home.tcss panels
    --------------------------------------------------------------------------- */
 
 ConfigScreen #left-panel {
@@ -42,7 +42,7 @@ ConfigScreen #right-panel {
 }
 
 /* ---------------------------------------------------------------------------
-   Config panel (right side — the settings list)
+   Config panel (right side the settings list)
    --------------------------------------------------------------------------- */
 
 #config-title {
@@ -51,7 +51,7 @@ ConfigScreen #right-panel {
     margin-bottom: 1;
 }
 
-#config-list {
+#config-panel {
     height: 1fr;
     overflow-y: auto;
 }
@@ -77,14 +77,14 @@ ConfigScreen #right-panel {
 }
 
 /* ---------------------------------------------------------------------------
-   Popup base — all popups share this
+   Popup base all popups share this
    --------------------------------------------------------------------------- */
 
 .config-popup {
+    width: 70%;
     background: $surface;
     border: solid $primary;
     padding: 1 2;
-    /* Width/height set per-popup or auto */
 }
 
 .popup-title {
@@ -98,13 +98,17 @@ ConfigScreen #right-panel {
     margin-bottom: 1;
 }
 
+_BasePopup {
+    align: right middle;
+}
+
 /* Scrollable content area inside popups */
 .popup-scroll {
     height: 1fr;
     overflow-y: auto;
 }
 
-/* Pinned help section — always at bottom, never scrolls */
+/* Pinned help section always at bottom, never scrolls */
 .popup-help {
     border-top: solid $primary;
     padding-top: 1;
@@ -185,7 +189,7 @@ ConfigScreen #right-panel {
 }
 
 /* ---------------------------------------------------------------------------
-   Boolean popup option rows — highlight on hover/focus
+   Boolean popup option rows highlight on hover/focus
    --------------------------------------------------------------------------- */
 
 .option-row {

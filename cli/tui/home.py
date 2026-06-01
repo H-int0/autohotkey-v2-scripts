@@ -48,29 +48,39 @@ class HomeScreen(Screen):
 
     def update_status(self):
         cfg = load_user_config()
-        version = cfg.get("version", DEFAULT_CONFIG["version"])
-        installed = "YES" if os.path.exists(INSTALL_DIR) else "NO"
-        startup = "ENABLED" if is_startup_enabled() else "DISABLED"
-        ahk = "YES" if self._is_ahk_running() else "NO"
-        auto_start = "Yes" if is_startup_enabled() else "No"
-
+        st_tz = cfg.get("startupTZID", "")
+        
         status_text = (
-            f"[b]STATUS[/b]\n"
-            f"───────────────────────\n"
-            f"Installed:   {installed}\n"
-            f"Version:     v{version}\n"
-            f"Startup:     {startup}\n"
-            f"Auto start:  {auto_start}\n"
-            f"AHK running: {ahk}\n"
+            f"[b]STATUS[/b]\n───────────────────────\n"
+            f"Installed:   {'Yes' if os.path.exists(INSTALL_DIR) else 'No'}\n"
+            f"Version:     v{cfg.get('version', DEFAULT_CONFIG['version'])}\n"
+            f"Startup:     {'Enabled' if is_startup_enabled() else 'Disabled'}\n"
+            f"Auto start:  {'Yes' if is_startup_enabled() else 'No'}\n"
+            f"AHK running: {'Yes' if self._is_ahk_running() else 'No'}\n"
+            f"Startup TZ:  {st_tz if st_tz else '(default)'}\n\n"
         )
-        # Update text dynamically
+        commands = (
+            "[b]COMMANDS[/b]\n───────────────────────\n"
+            "/install   Install Strap\n/update    Update Strap\n/config    Configure\n"
+            "/help      Show commands\n/run       Launch Startup\n/stop      Stop AHK script\n"
+            "/clear     Clear terminal\n/restart   Restart TUI\n/exit      Quit application\n"
+        )
+        hints = (
+            "[b]CLI SHORTCUTS[/b]\n───────────────────────\n"
+            "Chained commands with ^\n"
+            "  e.g. /clear ^ /run\n\n"
+            "Type /config to view\nand edit settings."
+        )
         self.query_one("#status-text", Static).update(status_text)
+        self.query_one("#commands-text", Static).update(commands)
+        self.query_one("#hints-text", Static).update(hints)
 
     def compose(self) -> ComposeResult:
         with Horizontal():
             with Vertical(id="left-panel"):
                 yield Static("", id="status-text")
-                yield Static(COMMANDS_TEXT, id="commands-text")
+                yield Static("", id="commands-text")
+                yield Static("", id="hints-text")
                 yield Static("SPDX-License-Identifier: GPL-3.0-or-later\nCopyright (C) 2026 H-int0", id="footer-text")
             
             with Vertical(id="right-panel"):
@@ -277,3 +287,7 @@ class HomeScreen(Screen):
         self.input_widget.focus()
         self.state = "idle"
         self.process_next_command()
+
+    def on_key(self, event) -> None:
+        if event.key == "escape":
+            self.app.exit(result="exit")

@@ -22,6 +22,11 @@
 }
 
 #commands-text {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#hints-text {
     height: 1fr;
 }
 

@@ -1,8 +1,3 @@
-# =============================================================================
-# config.py
-# ConfigScreen — the /config TUI page.
-# =============================================================================
-
 from __future__ import annotations
 
 import os
@@ -211,15 +206,15 @@ def _fmt_tz_entry(idx: int, win_id: str, display: str, cities: str, utc: str, se
     time_str = _live_time(win_id)
     time_part = f"{{{time_str}}}" if time_str else ""
     mark = "[bold yellow]*[/bold yellow]" if selected else " "
-    
+
     # Format: [24] Russian Standard Time {17:36, Apr-21-2029}      [UTC +3]
     raw_left = f"[{idx}] {display} {time_part}"
     left = f"{mark}{raw_left}"
-    
+
     # Pad so UTC lines up at ~75
     padding = max(1, 75 - len(raw_left))
     row = f"{left}{' ' * padding}[{utc}]"
-    
+
     if cities:
         row += f"\n   ({cities})"
     return row
@@ -438,14 +433,14 @@ class TimezonePopup(_BasePopup):
 
     def _render_saved(self) -> str:
         if not self._active:
-            return "  (none)"
+            return "  none"
         lines = []
         for win_id in self._active:
             idx = next((i + 1 for i, e in enumerate(TIMEZONE_CATALOG) if e[0] == win_id), "?")
             time_str = _live_time(win_id)
             time_part = f"[{time_str}]" if time_str else ""
             utc = next((e[3] for e in TIMEZONE_CATALOG if e[0] == win_id), "")
-            
+
             # Format: [24] (UTC +3) Russian Standard Time               [05:28, Dec-31-2029]
             raw_left = f"[{idx}] ({utc}) {win_id}"
             padding = max(1, 75 - len(raw_left))
@@ -580,22 +575,23 @@ class ConfigPanel(Static):
 
         tray = "visible" if p("trayIconVisible", True) else "hidden"
         ttdur = p("tooltipDuration", 2500)
-        
+
         tzs: list[str] = p("timezones", [])
         utc_labels = [next((e[3] for e in TIMEZONE_CATALOG if e[0] == win_id), win_id) for win_id in tzs]
-        tz_display = ", ".join(utc_labels) if utc_labels else "(none)"
-        
+        tz_display = ", ".join(utc_labels) if utc_labels else "none"
+
         startup_tz = p("startupTZID", "")
-        startup_tz_display = startup_tz if startup_tz else "(default)"
-        
+        startup_tz_display = startup_tz if startup_tz else "default"
+
         feat = p("features", DEFAULT_CONFIG["features"])
         def fl(k): return "active" if feat.get(k, True) else "inactive"
 
         def p_line(prefix, title, value, extra=""):
-            raw_left = f"{prefix} {title}"
-            pad = max(1, 37 - len(raw_left))
+            eprefix = prefix.replace("[", "\\[").replace("]", "\\]")
+            raw_left = f"{eprefix} {title}"
+            pad = max(1, 37 - len(f"{prefix} {title}")) # calculate padding on unescaped len
             mark = "[bold yellow]*[/bold yellow]" if self._mark_bool(prefix[1:3]) else " "
-            return f"{mark}{raw_left}{' ' * pad}[{value}]{extra}"
+            return f"{mark}{raw_left}{' ' * pad}\\[{value}\\]{extra}"
 
         lines = [
             "[bold blue]Customize STRAP[/bold blue]",
@@ -615,8 +611,8 @@ class ConfigPanel(Static):
             "",
             "─" * 60,
             "Configure - Features\n",
-            f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y1') else ' '}[y1] Force Kill",
-            f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y2') else ' '}[y2] Color Picker",
+            f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y1') else ' '}\\[y1\\] Force Kill",
+            f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y2') else ' '}\\[y2\\] Color Picker",
         ]
         return "\n".join(lines)
 
@@ -712,7 +708,7 @@ class ConfigScreen(Screen):
         cfg = load_user_config()
         st_tz = cfg.get("startupTZID", "")
         pending = self.panel.pending_count() if hasattr(self, "panel") else 0
-        
+
         status = (
             f"[b]STATUS[/b]\n───────────────────────\n"
             f"Installed:   {'Yes' if os.path.exists(INSTALL_DIR) else 'No'}\n"
@@ -720,10 +716,10 @@ class ConfigScreen(Screen):
             f"Startup:     {'Enabled' if is_startup_enabled() else 'Disabled'}\n"
             f"Auto start:  {'Yes' if is_startup_enabled() else 'No'}\n"
             f"AHK running: {'Yes' if self._is_ahk_running() else 'No'}\n"
-            f"Startup TZ:  {st_tz if st_tz else '(default)'}\n\n"
+            f"Startup TZ:  {st_tz if st_tz else 'default'}\n\n"
             f"{f'Pending:     {pending} change(s)' if pending else ''}\n"
         )
-        
+
         commands = (
             "[b]COMMANDS[/b]\n───────────────────────\n"
             "/install   Install Strap\n/update    Update Strap\n/config    Configure\n"
@@ -782,12 +778,12 @@ class ConfigScreen(Screen):
         val = self.input.value
         if not val: return
         keywords = ["/install", "/update", "/config", "/help", "/run", "/stop", "/clear", "/restart", "/exit", "--save", "--save --exit", "--abort", "true", "false", "active", "inactive", "enable", "disable", "visible", "hidden"]
-        
+
         if val.endswith("--save --e") or val.endswith("--save --ex") or val.endswith("--save --exi"):
             self.input.value = val.rsplit("--save", 1)[0] + "--save --exit"
             self.input.cursor_position = len(self.input.value)
             return
-            
+
         parts = val.split()
         if not parts: return
         last_word = parts[-1].lower()
@@ -842,7 +838,7 @@ class ConfigScreen(Screen):
 
         self._update_left_panel(flag, no)
         if not value and not sub: self._open_popup(flag, no); return
-        
+
         if flag == "u" and no in (3, 4) and not value and sub:
             value = sub
             sub = None

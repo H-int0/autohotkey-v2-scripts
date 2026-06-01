@@ -9,7 +9,7 @@ class StrapApp(App):
     }
     """
 
-    BINDINGS = [("escape", "exit_app", "Exit")]
+    BINDINGS = []
 
     SCREENS = {
         "home":   HomeScreen,
