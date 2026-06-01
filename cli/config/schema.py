@@ -19,37 +19,49 @@ DEFAULT_CONFIG = {
     # Whether a startup shortcut exists in shell:startup
     "startupEnabled": False,
 
-    # --- Tooltip settings ---
+    # --- [u1] Tray Icon ---
+    # UI:  True  = Visible  (A_IconHidden := 0 in AHK)
+    # UI:  False = Hidden   (A_IconHidden := 1 in AHK)
+    # Note: AHK's value is the logical inverse of this flag.
+    "trayIconVisible": True,
+
+    # --- [u2] Tooltip Timeout ---
+    # Positive integer, milliseconds. 1 sec = 1000 ms.
     "tooltipDuration": 2500,
-    "msgColorPicker": "Copied to Clipboard",
-    "msgEndTask": "EVAPORATED!",
 
-    # --- Numpad Emulator settings ---
-    "numpadShiftSymbols": True,
-
-    # --- Color Picker settings ---
-    "colorPickerMsgBox": False,
-
-    # --- Timezone settings ---
-    "startupTZID": "",
+    # --- [u3] Switching Timezones ---
+    # Ordered list of active Windows TZ IDs for the timezone cycler.
+    # Maps directly to which TZ_* vars are 1 in timezones-variables.ahk.
     "timezones": [
-        {"id": "W. Europe Standard Time",   "label": "(UTC +1) \"Berlin / Paris\""},
-        {"id": "Russian Standard Time",     "label": "(UTC +3) \"Moscow\""},
-        {"id": "Tokyo Standard Time",       "label": "(UTC +9) \"Tokyo\""},
-        {"id": "AUS Eastern Standard Time", "label": "(UTC +10) \"Sydney\""},
-        {"id": "Eastern Standard Time",     "label": "(UTC -5) \"Eastern Time\""},
+        "W. Europe Standard Time",
+        "Russian Standard Time",
+        "Tokyo Standard Time",
+        "AUS Eastern Standard Time",
+        "Eastern Standard Time",
     ],
 
-    # --- Feature toggles ---
-    # True  = #Include line is active in source.ahk
-    # False = #Include line is commented out in source.ahk
+    # --- [u4] Timezone on Startup ---
+    # Single Windows TZ ID string, or "" for no override (default Windows TZ).
+    "startupTZID": "",
+
+    # --- [z1-z6] Feature toggles ---
+    # True  = enabled  (FeatureNameEnabled := 1 in config.ahk)
+    # False = inactive (FeatureNameEnabled := 0 in config.ahk)
     "features": {
         "numpadEmulator":   True,
+        "altCodes":         True,
         "timezoneSwitcher": True,
         "forceKillTask":    True,
-        "colorPicker":      False,
+        "colorPicker":      True,
         "lineNavigation":   True,
     },
+
+    # --- [y1] Force Kill feature settings ---
+    "msgEndTask": "EVAPORATED!",
+
+    # --- [y2] Color Picker feature settings ---
+    "colorPickerMsgBox": False,
+    "msgColorPicker":    "Copied to Clipboard",
 }
 
 # -----------------------------------------------------------------------------
@@ -64,7 +76,5 @@ DEFAULT_CONFIG = {
 #   "features.oldName": "features.newName"
 # -----------------------------------------------------------------------------
 MIGRATIONS = {
-    # Example (not real shows the format):
-    # "tooltipDuration": "Config_TooltipDuration",
-    # "features.forceKill": "features.forceKillTask",
+    "numpadShiftSymbols": None,   # deleted
 }
