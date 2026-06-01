@@ -1,8 +1,7 @@
 # =============================================================================
 # parser.py
-# Reads config.ahk and source.ahk and returns Python dicts.
+# Reads config.ahk and timezones-variables.ahk and returns Python dicts.
 # Used during first install to bootstrap user-config.json from the actual files.
-#
 # =============================================================================
 
 import re
@@ -12,6 +11,11 @@ def parse_config_ahk(ahk_content: str) -> dict:
     """
     Parse config.ahk content and return a dict of config values.
     Only extracts keys that are tracked in user-config.json.
+
+    Mapping:
+        A_IconHidden := 0  ->  trayIconVisible: True   (visible)
+        A_IconHidden := 1  ->  trayIconVisible: False  (hidden)
+        AHK value is the logical inverse of the UI flag.
     """
     result = {}
 
@@ -24,59 +28,78 @@ def parse_config_ahk(ahk_content: str) -> dict:
                 return None
         return None
 
+    # [u1] Tray Icon   inverted: AHK 1 = hidden = UI False
+    val = find(r"A_IconHidden\s*:=\s*(\d+)", int)
+    if val is not None:
+        result["trayIconVisible"] = (val == 0)
+
+    # [u2] Tooltip Timeout
     val = find(r"Config_TooltipDuration\s*:=\s*(\d+)", int)
     if val is not None:
         result["tooltipDuration"] = val
+
+    # [u4] Timezone on Startup
+    val = find(r'StartupTZID\s*:=\s*"(.*?)"')
+    if val is not None:
+        result["startupTZID"] = val
+
+    # [z1-z6] Feature toggles   AHK 1 = enabled = True
+    feature_map = {
+        "NumpadEmulatorEnabled": "numpadEmulator",
+        "AltCodesEnabled":       "altCodes",
+        "TimezoneSwitcherEnabled": "timezoneSwitcher",
+        "ForceKillEnabled":      "forceKillTask",
+        "ColorPickerEnabled":    "colorPicker",
+        "LineNavEnabled":        "lineNavigation",
+    }
+    features = {}
+    for ahk_var, cfg_key in feature_map.items():
+        val = find(rf"{ahk_var}\s*:=\s*(\d+)", int)
+        if val is not None:
+            features[cfg_key] = bool(val)
+    if features:
+        result["features"] = features
+
+    # [y1] Force Kill tooltip text
+    val = find(r'Msg_EndTask\s*:=\s*"(.*?)"')
+    if val is not None:
+        result["msgEndTask"] = val
+
+    # [y2] Color Picker settings
+    val = find(r"ColorPickerMsgBox\s*:=\s*(\d+)", int)
+    if val is not None:
+        result["colorPickerMsgBox"] = bool(val)
 
     val = find(r'Msg_ColorPicker\s*:=\s*"(.*?)"')
     if val is not None:
         result["msgColorPicker"] = val
 
-    val = find(r'Msg_EndTask\s*:=\s*"(.*?)"')
-    if val is not None:
-        result["msgEndTask"] = val
-
-    val = find(r"NumpadShiftSymbols\s*:=\s*(true|false)")
-    if val is not None:
-        result["numpadShiftSymbols"] = val.lower() == "true"
-
-    val = find(r"ColorPickerMsgBox\s*:=\s*(true|false)")
-    if val is not None:
-        result["colorPickerMsgBox"] = val.lower() == "true"
-
-    val = find(r'StartupTZID\s*:=\s*"(.*?)"')
-    if val is not None:
-        result["startupTZID"] = val
-
-    # Extract active timezones skip the empty template entry TZData[""] := ...
-    tzs = []
-    for m in re.finditer(r'TZData\["(?!")([^"]+)"\]\s*:=\s*"(.*?)"', ahk_content):
-        tzs.append({"id": m.group(1), "label": m.group(2)})
-    if tzs:
-        result["timezones"] = tzs
-
     return result
 
 
-def parse_source_ahk(ahk_content: str) -> dict:
+def parse_timezones_variables_ahk(ahk_content: str) -> list:
     """
-    Parse the SELECT FEATURES TO LOAD block in source.ahk.
-    Returns a dict of { camelCaseFeatureName: bool (True = enabled) }.
-    A line starting with '; #Include' is disabled; '#Include' alone is enabled.
+    Parse timezones-variables.ahk and return a list of active Windows TZ IDs.
+
+    Each enabled entry looks like:
+        TZ_Eastern_Standard_Time := 1
+
+    The TZ ID used in TZData (e.g. "Eastern Standard Time") is reconstructed
+    by replacing underscores with spaces and stripping the leading "TZ_" prefix.
+
+    Returns a list of TZ ID strings that are currently set to 1, preserving
+    the order they appear in the file.
     """
-    features = {}
+    active = []
+    pattern = re.compile(
+        r"^[ \t]*TZ_([A-Za-z0-9_]+)\s*:=\s*([01])",
+        re.MULTILINE
+    )
+    for m in pattern.finditer(ahk_content):
+        underscore_name = m.group(1)   # e.g. "Eastern_Standard_Time"
+        enabled         = m.group(2) == "1"
+        tz_id           = underscore_name.replace("_", " ")  # "Eastern Standard Time"
+        if enabled:
+            active.append(tz_id)
 
-    # Matches both:
-    #   #Include features/numpad-emulator.ahk        (enabled)
-    #   ; #Include features/numpad-emulator.ahk      (disabled)
-    pattern = r"^[ \t]*(;?\s*)#Include\s+features/([a-zA-Z0-9_-]+)\.ahk"
-    for m in re.finditer(pattern, ahk_content, re.MULTILINE):
-        disabled = m.group(1).strip().startswith(";")
-        filename = m.group(2)  # e.g. "numpad-emulator"
-
-        # dash-case -> camelCase
-        parts = filename.split("-")
-        camel = parts[0] + "".join(p.capitalize() for p in parts[1:])
-        features[camel] = not disabled
-
-    return features
+    return active
