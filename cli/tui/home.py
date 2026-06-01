@@ -134,10 +134,10 @@ class HomeScreen(Screen):
         elif c == "/update":
             self.state = "update_start"
             self._handle_update_start()
-        elif c == "/config":
-            self.log_widget.write("/config is coming in Phase 2.\nStay tuned.")
-            self.log_widget.write("") # Blank line
-            self.process_next_command()
+        elif c == "/config" or c.startswith("/config "):
+            rest = cmd[7:].strip()   # everything after "/config"
+            from tui.config import ConfigScreen
+            self.app.push_screen(ConfigScreen(open_popup=rest if rest else None))
         elif c == "/help":
             self.log_widget.write("Available Commands:\n/install, /update, /config, /help, /run, /stop, /clear, /restart, /exit")
             self.log_widget.write("") # Blank line

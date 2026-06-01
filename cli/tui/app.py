@@ -1,5 +1,6 @@
 from textual.app import App
-from .home import HomeScreen
+from .home   import HomeScreen
+from .config import ConfigScreen
 
 class StrapApp(App):
     CSS = """
@@ -11,7 +12,8 @@ class StrapApp(App):
     BINDINGS = [("escape", "exit_app", "Exit")]
 
     SCREENS = {
-        "home": HomeScreen,
+        "home":   HomeScreen,
+        "config": ConfigScreen,
     }
 
     def __init__(self, start_screen="home", **kwargs):
