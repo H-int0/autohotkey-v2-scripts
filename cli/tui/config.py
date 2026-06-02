@@ -193,6 +193,7 @@ _UTC_OFFSETS: list[str] = sorted(
 def _live_time(windows_tz_id: str) -> str:
     """Return 'HH:MM, MMM-DD-YYYY' for a Windows TZ ID, or '' on failure."""
     iana = None
+    
     for k, v in _WIN_TO_IANA.items():
         if k.replace(".", "").lower() == windows_tz_id.replace(".", "").lower():
             iana = v
@@ -465,9 +466,8 @@ class TimezonePopup(_BasePopup):
         return (
             f"[b]CONFIG · [{'u3' if not self._single else 'u4'}] {self.popup_title().split(' - ')[1]}[/b]\n"
             f"───────────────────────\n"
-            f"/config {flag_no} <No.>          Toggle by index (e.g. 24)\n"
-            f"/config {flag_no} <tz_name>      Toggle by name (spaces or underscores)\n"
-            f"Esc / /back                   Close popup"
+            f"/config {flag_no}--<TZ_No.> <UTC_No.>    Toggle by UTC\n"
+            f"Esc / /back                             Close popup"
         )
 
     def _refresh_list(self) -> None:
@@ -505,14 +505,15 @@ class TimezonePopup(_BasePopup):
 
     def _resolve_tz_arg(self, arg: str) -> str | None:
         arg = arg.strip()
-        if arg.isdigit():
-            idx = int(arg) - 1
-            if 0 <= idx < len(TIMEZONE_CATALOG):
-                return TIMEZONE_CATALOG[idx][0]
-            return None
-        normalized = arg.replace("_", " ").lower()
-        for win_id, display, _, _ in TIMEZONE_CATALOG:
-            if win_id.lower() == normalized or display.lower() == normalized:
+        if arg.startswith("-set--"): arg = arg[6:]
+        if arg.isdigit() and 0 <= int(arg)-1 < len(TIMEZONE_CATALOG): return TIMEZONE_CATALOG[int(arg)-1][0]
+        
+        # Normalize to spaces (e.g., "utc_+3" -> "utc +3")
+        norm = arg.replace("_", " ").lower()
+        
+        # Search by Windows ID, Display Name, OR UTC value!
+        for win_id, display, _, utc in TIMEZONE_CATALOG:
+            if win_id.lower() == norm or display.lower() == norm or utc.lower() == norm: 
                 return win_id
         return None
 
@@ -745,24 +746,23 @@ class ConfigScreen(Screen):
             return (
                 "[b]CONFIG COMMANDS[/b]\n───────────────────────\n"
                 "--save          Save changes\n--save --exit   Save & go back\n--abort         Discard changes\n"
-                "/config -u -1   Open global setting\n/config -z -1   Toggle feature\n/config -y -1   Open feature cfg"
+                "/config -flag -No <value>  Modify setting\n"
+                "/config -flag -No          Open popup"
             )
         if flag == "z":
             names = {1:"NumPad Emulator", 2:"ALT Codes", 3:"TimeZone Switcher", 4:"Force Kill", 5:"Color Picker", 6:"Line Navigation"}
             return (
                 f"[b]CONFIG · [z{no}] {names.get(no, '')}[/b]\n───────────────────────\n"
-                f"--!             Flip toggle\n/config -z -{no} 1/0\n"
-                f"/config -z -{no} true/false\n/config -z -{no} enable/disable\n/config -z -{no} active/inactive"
+                f"/config -z -{no}              Open popup\n"
+                f"/config -z -{no} --!          Flip toggle\n"
+                f"/config -z -{no} 1|true|active|enable\n"
+                f"/config -z -{no} 0|false|inactive|disable"
             )
         if flag == "u":
-            if no == 1: return "[b]CONFIG · [u1] Tray Icon[/b]\n───────────────────────\n/config -u -1 visible/hidden\n/config -u -1 true/false\n/config -u -1 --!"
-            if no == 2: return "[b]CONFIG · [u2] Tooltip Timeout[/b]\n───────────────────────\n/config -u -2 <ms>\n  e.g. /config -u -2 3000\n  (positive integer)"
-            if no == 3: return "[b]CONFIG · [u3] Switching Timezones[/b]\n───────────────────────\n/config -u -3 <No.>\n/config -u -3 <tz_name>\n  (toggle: add if absent, remove if present)"
-            if no == 4: return "[b]CONFIG · [u4] TimeZone on Startup[/b]\n───────────────────────\n/config -u -4 <No.>\n/config -u -4 <tz_name>\n  (same TZ again = reset to default)"
-        if flag == "y":
-            if no == 1: return "[b]CONFIG · [y1] Force Kill[/b]\n───────────────────────\n/config -y -1 <text>\n  (empty = disable tooltip)"
-            if no == 2: return "[b]CONFIG · [y2] Color Picker[/b]\n───────────────────────\n/config -y -2--1 enable/disable\n/config -y -2--2 <text>"
-        return ""
+            if no == 1: return "[b]CONFIG · [u1] Tray Icon[/b]\n───────────────────────\n/config -u -1              Open popup\n/config -u -1 visible|hidden\n/config -u -1 true|false\n/config -u -1 --!          Flip toggle"
+            if no == 2: return "[b]CONFIG · [u2] Tooltip Timeout[/b]\n───────────────────────\n/config -u -2              Open popup\n/config -u -2 <ms>         Set value\n  (positive integer)"
+            if no == 3: return "[b]CONFIG · [u3] Switching Timezones[/b]\n───────────────────────\n/config -u -3              Open popup\n/config -u -3--<TZ No. in list> <UTC_No.>\n  (toggle: add if absent, remove if present)"
+            if no == 4: return "[b]CONFIG · [u4] TimeZone on Startup[/b]\n───────────────────────\n/config -u -4              Open popup\n/config -u -4--<TZ No. in list> <UTC_No.>\n  (same TZ again = reset to default)"
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "config-prompt":
@@ -865,8 +865,8 @@ class ConfigScreen(Screen):
                 if vl == "--!": self.panel.pending["trayIconVisible"] = not self.panel._effective("trayIconVisible", True)
                 elif parse_bool(vl) is not None: self.panel.pending["trayIconVisible"] = parse_bool(vl)
             elif no == 2 and v.isdigit() and int(v) > 0: self.panel.pending["tooltipDuration"] = int(v)
-            elif no == 3: self._toggle_tz("timezones", v)
-            elif no == 4: self._toggle_startup_tz(v)
+            elif no == 3: self._toggle_tz("timezones", sub if sub else v)
+            elif no == 4: self._toggle_startup_tz(sub if sub else v)
         elif flag == "z":
             fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation"}
             fk = fk_map.get(no)
@@ -915,7 +915,7 @@ class ConfigScreen(Screen):
     def _open_popup(self, flag: str, no: int) -> None:
         cfg = self.panel._effective
         if flag == "u":
-            if no == 1: self.app.push_screen(BooleanPopup("Configure - Tray Icon", ["visible", "hidden"], "visible" if cfg("trayIconVisible", True) else "hidden", "[b]CONFIG · [u1] Tray Icon[/b]\n───────────────────────\n/config -u -1 visible|hidden\n/config -u -1 --!\nEsc / /back  Close"), lambda r: self._apply_result("trayIconVisible", r=="visible", r))
+            if no == 1: self.app.push_screen(BooleanPopup("Configure - Tray Icon", ["visible", "hidden"], "visible" if cfg("trayIconVisible", True) else "hidden", "[b]CONFIG · [u1] Tray Icon[/b]\n───────────────────────\n/config -u -1 visible|hidden\n/config -u -1 true|false\n/config -u -1 --!\nEsc / /back  Close"), lambda r: self._apply_result("trayIconVisible", r=="visible", r))
             elif no == 2: self.app.push_screen(IntegerPopup("Configure - Tooltip Timeout", cfg("tooltipDuration", 2500), "1sec = 1000ms", "[b]CONFIG · [u2] Tooltip Timeout[/b]\n───────────────────────\n/config -u -2 <ms>\nEsc / /back  Close"), lambda r: self._apply_result("tooltipDuration", r, r))
             elif no == 3: self._active_tz_popup = TimezonePopup("u", 3, cfg("timezones", []), False); self.app.push_screen(self._active_tz_popup, lambda r: self._apply_result("timezones", r, r))
             elif no == 4: st = cfg("startupTZID", ""); self._active_tz_popup = TimezonePopup("u", 4, [st] if st else [], True); self.app.push_screen(self._active_tz_popup, lambda r: self._apply_result("startupTZID", r[0] if r else "", r))
@@ -923,7 +923,7 @@ class ConfigScreen(Screen):
             f_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation"}
             names = {1:"NumPad Emulator", 2:"ALT Codes", 3:"TimeZone Switcher", 4:"Force Kill", 5:"Color Picker", 6:"Line Navigation"}
             if fk := f_map.get(no):
-                self.app.push_screen(BooleanPopup(f"Configure - {names[no]}", ["active", "inactive"], "active" if cfg("features", DEFAULT_CONFIG["features"]).get(fk, True) else "inactive", f"[b]CONFIG · [z{no}] {names[no]}[/b]\n───────────────────────\n/config -z -{no} active|inactive|--!\nEsc / /back  Close"), lambda r, _fk=fk: self._apply_feat_result(_fk, r))
+                self.app.push_screen(BooleanPopup(f"Configure - {names[no]}", ["active", "inactive"], "active" if cfg("features", DEFAULT_CONFIG["features"]).get(fk, True) else "inactive", f"[b]CONFIG · [z{no}] {names[no]}[/b]\n───────────────────────\n/config -z -{no} active|inactive|--!\n/config -z -{no} 1|0|true|false\nEsc / /back  Close"), lambda r, _fk=fk: self._apply_feat_result(_fk, r))
         elif flag == "y":
             if no == 1: self.app.push_screen(ForceKillPopup(cfg("msgEndTask", "EVAPORATED!")), lambda r: self._apply_route_result("msgEndTask", r))
             elif no == 2: self.app.push_screen(ColorPickerPopup(cfg("colorPickerMsgBox", False), cfg("msgColorPicker", "Copied to Clipboard")), lambda r: self._apply_route_result(None, r))
