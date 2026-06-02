@@ -20,40 +20,30 @@ class _BasePopup(ModalScreen):
                     yield from self.compose_content()
                 yield Static("─" * 40, classes="popup-divider")
                 yield Static(self.help_text(), classes="popup-help")
-            
-            # Recreate the exact command prompt at the bottom of the popup!
-            with Horizontal(classes="popup-prompt-row"):
-                yield Static(">>", classes="popup-prompt-prefix")
-                yield Input(placeholder=self.input_placeholder(), id="popup-cmd-input")
 
-    def input_placeholder(self) -> str: return "Enter value or command..."
-    def popup_title(self) -> str: return "Configure"
-    def compose_content(self): yield Static("")
-    def help_text(self) -> str: return ""
-
-    def on_key(self, event) -> None:
-        if event.key == "escape":
-            self.dismiss(None)
-
-    def on_input_submitted(self, event: Input.Submitted) -> None:
-        # Route the bottom command line inputs
-        if event.input.id == "popup-cmd-input":
-            raw = event.value.strip()
-            event.input.value = ""
-            if raw.lstrip("/").lower() == "back":
-                self.dismiss(None)
-            elif raw:
-                self.process_cmd_input(raw)
-        else:
-            self.handle_other_input(event)
-
-    def process_cmd_input(self, raw: str) -> None: pass
-    def handle_other_input(self, event: Input.Submitted) -> None: pass
+                with Horizontal(classes="popup-prompt-row"):
+                    yield Static(">>", classes="popup-prompt-prefix")
+                    yield Input(placeholder=self.input_placeholder(), id="popup-cmd-input")
 
     def on_mount(self) -> None:
-        # Auto-focus the bottom command line so the user can type immediately
-        try: self.query_one("#popup-cmd-input", Input).focus()
-        except Exception: pass
+        try:
+            self.query_one("#popup-cmd-input", Input).focus()
+        except:
+            pass
+
+    def on_mouse_scroll_up(self, event) -> None:
+        if event.x < self.app.console.width * 0.3:
+            try: self.app.screen.query_one("#config-left-content").scroll_up()
+            except:
+                try: self.app.screen.query_one("#home-left-content").scroll_up()
+                except: pass
+
+    def on_mouse_scroll_down(self, event) -> None:
+        if event.x < self.app.console.width * 0.3:
+            try: self.app.screen.query_one("#config-left-content").scroll_down()
+            except:
+                try: self.app.screen.query_one("#home-left-content").scroll_down()
+                except: pass
 
 class BooleanPopup(_BasePopup):
     def __init__(self, title: str, options: list[str], current: str, help_txt: str, **kwargs):
@@ -184,11 +174,6 @@ class TimezonePopup(_BasePopup):
                 yield Static(self.popup_title(), classes="popup-title")
                 yield Static("─" * 40, classes="popup-divider")
 
-                with Vertical(id="tz-saved-section"):
-                    yield Static("Saved TimeZones\n", id="tz-saved-title")
-                    yield Static(self._render_saved(), id="tz-saved-list")
-                    yield Static("")
-
                 with Horizontal(id="tz-search-row"):
                     yield Static("", id="tz-filter-tags")
                     yield Input(placeholder="Search timezones...", id="tz-search-input")
@@ -200,15 +185,18 @@ class TimezonePopup(_BasePopup):
                         yield Static(offset, classes="filter-option", id=f"fopt-{safe_id}")
 
                 with ScrollableContainer(id="tz-list"):
+                    with Vertical(id="tz-saved-section"):
+                        yield Static("Saved TimeZones\n", id="tz-saved-title")
+                        yield Static(self._render_saved(), id="tz-saved-list")
+                        yield Static("")
                     yield Static(self._render_list(), id="tz-list-content")
 
                 yield Static("─" * 40, classes="popup-divider")
                 yield Static(self.help_text(), classes="popup-help")
                 
-            # Identical bottom command prompt
-            with Horizontal(classes="popup-prompt-row"):
-                yield Static(">>", classes="popup-prompt-prefix")
-                yield Input(placeholder="Type timezone name, No., or command...", id="popup-cmd-input")
+                with Horizontal(classes="popup-prompt-row"):
+                    yield Static(">>", classes="popup-prompt-prefix")
+                    yield Input(placeholder="Type timezone name, No., or command...", id="popup-cmd-input")
 
     def _render_saved(self) -> str:
         if not self._active:
@@ -299,8 +287,18 @@ class TimezonePopup(_BasePopup):
                 return win_id
         return None
 
-    def handle_other_input(self, event: Input.Submitted) -> None:
-        pass # tz-search-input ignores enter and won't close
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        # Prevent Enter key from closing popup if typing in the search box
+        if event.input.id == "tz-search-input":
+            event.prevent_default()
+            return
+            
+        # Process command if typed in the bottom prompt
+        if event.input.id == "popup-cmd-input":
+            raw = event.value.strip()
+            event.input.value = ""
+            if raw:
+                self.process_cmd_input(raw)
 
     def process_cmd_input(self, raw: str) -> None:
         if raw.startswith("/") or raw.startswith("-"):
@@ -334,6 +332,6 @@ class UnsavedChangesPopup(_BasePopup):
 
     def process_cmd_input(self, raw: str) -> None:
         raw = raw.lower()
-        if raw in {"--save"}: self.dismiss("save")
-        elif raw in {"--!save", "--save --exit"}: self.dismiss("save_exit")
-        elif raw in {"--abort"}: self.dismiss("abort")
+        if raw in {"/config --save"}: self.dismiss("save")
+        elif raw in {"/config --!save", "/config --save --exit"}: self.dismiss("save_exit")
+        elif raw in {"/config --abort"}: self.dismiss("abort")
