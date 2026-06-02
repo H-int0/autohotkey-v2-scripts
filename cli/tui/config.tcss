@@ -88,20 +88,44 @@ ConfigScreen #right-panel {
 }
 
 /* ---------------------------------------------------------------------------
-   Popup base all popups share this
+   Popup styling so it replaces ONLY the right side
    --------------------------------------------------------------------------- */
 
 _BasePopup {
     align: right top;
+    background: transparent;
+}
+
+.popup-right-panel {
+    width: 70%;
+    height: 100%;
 }
 
 .config-popup {
-    width: 70%;
     height: 1fr;
-    margin-bottom: 3;
     background: $surface;
-    border: solid $primary;
     padding: 1 2;
+}
+
+.popup-prompt-row {
+    dock: bottom;
+    border-top: solid $primary;
+    height: 3;
+    align: left middle;
+    background: $surface;
+}
+
+.popup-prompt-prefix {
+    width: auto;
+    padding: 0 1;
+    color: $accent;
+    text-style: bold;
+}
+
+.popup-prompt-row Input {
+    width: 1fr;
+    border: none;
+    background: transparent;
 }
 
 .popup-title {
@@ -182,23 +206,6 @@ _BasePopup {
 #tz-list {
     height: 1fr;
     overflow-y: auto;
-}
-
-/* ---------------------------------------------------------------------------
-   Unsaved changes popup
-   --------------------------------------------------------------------------- */
-
-#unsaved-popup {
-    width: 60%;
-    height: auto;
-    max-height: 80%;
-}
-
-#unsaved-changes-list {
-    height: auto;
-    max-height: 20;
-    overflow-y: auto;
-    margin-bottom: 1;
 }
 
 /* ---------------------------------------------------------------------------

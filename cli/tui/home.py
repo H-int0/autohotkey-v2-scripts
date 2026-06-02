@@ -57,7 +57,7 @@ class HomeScreen(Screen):
             f"Startup:     {'Enabled' if is_startup_enabled() else 'Disabled'}\n"
             f"Auto start:  {'Yes' if is_startup_enabled() else 'No'}\n"
             f"AHK running: {'Yes' if self._is_ahk_running() else 'No'}\n"
-            f"Startup TZ:  {st_tz if st_tz else '(default)'}\n\n"
+            f"Startup TZ:  {st_tz if st_tz else 'default'}\n\n"
         )
         commands = (
             "[b]COMMANDS[/b]\n───────────────────────\n"
