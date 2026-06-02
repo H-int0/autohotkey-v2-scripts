@@ -85,16 +85,18 @@ CONFIG_U2_TEXT = (
 CONFIG_U3_TEXT = (
     "[b]CONFIG - [u3] Switching Timezones[/b]\n"
     "─────────────────────────\n"
-    "/config -u -3              (Open popup)\n"
-    "/config -u -3--TZ No.      (Toggle timezone)\n"
+    "/config -u -3                  (Open popup)\n"
+    "/config -u -3 UTC_No.  or\n"
+    "/config -u -3--TZ_No. UTC_No.  (Add timezone)\n"
     "  (adds if absent, removes if present)\n\n"
 )
 
 CONFIG_U4_TEXT = (
     "[b]CONFIG - [u4] TimeZone on Startup[/b]\n"
     "─────────────────────────\n"
-    "/config -u -4              (Open popup)\n"
-    "/config -u -4--TZ No.      (Set startup TZ)\n"
+    "/config -u -4                  (Open popup)\n"
+    "/config -u -4 UTC_No.  or\n"
+    "/config -u -4--TZ_No. UTC_No.  (Set startup TZ)\n"
     "  (same TZ again = reset to default)\n\n"
 )
 
@@ -121,6 +123,7 @@ def get_popup_tz_text(flag: str, no: int, is_single: bool, title: str) -> str:
     return (
         f"[b]CONFIG - [{tag}] {clean_title}[/b]\n"
         f"─────────────────────────\n"
+        f"/config {flag_no} UTC_No.  or\n"
         f"/config {flag_no}--TZ_No. UTC_No.  (Toggle by UTC)\n\n"
         f"/back or Esc                       (Close)\n\n"
     )

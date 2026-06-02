@@ -227,8 +227,8 @@ class ConfigScreen(Screen):
         if arg.startswith("-set--"): arg = arg[6:]
         if arg.isdigit() and 0 <= int(arg)-1 < len(TIMEZONE_CATALOG): return TIMEZONE_CATALOG[int(arg)-1][0]
         norm = arg.replace("_", " ").lower()
-        for win_id, display, _, _ in TIMEZONE_CATALOG:
-            if win_id.lower() == norm or display.lower() == norm: return win_id
+        for win_id, display, _, utc in TIMEZONE_CATALOG:
+            if win_id.lower() == norm or display.lower() == norm or utc.lower() == norm: return win_id
         return None
 
     def _open_popup(self, flag: str, no: int) -> None:
