@@ -78,4 +78,7 @@ def sync_schema(current_config: dict) -> dict:
             # New key added in a newer Strap version   use default
             synced[key] = default_val
 
+    # Enforce version strictly from schema
+    synced["version"] = DEFAULT_CONFIG["version"]
+
     return synced
