@@ -5,6 +5,7 @@ from config.manager import load_user_config, save_user_config
 from config.schema import DEFAULT_CONFIG
 from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
 from tui.tz_catalog import TIMEZONE_CATALOG
+from config.schema import FEATURE_REGISTRY
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
 
@@ -42,7 +43,6 @@ class ConfigPanel(Static):
         startup_tz_display = startup_tz if startup_tz else "default"
         
         feat = p("features", DEFAULT_CONFIG["features"])
-        def fl(k): return "active" if feat.get(k, True) else "inactive"
 
         def p_line(prefix, title, value, extra=""):
             eprefix = prefix.replace("[", "\\[")
@@ -60,12 +60,7 @@ class ConfigPanel(Static):
             p_line("[u3]", "Switching Timezones", tz_display),
             p_line("[u4]", "TimeZone on Startup", startup_tz_display),
             "",
-            p_line("[z1]", "NumPad Emulator", fl('numpadEmulator')),
-            p_line("[z2]", "ALT Codes", fl('altCodes')),
-            p_line("[z3]", "TimeZone Switcher", fl('timezoneSwitcher')),
-            p_line("[z4]", "Force Kill", fl('forceKillTask')),
-            p_line("[z5]", "Color Picker", fl('colorPicker')),
-            p_line("[z6]", "Line Navigation", fl('lineNavigation')),
+            *[p_line(f"[z{i}]", f["label"], "active" if feat.get(f["key"], f["default"]) else "inactive") for i, f in enumerate(FEATURE_REGISTRY, 1)],
             "",
             "─" * 60,
             "Configure - Features\n",
@@ -75,10 +70,7 @@ class ConfigPanel(Static):
         return "\n".join(lines)
 
     def _mark_bool(self, flag_no: str) -> bool:
-        z_map = {
-            "z1": "numpadEmulator", "z2": "altCodes", "z3": "timezoneSwitcher",
-            "z4": "forceKillTask", "z5": "colorPicker", "z6": "lineNavigation"
-        }
+        z_map = {f"z{i+1}": f["key"] for i, f in enumerate(FEATURE_REGISTRY)}
         
         if flag_no in z_map:
             feat = z_map[flag_no]
@@ -106,13 +98,16 @@ class ConfigPanel(Static):
 
     def pending_summary(self) -> dict[str, tuple]:
         summary = {}
+        feature_labels = {f"features.{f['key']}": f["label"] for f in FEATURE_REGISTRY}
         label_map = {
-            "trayIconVisible": "Tray Icon", "tooltipDuration": "Tooltip Timeout",
-            "timezones": "Switching Timezones", "startupTZID": "TimeZone on Startup",
-            "features.numpadEmulator": "NumPad Emulator", "features.altCodes": "ALT Codes",
-            "features.timezoneSwitcher":"TimeZone Switcher", "features.forceKillTask": "Force Kill",
-            "features.colorPicker": "Color Picker", "features.lineNavigation": "Line Navigation",
-            "msgEndTask": "Force Kill Tooltip", "colorPickerMsgBox": "Color Picker Box", "msgColorPicker": "Color Picker Tooltip",
+            **feature_labels,
+            "trayIconVisible": "Tray Icon",
+            "tooltipDuration": "Tooltip Timeout",
+            "timezones": "Switching Timezones",
+            "startupTZID": "TimeZone on Startup",
+            "msgEndTask": "Force Kill Tooltip",
+            "colorPickerMsgBox": "Color Picker Box",
+            "msgColorPicker": "Color Picker Tooltip",
         }
         for key, new_val in self.pending.items():
             summary[label_map.get(key, key)] = (str(self.cfg.get(key, "(not set)")), str(new_val))

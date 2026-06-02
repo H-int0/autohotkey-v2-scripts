@@ -1,5 +1,13 @@
 import re
 
+from config.schema import FEATURE_REGISTRY
+
+# =============================================================================
+# file_editor.py
+# edits the config.ahk
+# =============================================================================
+
+
 def update_config_ahk(config_data: dict, ahk_path: str) -> None:
     """
     Re-apply user-config values onto config.ahk.
@@ -48,19 +56,11 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
     )
 
     # --- [z1-z6] Feature toggles ---
-    feature_map = {
-        "numpadEmulator":   "NumpadEmulatorEnabled",
-        "altCodes":         "AltCodesEnabled",
-        "timezoneSwitcher": "TimezoneSwitcherEnabled",
-        "forceKillTask":    "ForceKillEnabled",
-        "colorPicker":      "ColorPickerEnabled",
-        "lineNavigation":   "LineNavEnabled",
-    }
     features = config_data.get("features", {})
-    for cfg_key, ahk_var in feature_map.items():
-        ahk_val = 1 if features.get(cfg_key, True) else 0
+    for f in FEATURE_REGISTRY:
+        ahk_val = 1 if features.get(f["key"], f["default"]) else 0
         content = re.sub(
-            rf"({re.escape(ahk_var)}\s*:=\s*)\d+",
+            rf"({re.escape(f['ahk_var'])}\s*:=\s*)\d+",
             rf"\g<1>{ahk_val}",
             content, flags=re.IGNORECASE
         )

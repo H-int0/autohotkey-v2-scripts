@@ -9,6 +9,15 @@ import os
 #                    format: { "old_key": "new_key" }
 # =============================================================================
 
+FEATURE_REGISTRY = [
+    {"key": "numpadEmulator",   "ahk_var": "NumpadEmulatorEnabled",  "label": "NumPad Emulator",    "default": True},
+    {"key": "altCodes",         "ahk_var": "AltCodesEnabled",        "label": "ALT Codes",          "default": True},
+    {"key": "timezoneSwitcher", "ahk_var": "TimezoneSwitcherEnabled","label": "TimeZone Switcher",  "default": True},
+    {"key": "forceKillTask",    "ahk_var": "ForceKillEnabled",       "label": "Force Kill",         "default": True},
+    {"key": "colorPicker",      "ahk_var": "ColorPickerEnabled",     "label": "Color Picker",       "default": True},
+    {"key": "lineNavigation",   "ahk_var": "LineNavEnabled",         "label": "Line Navigation",    "default": True},
+]
+
 DEFAULT_CONFIG = {
     # Strap version currently installed
     "version": "0.4.0",
@@ -47,14 +56,7 @@ DEFAULT_CONFIG = {
     # --- [z1-z6] Feature toggles ---
     # True  = enabled  (FeatureNameEnabled := 1 in config.ahk)
     # False = inactive (FeatureNameEnabled := 0 in config.ahk)
-    "features": {
-        "numpadEmulator":   True,
-        "altCodes":         True,
-        "timezoneSwitcher": True,
-        "forceKillTask":    True,
-        "colorPicker":      True,
-        "lineNavigation":   True,
-    },
+    "features": {f["key"]: f["default"] for f in FEATURE_REGISTRY},
 
     # --- [y1] Force Kill feature settings ---
     "msgEndTask": "EVAPORATED!",

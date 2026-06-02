@@ -1,6 +1,7 @@
 import sys
 import os
 import subprocess
+
 from tui.help_text import TERMINAL_COMMANDS_TEXT
 
 # =============================================================================

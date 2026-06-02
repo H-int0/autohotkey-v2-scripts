@@ -57,9 +57,10 @@ def get_status_text(version: str, is_installed: bool, startup_enabled: bool, ahk
     return base
 
 def get_config_z_text(no: int) -> str:
-    names = {1: "NumPad Emulator", 2: "ALT Codes", 3: "TimeZone Switcher", 4: "Force Kill", 5: "Color Picker", 6: "Line Navigation"}
+    from config.schema import FEATURE_REGISTRY
+    name = FEATURE_REGISTRY[no - 1]["label"] if 0 < no <= len(FEATURE_REGISTRY) else ""
     return (
-        f"[b]CONFIG - [z{no}] {names.get(no, '')}[/b]\n"
+        f"[b]CONFIG - [z{no}] {name}[/b]\n"
         f"─────────────────────────\n"
         f"/config -z -{no}              Open popup\n"
         f"/config -z -{no} --!          Flip value\n"

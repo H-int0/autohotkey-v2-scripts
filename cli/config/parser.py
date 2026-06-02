@@ -1,5 +1,7 @@
 import re
 
+from config.schema import FEATURE_REGISTRY
+
 # =============================================================================
 # parser.py
 # Reads config.ahk and timezones-variables.ahk and returns Python dicts.
@@ -43,19 +45,11 @@ def parse_config_ahk(ahk_content: str) -> dict:
         result["startupTZID"] = val
 
     # [z1-z6] Feature toggles   AHK 1 = enabled = True
-    feature_map = {
-        "NumpadEmulatorEnabled": "numpadEmulator",
-        "AltCodesEnabled":       "altCodes",
-        "TimezoneSwitcherEnabled": "timezoneSwitcher",
-        "ForceKillEnabled":      "forceKillTask",
-        "ColorPickerEnabled":    "colorPicker",
-        "LineNavEnabled":        "lineNavigation",
-    }
     features = {}
-    for ahk_var, cfg_key in feature_map.items():
-        val = find(rf"{ahk_var}\s*:=\s*(\d+)", int)
+    for f in FEATURE_REGISTRY:
+        val = find(rf"{f['ahk_var']}\s*:=\s*(\d+)", int)
         if val is not None:
-            features[cfg_key] = bool(val)
+            features[f["key"]] = bool(val)
     if features:
         result["features"] = features
 
