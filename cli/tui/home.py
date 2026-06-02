@@ -167,6 +167,10 @@ class HomeScreen(Screen):
             self.log_widget.write("")
             self.process_next_command()
 
+        elif c in ("/back", "back"):
+            self.log_widget.write("") # Blank line
+            self.process_next_command()
+
         elif c == "/run":
             self.run_strap_shortcut()
             self.log_widget.write("") # Blank line

@@ -10,6 +10,10 @@ from tui.help_text import POPUP_FORCE_KILL, POPUP_COLOR_PICKER, get_popup_tz_tex
 # =============================================================================
 
 class _BasePopup(ModalScreen):
+    def popup_title(self) -> str: return ""
+    def help_text(self) -> str: return ""
+    def input_placeholder(self) -> str: return "Type command..."
+
     def compose(self) -> ComposeResult:
         with Vertical(classes="popup-right-panel"):
             with Vertical(classes="config-popup", id="popup-outer"):
