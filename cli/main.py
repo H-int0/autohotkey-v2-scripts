@@ -55,10 +55,12 @@ def main() -> None:
 
     # If the user typed an argument in the terminal (e.g., strap /install)
     if len(sys.argv) > 1:
-        raw_arg = sys.argv[1].strip()
         
-        # Normalize command
-        cmd = raw_arg.lower()
+        raw_arg = " ".join(sys.argv[1:]).strip()
+        
+        # Normalize command by splitting the main command from the rest
+        parts = raw_arg.split(" ", 1)
+        cmd = parts[0].lower()
         if not cmd.startswith("/"):
             cmd = "/" + cmd
 
@@ -71,7 +73,7 @@ def main() -> None:
             
         elif cmd == "/config":
             # Open TUI on config page, pass any trailing args as the initial popup command
-            rest = raw_arg[7:].strip() if len(raw_arg) > 7 else ""
+            rest = parts[1].strip() if len(parts) > 1 else ""
             while True:
                 from tui.app import StrapApp
                 from tui.config import ConfigScreen
