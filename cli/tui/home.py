@@ -160,9 +160,7 @@ class HomeScreen(Screen):
         elif c in ("/help", "/?"):
             clean_commands = COMMANDS_TEXT.replace("[b]", "").replace("[/b]", "")
             self.log_widget.write(f"Available Commands:\n\n{clean_commands}")
-            self.process_next_command()
-            
-            self.log_widget.write("") # Blank line
+            self.log_widget.write("")
             self.process_next_command()
 
         elif c == "/run":

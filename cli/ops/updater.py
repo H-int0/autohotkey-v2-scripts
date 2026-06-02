@@ -6,6 +6,7 @@ import requests
 from config.manager import load_user_config, save_user_config, sync_schema
 from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
 from ops.startup     import is_startup_enabled, enable_startup, disable_startup
+from config.schema import DEFAULT_CONFIG
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
 GITHUB_API  = "https://api.github.com/repos/H-int0/autohotkey-v2-scripts/releases/latest"
@@ -16,7 +17,7 @@ def run(enable_startup_flag: bool = False) -> None:
     print("\n>> STRAP UPDATER\n")
 
     cfg = load_user_config()
-    current_version = cfg.get("version", "0.0.0")
+    current_version = DEFAULT_CONFIG["version"]
 
     print("Checking GitHub for updates...")
     try:
