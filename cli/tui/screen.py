@@ -239,12 +239,7 @@ class ConfigScreen(Screen):
                     BooleanPopup(
                         "Configure - Tray Icon", ["visible", "hidden"],
                         "visible" if cfg("trayIconVisible", True) else "hidden",
-                        "[b]CONFIG - [u1] Tray Icon[/b]\n"
-                        "─────────────────────────\n"
-                        "/config -u -1              Open popup\n"
-                        "/config -u -1 --!          Flip value\n"
-                        "/config -u -1 value        visible|hidden\n\n"
-                        "/back or Esc               Close\n\n"
+                        CONFIG_U1_TEXT.rstrip() + "\n\n/back or Esc               (Close)\n\n"
                     ),
                     lambda r: self._apply_result("trayIconVisible", r == "visible", r)
                 )
@@ -252,11 +247,7 @@ class ConfigScreen(Screen):
                 self.app.push_screen(
                     IntegerPopup(
                         "Configure - Tooltip Timeout", cfg("tooltipDuration", 2500), "1sec = 1000ms",
-                        "[b]CONFIG - [u2] Tooltip Timeout[/b]\n"
-                        "─────────────────────────\n"
-                        "/config -u -2              Open popup\n"
-                        "/config -u -2 time(in ms)  Set value\n\n"
-                        "/back or Esc               Close\n\n"
+                        CONFIG_U2_TEXT.rstrip() + "\n\n/back or Esc               (Close)\n\n"
                     ),
                     lambda r: self._apply_result("tooltipDuration", r, r)
                 )
@@ -275,12 +266,7 @@ class ConfigScreen(Screen):
                     BooleanPopup(
                         f"Configure - {names[no]}", ["active", "inactive"],
                         "active" if cfg("features", DEFAULT_CONFIG["features"]).get(fk, True) else "inactive",
-                        f"[b]CONFIG - [z{no}] {names.get(no, '')}[/b]\n"
-                        f"─────────────────────────\n"
-                        f"/config -z -{no}              Open popup\n"
-                        f"/config -z -{no} --!          Flip value\n"
-                        f"/config -z -{no} value        active|inactive\n\n"
-                        f"/back or Esc                  Close\n\n"
+                        get_config_z_text(no).rstrip() + "\n\n/back or Esc                  (Close)\n\n"
                     ),
                     lambda r, _fk=fk: self._apply_feat_result(_fk, r)
                 )
