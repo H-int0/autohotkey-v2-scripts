@@ -10,23 +10,13 @@ from textual.widgets import Static, Input, RichLog
 from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
 from ops.startup import is_startup_enabled
+from tui.help_text import (
+    COMMANDS_TEXT, CONFIG_COMMANDS_TEXT, get_status_text, 
+    get_config_z_text, CONFIG_U1_TEXT, CONFIG_U2_TEXT, 
+    CONFIG_U3_TEXT, CONFIG_U4_TEXT
+)
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
-
-COMMANDS_TEXT = (
-    "[b]COMMANDS[/b]\n"
-    "─────────────────────────\n"
-    "^ to chain    Ex: /run ^ /config\n"
-    "/install      Install Strap\n"
-    "/update       Update Strap\n"
-    "/config       Configure\n"
-    "/help, /?     Show commands\n"
-    "/run          Launch Startup\n"
-    "/stop         Stop AHK script\n"
-    "/clear        Clear terminal\n"
-    "/restart      Restart TUI\n"
-    "/exit         Quit application\n"
-)
 
 class HomeScreen(Screen):
     CSS_PATH = "home.tcss"
@@ -52,88 +42,29 @@ class HomeScreen(Screen):
         cfg = load_user_config()
         st_tz = cfg.get("startupTZID", "")
         
-        status_text = (
-            f"[b]STATUS[/b]\n"
-            f"─────────────────────────\n"
-            f"Version:      v{cfg.get('version', DEFAULT_CONFIG['version'])}\n"
-            f"Installed:    {'Yes' if os.path.exists(INSTALL_DIR) else 'No'}\n"
-            f"Startup:      {'Enabled' if is_startup_enabled() else 'Disabled'}\n"
-            f"Auto start:   {'Yes' if is_startup_enabled() else 'No'}\n"
-            f"AHK running:  {'Yes' if self._is_ahk_running() else 'No'}\n"
-            f"Startup TZ:   {st_tz if st_tz else 'default'}\n\n"
-        )
-        commands = (
-            "[b]COMMANDS[/b]\n"
-            "─────────────────────────\n"
-            "^ to chain    Ex: /run ^ /config\n\n"
-            "/install      Install Strap\n"
-            "/update       Update Strap\n"
-            "/config       Configure\n"
-            "/help, /?     Show commands\n"
-            "/run          Launch Startup\n"
-            "/stop         Stop AHK script\n"
-            "/clear        Clear terminal\n"
-            "/restart      Restart TUI\n"
-            "/exit         Quit application\n\n"
+        status_text = get_status_text(
+            version=cfg.get('version', DEFAULT_CONFIG['version']),
+            is_installed=os.path.exists(INSTALL_DIR),
+            startup_enabled=is_startup_enabled(),
+            ahk_running=self._is_ahk_running(),
+            st_tz=st_tz
         )
 
         hints = self._build_hints(focused_flag, focused_no)
         self.query_one("#status-text", Static).update(status_text)
-        self.query_one("#commands-text", Static).update(commands)
+        self.query_one("#commands-text", Static).update(COMMANDS_TEXT)
         self.query_one("#hints-text", Static).update(hints)
 
     def _build_hints(self, flag: str, no: int) -> str:
         if not flag or not no:
-            return (
-                "[b]CONFIG COMMANDS[/b]\n"
-                "─────────────────────────\n"
-                "/config --save             Save changes\n"
-                "/config --save --exit      Save & go back\n"
-                "/config --abort            Discard changes\n"
-                "/config -flag -No.         Open popup\n"
-                "/config -flag -No. value   Modify setting\n\n"
-            )
+            return CONFIG_COMMANDS_TEXT
         if flag == "z":
-            names = {1:"NumPad Emulator", 2:"ALT Codes", 3:"TimeZone Switcher", 4:"Force Kill", 5:"Color Picker", 6:"Line Navigation"}
-            return (
-                f"[b]CONFIG - [z{no}] {names.get(no, '')}[/b]\n"
-                f"─────────────────────────\n"
-                f"/config -z -{no}              Open popup\n"
-                f"/config -z -{no} --!          Flip value\n"
-                f"/config -z -{no} value        active | inactive\n\n"
-            )
+            return get_config_z_text(no)
         if flag == "u":
-            if no == 1:
-                return (
-                    "[b]CONFIG - [u1] Tray Icon[/b]\n"
-                    "─────────────────────────\n"
-                    "/config -u -1              Open popup\n"
-                    "/config -u -1 --!          Flip value\n"
-                    "/config -u -1 value        visible | hidden\n\n"
-                )
-            if no == 2:
-                return (
-                    "[b]CONFIG - [u2] Tooltip Timeout[/b]\n"
-                    "─────────────────────────\n"
-                    "/config -u -2              Open popup\n"
-                    "/config -u -2 time(in ms)  Set value\n\n"
-                )
-            if no == 3:
-                return (
-                    "[b]CONFIG - [u3] Switching Timezones[/b]\n"
-                    "─────────────────────────\n"
-                    "/config -u -3              Open popup\n"
-                    "/config -u -3--<TZ No.>    Toggle timezone\n"
-                    "  (adds if absent, removes if present)\n\n"
-                )
-            if no == 4:
-                return (
-                    "[b]CONFIG - [u4] TimeZone on Startup[/b]\n"
-                    "─────────────────────────\n"
-                    "/config -u -4              Open popup\n"
-                    "/config -u -4--<TZ No.>    Set startup TZ\n"
-                    "  (same TZ again = reset to default)\n\n"
-                )
+            if no == 1: return CONFIG_U1_TEXT
+            if no == 2: return CONFIG_U2_TEXT
+            if no == 3: return CONFIG_U3_TEXT
+            if no == 4: return CONFIG_U4_TEXT
         return ""
 
     def compose(self) -> ComposeResult:
@@ -227,18 +158,9 @@ class HomeScreen(Screen):
             self.app.push_screen(ConfigScreen(open_popup=rest if rest else None))
 
         elif c in ("/help", "/?"):
-            self.log_widget.write(
-                "Available Commands:\n\n"
-                "/install\n"
-                "/update\n"
-                "/config\n"
-                "/help\n"
-                "/run\n"
-                "/stop\n"
-                "/clear\n"
-                "/restart\n"
-                "/exit\n"
-            )
+            clean_commands = COMMANDS_TEXT.replace("[b]", "").replace("[/b]", "")
+            self.log_widget.write(f"Available Commands:\n\n{clean_commands}")
+            self.process_next_command()
             
             self.log_widget.write("") # Blank line
             self.process_next_command()

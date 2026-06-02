@@ -1,6 +1,7 @@
 import sys
 import os
 import subprocess
+from tui.help_text import TERMINAL_COMMANDS_TEXT
 
 # =============================================================================
 # main.py
@@ -8,19 +9,7 @@ import subprocess
 # =============================================================================
 
 def _print_help() -> None:
-    print(
-        "\nCOMMAND         DESCRIPTION\n"
-        "──────────────────────────────────\n"
-        "strap /install  Install Strap to %APPDATA%\\Strap\n"
-        "strap /update   Check for and apply updates from GitHub\n"
-        "strap /config   Configure Strap settings\n"
-        "strap /help     Show this help message\n"
-        "strap /run      Launch Startup\n"
-        "strap /stop     Stop running AHK scripts\n"
-        "strap /clear    Clear terminal\n"
-        "strap /restart  Restart TUI\n"
-        "strap /exit     Exit immediately\n"
-    )
+    print(TERMINAL_COMMANDS_TEXT)
 
 def cli_install():
     from ops.installer import run as install_run

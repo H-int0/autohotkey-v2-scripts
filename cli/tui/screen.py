@@ -12,6 +12,11 @@ from ops.startup import is_startup_enabled
 from tui.panel import ConfigPanel
 from tui.popups import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup, TimezonePopup, UnsavedChangesPopup
 from tui.tz_catalog import TIMEZONE_CATALOG
+from tui.help_text import (
+    COMMANDS_TEXT, CONFIG_COMMANDS_TEXT, get_status_text, 
+    get_config_z_text, CONFIG_U1_TEXT, CONFIG_U2_TEXT, 
+    CONFIG_U3_TEXT, CONFIG_U4_TEXT
+)
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
 
@@ -66,89 +71,30 @@ class ConfigScreen(Screen):
         st_tz = cfg.get("startupTZID", "")
         pending = self.panel.pending_count() if hasattr(self, "panel") else 0
         
-        status = (
-            f"[b]STATUS[/b]\n"
-            f"─────────────────────────\n"
-            f"Installed:    {'Yes' if os.path.exists(INSTALL_DIR) else 'No'}\n"
-            f"Version:      v{cfg.get('version', DEFAULT_CONFIG['version'])}\n"
-            f"Startup:      {'Enabled' if is_startup_enabled() else 'Disabled'}\n"
-            f"Auto start:   {'Yes' if is_startup_enabled() else 'No'}\n"
-            f"AHK running:  {'Yes' if self._is_ahk_running() else 'No'}\n"
-            f"Startup TZ:   {st_tz if st_tz else 'default'}\n\n"
-            f"Pending:      {pending}\n\n"
-        )
-        commands = (
-            "[b]COMMANDS[/b]\n"
-            "─────────────────────────\n"
-            "^ to chain    Ex: /run ^ /config\n"
-            "/install      Install Strap\n"
-            "/update       Update Strap\n"
-            "/config       Configure\n"
-            "/help, /?     Show commands\n"
-            "/run          Launch Startup\n"
-            "/stop         Stop AHK script\n"
-            "/clear        Clear terminal\n"
-            "/restart      Restart TUI\n"
-            "/exit         Quit application\n\n"
+        status_text = get_status_text(
+            version=cfg.get('version', DEFAULT_CONFIG['version']),
+            is_installed=os.path.exists(INSTALL_DIR),
+            startup_enabled=is_startup_enabled(),
+            ahk_running=self._is_ahk_running(),
+            st_tz=st_tz,
+            pending_count=pending
         )
 
         hints = self._build_hints(focused_flag, focused_no)
-        self.query_one("#config-status-text", Static).update(status)
-        self.query_one("#config-commands-text", Static).update(commands)
+        self.query_one("#config-status-text", Static).update(status_text)
+        self.query_one("#config-commands-text", Static).update(COMMANDS_TEXT)
         self.query_one("#config-hints-text", Static).update(hints)
 
     def _build_hints(self, flag: str, no: int) -> str:
         if not flag or not no:
-            return (
-                "[b]CONFIG COMMANDS[/b]\n"
-                "─────────────────────────\n"
-                "/config --save             Save changes\n"
-                "/config --save --exit      Save & \n"
-                "/config --abort            Discardnges\n"
-                "/config -flag -No.         Open popup\n"
-                "/config -flag -No. value   Modify setting\n\n"
-            )
+            return CONFIG_COMMANDS_TEXT
         if flag == "z":
-            names = {1:"NumPad Emulator", 2:"ALT Codes", 3:"TimeZone Switcher", 4:"Force Kill", 5:"Color Picker", 6:"Line Navigation"}
-            return (
-                f"[b]CONFIG - [z{no}] {names.get(no, '')}[/b]\n"
-                f"─────────────────────────\n"
-                f"/config -z -{no}              Open popup\n"
-                f"/config -z -{no} --!          Flip value\n"
-                f"/config -z -{no} value        active | inactive\n\n"
-            )
+            return get_config_z_text(no)
         if flag == "u":
-            if no == 1:
-                return (
-                    "[b]CONFIG - [u1] Tray Icon[/b]\n"
-                    "─────────────────────────\n"
-                    "/config -u -1              Open popup\n"
-                    "/config -u -1 --!          Flip value\n"
-                    "/config -u -1 value        visible | hidden\n\n"
-                )
-            if no == 2:
-                return (
-                    "[b]CONFIG - [u2] Tooltip Timeout[/b]\n"
-                    "─────────────────────────\n"
-                    "/config -u -2              Open popup\n"
-                    "/config -u -2 time(in ms)  Set value\n\n"
-                )
-            if no == 3:
-                return (
-                    "[b]CONFIG - [u3] Switching Timezones[/b]\n"
-                    "─────────────────────────\n"
-                    "/config -u -3              Open popup\n"
-                    "/config -u -3--<TZ No.>    Toggle timezone\n"
-                    "  (adds if absent, removes if present)\n\n"
-                )
-            if no == 4:
-                return (
-                    "[b]CONFIG - [u4] TimeZone on Startup[/b]\n"
-                    "─────────────────────────\n"
-                    "/config -u -4              Open popup\n"
-                    "/config -u -4--<TZ No.>    Set startup TZ\n"
-                    "  (same TZ again = reset to default)\n\n"
-                )
+            if no == 1: return CONFIG_U1_TEXT
+            if no == 2: return CONFIG_U2_TEXT
+            if no == 3: return CONFIG_U3_TEXT
+            if no == 4: return CONFIG_U4_TEXT
         return ""
     
     def on_input_changed(self, event: Input.Changed) -> None:
