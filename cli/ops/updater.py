@@ -9,9 +9,17 @@ from ops.startup     import is_startup_enabled, enable_startup, disable_startup
 from config.schema import DEFAULT_CONFIG
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
-GITHUB_API  = "https://api.github.com/repos/H-int0/autohotkey-v2-scripts/releases/latest"
+GITHUB_API = "https://api.github.com/repos/H-int0/autohotkey-v2-scripts/tags"
 
 _KEEP_DIRS = {"backup", "update", "user", "bin"}
+
+def parse_version(version_str: str) -> tuple:
+    """Converts a 'vX.X.X' string into a tuple of integers for reliable comparison."""
+    try:
+        return tuple(map(int, version_str.lstrip("v").split(".")))
+    except ValueError:
+        # Fallback if a tag doesn't match the X.X.X format
+        return (0, 0, 0)
 
 def run(enable_startup_flag: bool = False) -> None:
     print("\n>> STRAP UPDATER\n")
@@ -23,15 +31,25 @@ def run(enable_startup_flag: bool = False) -> None:
     try:
         resp = requests.get(GITHUB_API, timeout=10)
         resp.raise_for_status()
-        data        = resp.json()
-        latest_tag  = data.get("tag_name", "")
-        zip_url     = data.get("zipball_url", "")
+        data = resp.json()
+        
+        if not data:
+            print("No tags found in the repository.")
+            return
+
+        latest_tag  = data[0].get("name", "")
+        zip_url     = data[0].get("zipball_url", "")
         latest_ver  = latest_tag.lstrip("v")
+        
     except Exception as e:
         print(f"Failed to check for updates: {e}")
         return
 
-    if current_version == latest_ver:
+    # Convert both versions to integer tuples for accurate semantic comparison
+    current_tuple = parse_version(current_version)
+    latest_tuple  = parse_version(latest_ver)
+
+    if current_tuple >= latest_tuple:
         print(f"You're already on the latest version (v{current_version}).")
         return
 

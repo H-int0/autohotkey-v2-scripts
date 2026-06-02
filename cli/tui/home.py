@@ -236,8 +236,8 @@ class HomeScreen(Screen):
     def _handle_prompt(self, raw: str):
         # We allow ignoring the '/' strict rule for prompt y/n answers specifically
         ans = raw.lstrip("/").lower()
-        is_yes = ans in {"yes", "ya", "yeah", "y", "yep", "yup", "sure"}
-        is_no = ans in {"no", "nah", "n", "nope"}
+        is_yes = ans in {"y", "yes", "yeah", "ya", "yep", "yup", "yeah", "sure", "ok", "okay", "affirmative",  "da", "positive", "yeah", "sure", "ok", "okay", "affirmative", "positive"}
+        is_no = ans in {"no", "nah", "n", "nope", "negative", "naw", "nay", "nyet", "die", "negative", "naw", "nay", "nyet", }
 
         if self.state == "install_ask_reinstall":
             if is_yes:
