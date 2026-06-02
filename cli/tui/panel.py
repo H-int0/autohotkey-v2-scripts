@@ -10,7 +10,7 @@ from config.schema import FEATURE_REGISTRY
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
 
 # =============================================================================
-# ConfigPanel
+# Config Screen Left Side Panel
 # =============================================================================
 
 class ConfigPanel(Static):

@@ -206,7 +206,7 @@ class TimezonePopup(_BasePopup):
                 
                 with Horizontal(classes="popup-prompt-row"):
                     yield Static(">>", classes="popup-prompt-prefix")
-                    yield Input(placeholder="Type timezone name, No., or command...", id="popup-cmd-input")
+                    yield Input(placeholder="Type command...", id="popup-cmd-input")
 
     def _render_saved(self) -> str:
         if not self._active:

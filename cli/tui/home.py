@@ -18,6 +18,10 @@ from tui.help_text import (
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
 
+# =============================================================================
+# Home Screen
+# =============================================================================
+
 class HomeScreen(Screen):
     CSS_PATH = "home.tcss"
 
@@ -87,7 +91,7 @@ class HomeScreen(Screen):
         self.log_widget = self.query_one("#term-log", RichLog)
         self.input_widget = self.query_one("#prompt", Input)
         self.update_status()
-        self.log_widget.write("[bold blue]Welcome to Strap CLI![/bold blue]")
+        self.log_widget.write("[bold blue]Welcome to Strap CLI![/bold blue]\n\n[italic green](Open in full screen for a better experience)[italic /green]")
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "prompt":
@@ -178,7 +182,7 @@ class HomeScreen(Screen):
 
         elif c == "/clear":
             self.log_widget.clear()
-            self.log_widget.write("[bold blue]Welcome to Strap CLI![/bold blue]")
+            self.log_widget.write("[bold blue]Welcome to Strap CLI![/bold blue]\n\n[italic green](Open in full screen for a better experience)[italic /green]")
             delattr(self, 'welcome_cleared')
             self.log_widget.write("") # Blank line
             self.process_next_command()
