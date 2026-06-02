@@ -4,7 +4,6 @@ import winreg
 
 from config.manager import load_user_config, save_user_config
 from config.parser  import parse_config_ahk, parse_timezones_variables_ahk
-
 from ops.startup    import enable_startup
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")

@@ -6,12 +6,9 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.widgets import Static, Input
-
 from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
-
 from ops.startup import is_startup_enabled
-
 from tui.panel import ConfigPanel
 from tui.popups import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup, TimezonePopup, UnsavedChangesPopup
 from tui.tz_catalog import TIMEZONE_CATALOG
@@ -70,27 +67,28 @@ class ConfigScreen(Screen):
         pending = self.panel.pending_count() if hasattr(self, "panel") else 0
         
         status = (
-            f"[b]STATUS[/b]\n───────────────────────\n"
-            f"Installed:   {'Yes' if os.path.exists(INSTALL_DIR) else 'No'}\n"
-            f"Version:     v{cfg.get('version', DEFAULT_CONFIG['version'])}\n"
-            f"Startup:     {'Enabled' if is_startup_enabled() else 'Disabled'}\n"
-            f"Auto start:  {'Yes' if is_startup_enabled() else 'No'}\n"
-            f"AHK running: {'Yes' if self._is_ahk_running() else 'No'}\n"
-            f"Startup TZ:  {st_tz if st_tz else 'default'}\n\n"
-            f"{f'Pending:     {pending} change(s)' if pending else ''}\n"
+            f"[b]STATUS[/b]\n"
+            f"─────────────────────────────────────────────\n"
+            f"Installed:    {'Yes' if os.path.exists(INSTALL_DIR) else 'No'}\n"
+            f"Version:      v{cfg.get('version', DEFAULT_CONFIG['version'])}\n"
+            f"Startup:      {'Enabled' if is_startup_enabled() else 'Disabled'}\n"
+            f"Auto start:   {'Yes' if is_startup_enabled() else 'No'}\n"
+            f"AHK running:  {'Yes' if self._is_ahk_running() else 'No'}\n"
+            f"Startup TZ:   {st_tz if st_tz else 'default'}\n\n"
         )
-        
         commands = (
-            "[b]COMMANDS[/b]\n───────────────────────\n"
-            "/install   Install Strap\n"
-            "/update    Update Strap\n"
-            "/config    Configure\n"
-            "/help      Show commands\n"
-            "/run       Launch Startup\n"
-            "/stop      Stop AHK script\n"
-            "/clear     Clear terminal\n"
-            "/restart   Restart TUI\n"
-            "/exit      Quit application\n"
+            "[b]COMMANDS[/b]\n"
+            "─────────────────────────────────────────────\n"
+            "^ to chain    Ex: /run ^ /config\n"
+            "/install      Install Strap\n"
+            "/update       Update Strap\n"
+            "/config       Configure\n"
+            "/help, /?     Show commands\n"
+            "/run          Launch Startup\n"
+            "/stop         Stop AHK script\n"
+            "/clear        Clear terminal\n"
+            "/restart      Restart TUI\n"
+            "/exit         Quit application\n\n"
         )
 
         hints = self._build_hints(focused_flag, focused_no)
@@ -101,53 +99,57 @@ class ConfigScreen(Screen):
     def _build_hints(self, flag: str, no: int) -> str:
         if not flag or not no:
             return (
-                "[b]CONFIG COMMANDS[/b]\n───────────────────────\n"
-                "--save                   Save changes\n"
-                "--save --exit            Save & go back\n"
-                "--abort                  Discard changes\n"
-                "/config -flag -No val    Modify setting\n"
-                "/config -flag -No        Open popup"
+                "[b]CONFIG COMMANDS[/b]\n"
+                "─────────────────────────────────────────────\n"
+                "/config --save                 Save changes\n"
+                "/config --save --exit          Save & go back\n"
+                "/config --abort                Discard changes\n"
+                "/config -flag -No. value       Modify setting\n"
+                "/config -flag -No.             Open popup\n\n"
             )
         if flag == "z":
             names = {1:"NumPad Emulator", 2:"ALT Codes", 3:"TimeZone Switcher", 4:"Force Kill", 5:"Color Picker", 6:"Line Navigation"}
             return (
-                f"[b]CONFIG · [z{no}] {names.get(no, '')}[/b]\n───────────────────────\n"
-                f"/config -z -{no}              Open popup\n"
-                f"/config -z -{no} --!          Flip toggle\n"
-                f"/config -z -{no} 1|true|active|enable\n"
-                f"/config -z -{no} 0|false|inactive|disable"
+                f"[b]CONFIG - [z{no}] {names.get(no, '')}[/b]\n"
+                f"─────────────────────────────────────────────\n"
+                f"/config -z -{no}                  Open popup\n"
+                f"/config -z -{no} --!              Flip value\n"
+                f"/config -z -{no} value            active|inactive\n\n"
             )
         if flag == "u":
             if no == 1:
                 return (
-                    "[b]CONFIG · [u1] Tray Icon[/b]\n───────────────────────\n"
-                    "/config -u -1              Open popup\n"
-                    "/config -u -1 visible|hidden\n"
-                    "/config -u -1 true|false\n"
-                    "/config -u -1 --!          Flip toggle"
+                    "[b]CONFIG - [u1] Tray Icon[/b]\n"
+                    "─────────────────────────────────────────────\n"
+                    "/config -u -1                  Open popup\n"
+                    "/config -u -1 --!              Flip value\n"
+                    "/config -u -1 value            visible|hidden\n\n"
                 )
             if no == 2:
                 return (
-                    "[b]CONFIG · [u2] Tooltip Timeout[/b]\n───────────────────────\n"
-                    "/config -u -2              Open popup\n"
-                    "/config -u -2 <ms>         Set value\n"
-                    "  (positive integer)"
+                    "[b]CONFIG - [u2] Tooltip Timeout[/b]\n"
+                    "─────────────────────────────────────────────\n"
+                    "/config -u -2                  Open popup\n"
+                    "/config -u -2 time(in ms)      Set value\n\n"
                 )
             if no == 3:
                 return (
-                    "[b]CONFIG · [u3] Switching Timezones[/b]\n───────────────────────\n"
-                    "/config -u -3              Open popup\n"
-                    "/config -u -3--<TZ No.>    Toggle timezone\n"
-                    "  (add if absent, remove if present)"
+                    "[b]CONFIG - [u3] Switching Timezones[/b]\n"
+                    "─────────────────────────────────────────────\n"
+                    "/config -u -3                  Open popup\n"
+                    "/config -u -3--<TZ No.>        Toggle timezone\n"
+                    "  (adds if absent, removes if present)\n\n"
                 )
             if no == 4:
                 return (
-                    "[b]CONFIG · [u4] TimeZone on Startup[/b]\n───────────────────────\n"
-                    "/config -u -4              Open popup\n"
-                    "/config -u -4--<TZ No.>    Set startup TZ\n"
-                    "  (same TZ again = reset to default)"
+                    "[b]CONFIG - [u4] TimeZone on Startup[/b]\n"
+                    "─────────────────────────────────────────────\n"
+                    "/config -u -4                  Open popup\n"
+                    "/config -u -4--<TZ No.>        Set startup TZ\n"
+                    "  (same TZ again = reset to default)\n\n"
                 )
-
+        return ""
+    
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "config-prompt":
             val = event.value.strip().lower()
@@ -171,14 +173,14 @@ class ConfigScreen(Screen):
         if not val:
             return
         keywords = [
-            "/install", "/update", "/config", "/help", "/run", "/stop",
-            "/clear", "/restart", "/exit", "--save", "--save --exit",
-            "--abort", "true", "false", "active", "inactive",
+            "/install", "/update", "/config", "/help", "/?", "/run", "/stop",
+            "/clear", "/restart", "/exit", "/config --save", "/config --save --exit",
+            "/config --abort", "true", "false", "active", "inactive",
             "enable", "disable", "visible", "hidden"
         ]
 
-        if val.endswith("--save --e") or val.endswith("--save --ex") or val.endswith("--save --exi"):
-            self.input.value = val.rsplit("--save", 1)[0] + "--save --exit"
+        if val.endswith("/config --save --e") or val.endswith("/config --save --ex") or val.endswith("/config --save --exi"):
+            self.input.value = val.rsplit("/config --save", 1)[0] + "/config --save --exit"
             self.input.cursor_position = len(self.input.value)
             return
             
@@ -217,11 +219,11 @@ class ConfigScreen(Screen):
         if cl in ("/back", "back"):
             self._try_leave(); return
 
-        if cl in ("--save", "/config --save"):
+        if cl == "/config --save":
             self._do_save(exit_after=False); return
-        if cl in ("--save --exit", "--!save", "/config --save --exit", "/config --!save"):
+        if cl in ("/config --save --exit", "/config --!save"):
             self._do_save(exit_after=True); return
-        if cl in ("--abort", "/config --abort"):
+        if cl == "/config --abort":
             self.panel.discard_pending()
             self.panel.refresh_display()
             self._update_left_panel(); return
@@ -318,11 +320,12 @@ class ConfigScreen(Screen):
                     BooleanPopup(
                         "Configure - Tray Icon", ["visible", "hidden"],
                         "visible" if cfg("trayIconVisible", True) else "hidden",
-                        "[b]CONFIG · [u1] Tray Icon[/b]\n───────────────────────\n"
-                        "/config -u -1 visible|hidden\n"
-                        "/config -u -1 true|false\n"
-                        "/config -u -1 --!\n"
-                        "Esc / /back  Close"
+                        "[b]CONFIG - [u1] Tray Icon[/b]\n"
+                        "─────────────────────────────────────────────\n"
+                        "/config -u -1                  Open popup\n"
+                        "/config -u -1 --!              Flip value\n"
+                        "/config -u -1 value            visible|hidden\n\n"
+                        "/back or Esc                   Close\n\n"
                     ),
                     lambda r: self._apply_result("trayIconVisible", r == "visible", r)
                 )
@@ -330,9 +333,11 @@ class ConfigScreen(Screen):
                 self.app.push_screen(
                     IntegerPopup(
                         "Configure - Tooltip Timeout", cfg("tooltipDuration", 2500), "1sec = 1000ms",
-                        "[b]CONFIG · [u2] Tooltip Timeout[/b]\n───────────────────────\n"
-                        "/config -u -2 <ms>\n"
-                        "Esc / /back  Close"
+                        "[b]CONFIG - [u2] Tooltip Timeout[/b]\n"
+                        "─────────────────────────────────────────────\n"
+                        "/config -u -2                  Open popup\n"
+                        "/config -u -2 time(in ms)      Set value\n\n"
+                        "/back or Esc                   Close\n\n"
                     ),
                     lambda r: self._apply_result("tooltipDuration", r, r)
                 )
@@ -351,10 +356,12 @@ class ConfigScreen(Screen):
                     BooleanPopup(
                         f"Configure - {names[no]}", ["active", "inactive"],
                         "active" if cfg("features", DEFAULT_CONFIG["features"]).get(fk, True) else "inactive",
-                        f"[b]CONFIG · [z{no}] {names[no]}[/b]\n───────────────────────\n"
-                        f"/config -z -{no} active|inactive|--!\n"
-                        f"/config -z -{no} 1|0|true|false\n"
-                        "Esc / /back  Close"
+                        f"[b]CONFIG - [z{no}] {names.get(no, '')}[/b]\n"
+                        f"─────────────────────────────────────────────\n"
+                        f"/config -z -{no}                  Open popup\n"
+                        f"/config -z -{no} --!              Flip value\n"
+                        f"/config -z -{no} value            active|inactive\n\n"
+                        f"/back or Esc                      Close\n\n"
                     ),
                     lambda r, _fk=fk: self._apply_feat_result(_fk, r)
                 )

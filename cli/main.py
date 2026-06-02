@@ -13,7 +13,7 @@ def _print_help() -> None:
         "──────────────────────────────────────────────────────\n"
         "strap /install  Install Strap to %APPDATA%\\Strap\n"
         "strap /update   Check for and apply updates from GitHub\n"
-        "strap /config   Configure Strap settings (Phase 2)\n"
+        "strap /config   Configure Strap settings\n"
         "strap /help     Show this help message\n"
         "strap /run      Launch Startup\n"
         "strap /stop     Stop running AHK scripts\n"
@@ -28,13 +28,13 @@ def cli_install():
     
     reinstall = False
     if os.path.exists(INSTALL_DIR):
-        ans = input(f"Strap is already installed at {INSTALL_DIR}.\nDo you want to reinstall and overwrite it? (yes/no): ").strip().lower()
+        ans = input(f"Strap is already installed at {INSTALL_DIR}.\n\nDo you want to reinstall and overwrite it? (y/n): ").strip().lower()
         if ans not in {"yes", "ya", "yeah", "y", "yep", "yup"}:
             print("Installation aborted.")
             return
         reinstall = True
         
-    ans2 = input("Do you want Strap to automatically start on boot? (yes/no): ").strip().lower()
+    ans2 = input("Do you want Strap to automatically start on boot? (y/n): ").strip().lower()
     enable_startup = ans2 in {"yes", "ya", "yeah", "y", "yep", "yup"}
     
     install_run(reinstall=reinstall, enable_startup_flag=enable_startup)
@@ -45,7 +45,7 @@ def cli_update():
     
     enable_startup = False
     if not is_startup_enabled():
-        ans = input("Strap isn't configured to start on boot.\nDo you want to enable it now? (yes/no): ").strip().lower()
+        ans = input("Strap isn't configured to start on boot.\nDo you want to enable it now? (y/n): ").strip().lower()
         enable_startup = ans in {"yes", "ya", "yeah", "y", "yep", "yup"}
         
     update_run(enable_startup_flag=enable_startup)
@@ -82,7 +82,7 @@ def main() -> None:
                 if result != "reload":
                     break
 
-        elif cmd == "/help":
+        elif cmd in ("/help", "/?"):
             _print_help()
 
         elif cmd == "/run":

@@ -4,7 +4,6 @@ from textual.screen import ModalScreen
 from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.widgets import Static, Input, Button
 from textual.app import ComposeResult
-
 from tui.tz_catalog import TIMEZONE_CATALOG, _UTC_OFFSETS, _live_time, _fmt_tz_entry
 
 # =============================================================================
@@ -117,19 +116,18 @@ class ForceKillPopup(_BasePopup):
         self._current = current
 
     def popup_title(self) -> str: return "Configure - Tooltip Text"
-    def input_placeholder(self) -> str: return "/config -y -1 <value>"
+    def input_placeholder(self) -> str: return "/config -y -1--No. value"
 
     def compose_content(self):
-        val = self._current if self._current else "(disabled)"
-        yield Static(f"[1] Tooltip Text                      [{val}]  (leave it empty to disable Tooltip)", id="fk-opt-1")
+        val = self._current if self._current else "disabled"
+        yield Static(f"[1] Tooltip Text                    \\[{val}]  (leave it empty to disable Tooltip)", id="fk-opt-1")
 
     def help_text(self) -> str:
         return (
-            "[b]CONFIG · [y1] Force Kill[/b]\n"
-            "───────────────────────\n"
-            "/config -y -1 <text>    Set text\n"
-            "/config -y -1           Disable (leave empty)\n"
-            "Esc / /back             Close popup"
+            "[b]CONFIG - [y1] Force Kill[/b]\n"
+            "─────────────────────────────────────────────\n"
+            "/config -y -1--1 text          Set text\n\n"
+            "/back or Esc                   Close\n\n"
         )
 
     def process_cmd_input(self, raw: str) -> None:
@@ -142,21 +140,22 @@ class ColorPickerPopup(_BasePopup):
         self._msg = msg
 
     def popup_title(self) -> str: return "Configure - Color Picker"
-    def input_placeholder(self) -> str: return "/config -y -2--1 enable  or  /config -y -2--2 <text>"
+    def input_placeholder(self) -> str: return "/config -y -2--No. value"
 
     def compose_content(self):
         box_val = "enable" if self._msgbox else "disable"
-        tt_val = self._msg if self._msg else "(disabled)"
-        yield Static(f"[1] Summary Box                     [{box_val}]", id="cp-opt-1")
-        yield Static(f"[2] Tooltip Text                    [{tt_val}]  (leave it empty to disable Tooltip)", id="cp-opt-2")
+        tt_val = self._msg if self._msg else "disabled"
+        yield Static(f"[1] Summary Box                   \\[{box_val}]", id="cp-opt-1")
+        yield Static(f"[2] Tooltip Text                  \\[{tt_val}]  (leave it empty to disable Tooltip)", id="cp-opt-2")
 
     def help_text(self) -> str:
         return (
-            "[b]CONFIG · [y2] Color Picker[/b]\n"
-            "───────────────────────\n"
-            "/config -y -2--1 enable|disable|true|false|--!\n"
-            "/config -y -2--2 <text>   (empty = disable tooltip)\n"
-            "Esc / /back               Close popup"
+            "[b]CONFIG - [y2] Color Picker[/b]\n"
+            "─────────────────────────────────────────────\n"
+            "/config -y -2--1 --!           Flip value\n"
+            "/config -y -2--1 value         enable|disable\n\n"
+            "/config -y -2--2 text          Set Text\n\n"
+            "/back or Esc                   Close\n\n"
         )
 
     def process_cmd_input(self, raw: str) -> None:
@@ -242,15 +241,15 @@ class TimezonePopup(_BasePopup):
                 continue
             selected = win_id in self._active
             lines.append(_fmt_tz_entry(i, win_id, display, cities, utc, selected))
-        return "\n\n".join(lines) if lines else "(no results)"
+        return "\n\n".join(lines) if lines else "no results"
 
     def help_text(self) -> str:
         flag_no = f"-{self._flag} -{self._no}"
         return (
-            f"[b]CONFIG · [{'u3' if not self._single else 'u4'}] {self.popup_title().split(' - ')[1]}[/b]\n"
-            f"───────────────────────\n"
-            f"/config {flag_no}--<TZ_No.> <UTC_No.>    Toggle by UTC\n"
-            f"Esc / /back                             Close popup"
+            f"[b]CONFIG - [{'u3' if not self._single else 'u4'}] {self.popup_title().split(' - ')[1]}[/b]\n"
+            f"─────────────────────────────────────────────\n"
+            f"/config {flag_no}--TZ_No. UTC_No.     Toggle by UTC\n\n"
+            f"/back or Esc                          Close\n\n"
         )
 
     def _refresh_list(self) -> None:
@@ -317,7 +316,7 @@ class UnsavedChangesPopup(_BasePopup):
         self._changes = changes
 
     def popup_title(self) -> str: return "Unsaved Changes"
-    def input_placeholder(self) -> str: return "--save / --save --exit / --abort"
+    def input_placeholder(self) -> str: return "/config --save | --save --exit | --abort"
 
     def compose_content(self):
         yield Static("You have unsaved changes:")
@@ -327,10 +326,10 @@ class UnsavedChangesPopup(_BasePopup):
 
     def help_text(self) -> str:
         return (
-            "--save          Save changes and stay on config page\n"
-            "--save --exit   Save changes and return\n"
-            "--abort         Discard all changes and stay\n"
-            "Esc / /back     Return to config page (changes kept pending)"
+            "/config --save                 Save changes\n"
+            "/config --save --exit          Save & go back\n"
+            "/config --abort                Discard changes\n\n"
+            "/back or Esc                   Close\n\n"
         )
 
     def process_cmd_input(self, raw: str) -> None:

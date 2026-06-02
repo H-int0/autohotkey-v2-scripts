@@ -76,5 +76,5 @@ DEFAULT_CONFIG = {
 #   "features.oldName": "features.newName"
 # -----------------------------------------------------------------------------
 MIGRATIONS = {
-    "numpadShiftSymbols": None,   # deleted
+  
 }

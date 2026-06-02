@@ -1,32 +1,31 @@
 import os
 import subprocess
-from contextlib import redirect_stdout
 
+from contextlib import redirect_stdout
 from textual import work
 from textual.screen import Screen
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.widgets import Static, Input, RichLog
-
 from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
-
 from ops.startup import is_startup_enabled
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
 
 COMMANDS_TEXT = (
     "[b]COMMANDS[/b]\n"
-    "───────────────────────\n"
-    "/install   Install Strap\n"
-    "/update    Update Strap\n"
-    "/config    Configure (WIP)\n"
-    "/help      Show commands\n"
-    "/run       Launch Startup\n"
-    "/stop      Stop AHK script\n"
-    "/clear     Clear terminal\n"
-    "/restart   Restart TUI\n"
-    "/exit      Quit application"
+    "─────────────────────────────────────────────\n"
+    "^ to chain    Ex: /run ^ /config\n"
+    "/install      Install Strap\n"
+    "/update       Update Strap\n"
+    "/config       Configure\n"
+    "/help, /?     Show commands\n"
+    "/run          Launch Startup\n"
+    "/stop         Stop AHK script\n"
+    "/clear        Clear terminal\n"
+    "/restart      Restart TUI\n"
+    "/exit         Quit application\n"
 )
 
 class HomeScreen(Screen):
@@ -49,34 +48,93 @@ class HomeScreen(Screen):
         except Exception:
             return False
 
-    def update_status(self):
+    def update_status(self, focused_flag: str = "", focused_no: int = 0):
         cfg = load_user_config()
         st_tz = cfg.get("startupTZID", "")
         
         status_text = (
-            f"[b]STATUS[/b]\n───────────────────────\n"
-            f"Installed:   {'Yes' if os.path.exists(INSTALL_DIR) else 'No'}\n"
-            f"Version:     v{cfg.get('version', DEFAULT_CONFIG['version'])}\n"
-            f"Startup:     {'Enabled' if is_startup_enabled() else 'Disabled'}\n"
-            f"Auto start:  {'Yes' if is_startup_enabled() else 'No'}\n"
-            f"AHK running: {'Yes' if self._is_ahk_running() else 'No'}\n"
-            f"Startup TZ:  {st_tz if st_tz else 'default'}\n\n"
+            f"[b]STATUS[/b]\n"
+            f"─────────────────────────────────────────────\n"
+            f"Installed:    {'Yes' if os.path.exists(INSTALL_DIR) else 'No'}\n"
+            f"Version:      v{cfg.get('version', DEFAULT_CONFIG['version'])}\n"
+            f"Startup:      {'Enabled' if is_startup_enabled() else 'Disabled'}\n"
+            f"Auto start:   {'Yes' if is_startup_enabled() else 'No'}\n"
+            f"AHK running:  {'Yes' if self._is_ahk_running() else 'No'}\n"
+            f"Startup TZ:   {st_tz if st_tz else 'default'}\n\n"
         )
         commands = (
-            "[b]COMMANDS[/b]\n───────────────────────\n"
-            "/install   Install Strap\n/update    Update Strap\n/config    Configure\n"
-            "/help      Show commands\n/run       Launch Startup\n/stop      Stop AHK script\n"
-            "/clear     Clear terminal\n/restart   Restart TUI\n/exit      Quit application\n"
+            "[b]COMMANDS[/b]\n"
+            "─────────────────────────────────────────────\n"
+            "^ to chain    Ex: /run ^ /config\n"
+            "/install      Install Strap\n"
+            "/update       Update Strap\n"
+            "/config       Configure\n"
+            "/help, /?     Show commands\n"
+            "/run          Launch Startup\n"
+            "/stop         Stop AHK script\n"
+            "/clear        Clear terminal\n"
+            "/restart      Restart TUI\n"
+            "/exit         Quit application\n\n"
         )
-        hints = (
-            "[b]CLI SHORTCUTS[/b]\n───────────────────────\n"
-            "Chained commands with ^\n"
-            "  e.g. /clear ^ /run\n\n"
-            "Type /config to view\nand edit settings."
-        )
+
+        hints = self._build_hints(focused_flag, focused_no)
         self.query_one("#status-text", Static).update(status_text)
         self.query_one("#commands-text", Static).update(commands)
         self.query_one("#hints-text", Static).update(hints)
+
+    def _build_hints(self, flag: str, no: int) -> str:
+        if not flag or not no:
+            return (
+                "[b]CONFIG COMMANDS[/b]\n"
+                "─────────────────────────────────────────────\n"
+                "/config --save                 Save changes\n"
+                "/config --save --exit          Save & go back\n"
+                "/config --abort                Discard changes\n"
+                "/config -flag -No. value       Modify setting\n"
+                "/config -flag -No.             Open popup\n\n"
+            )
+        if flag == "z":
+            names = {1:"NumPad Emulator", 2:"ALT Codes", 3:"TimeZone Switcher", 4:"Force Kill", 5:"Color Picker", 6:"Line Navigation"}
+            return (
+                f"[b]CONFIG - [z{no}] {names.get(no, '')}[/b]\n"
+                f"─────────────────────────────────────────────\n"
+                f"/config -z -{no}                  Open popup\n"
+                f"/config -z -{no} --!              Flip value\n"
+                f"/config -z -{no} value            active|inactive\n\n"
+            )
+        if flag == "u":
+            if no == 1:
+                return (
+                    "[b]CONFIG - [u1] Tray Icon[/b]\n"
+                    "─────────────────────────────────────────────\n"
+                    "/config -u -1                  Open popup\n"
+                    "/config -u -1 --!              Flip value\n"
+                    "/config -u -1 value            visible|hidden\n\n"
+                )
+            if no == 2:
+                return (
+                    "[b]CONFIG - [u2] Tooltip Timeout[/b]\n"
+                    "─────────────────────────────────────────────\n"
+                    "/config -u -2                  Open popup\n"
+                    "/config -u -2 time(in ms)      Set value\n\n"
+                )
+            if no == 3:
+                return (
+                    "[b]CONFIG - [u3] Switching Timezones[/b]\n"
+                    "─────────────────────────────────────────────\n"
+                    "/config -u -3                  Open popup\n"
+                    "/config -u -3--<TZ No.>        Toggle timezone\n"
+                    "  (adds if absent, removes if present)\n\n"
+                )
+            if no == 4:
+                return (
+                    "[b]CONFIG - [u4] TimeZone on Startup[/b]\n"
+                    "─────────────────────────────────────────────\n"
+                    "/config -u -4                  Open popup\n"
+                    "/config -u -4--<TZ No.>        Set startup TZ\n"
+                    "  (same TZ again = reset to default)\n\n"
+                )
+        return ""
 
     def compose(self) -> ComposeResult:
         with Horizontal():
@@ -99,6 +157,18 @@ class HomeScreen(Screen):
         self.input_widget = self.query_one("#prompt", Input)
         self.update_status()
         self.log_widget.write("[bold blue]Welcome to Strap CLI![/bold blue]")
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        if event.input.id == "prompt":
+            import re
+            val = event.value.strip().lower()
+            for prefix in ("strap ", "/strap ", "/config "):
+                if val.startswith(prefix):
+                    val = val[len(prefix):].strip()
+                    break
+            m = re.match(r"^-([uzy])\s+-(\d+)", val)
+            if m: self.update_status(m.group(1), int(m.group(2)))
+            else: self.update_status("", 0)
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         raw = event.value.strip()
@@ -146,20 +216,37 @@ class HomeScreen(Screen):
         if c == "/install":
             self.state = "install_start"
             self._handle_install_start()
+
         elif c == "/update":
             self.state = "update_start"
             self._handle_update_start()
+
         elif c == "/config" or c.startswith("/config "):
             rest = cmd[7:].strip()   # everything after "/config"
             from tui.screen import ConfigScreen
             self.app.push_screen(ConfigScreen(open_popup=rest if rest else None))
-        elif c == "/help":
-            self.log_widget.write("Available Commands:\n/install, /update, /config, /help, /run, /stop, /clear, /restart, /exit")
+
+        elif c in ("/help", "/?"):
+            self.log_widget.write(
+                "Available Commands:\n\n"
+                "/install\n"
+                "/update\n"
+                "/config\n"
+                "/help\n"
+                "/run\n"
+                "/stop\n"
+                "/clear\n"
+                "/restart\n"
+                "/exit\n"
+            )
+            
             self.log_widget.write("") # Blank line
             self.process_next_command()
+
         elif c == "/run":
             self.run_strap_shortcut()
             self.log_widget.write("") # Blank line
+
         elif c == "/stop":
             try:
                 subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -168,16 +255,20 @@ class HomeScreen(Screen):
                 self.log_widget.write(f"Failed to stop scripts: {e}")
             self.log_widget.write("") # Blank line
             self.process_next_command()
+
         elif c == "/clear":
             self.log_widget.clear()
             self.log_widget.write("[bold blue]Welcome to Strap CLI![/bold blue]")
             delattr(self, 'welcome_cleared')
             self.log_widget.write("") # Blank line
             self.process_next_command()
+
         elif c == "/restart":
             self.app.exit(result="reload") # keep "reload" string so main.py catches it
+
         elif c == "/exit":
             self.app.exit(result="exit")
+
         else:
             self.log_widget.write(f'Unknown command: "{cmd}"\nType /help for available commands.')
             self.log_widget.write("") # Blank line
@@ -198,24 +289,24 @@ class HomeScreen(Screen):
     def _handle_install_start(self):
         if os.path.exists(INSTALL_DIR):
             self.log_widget.write(f"Strap is already installed at {INSTALL_DIR}.")
-            self.log_widget.write("Do you want to reinstall and overwrite it? (yes/no):")
+            self.log_widget.write("Do you want to reinstall and overwrite it? (y/n):")
             self.state = "install_ask_reinstall"
         else:
             self.reinstall_confirmed = False
-            self.log_widget.write("Do you want Strap to automatically start on boot? (yes/no):")
+            self.log_widget.write("Do you want Strap to automatically start on boot? (y/n):")
             self.state = "install_ask_startup"
 
     def _handle_update_start(self):
         if not is_startup_enabled():
             self.log_widget.write("Strap isn't configured to start on boot.")
-            self.log_widget.write("Do you want to enable it now? (yes/no):")
+            self.log_widget.write("Do you want to enable it now? (y/n):")
             self.state = "update_ask_startup"
         else:
             self.startup_confirmed = True
             self.start_update()
 
     def _handle_prompt(self, raw: str):
-        # We allow ignoring the '/' strict rule for prompt Yes/No answers specifically
+        # We allow ignoring the '/' strict rule for prompt y/n answers specifically
         ans = raw.lstrip("/").lower()
         is_yes = ans in {"yes", "ya", "yeah", "y", "yep", "yup", "sure"}
         is_no = ans in {"no", "nah", "n", "nope"}
@@ -223,7 +314,7 @@ class HomeScreen(Screen):
         if self.state == "install_ask_reinstall":
             if is_yes:
                 self.reinstall_confirmed = True
-                self.log_widget.write("Do you want Strap to automatically start on boot? (yes/no):")
+                self.log_widget.write("Do you want Strap to automatically start on boot? (y/n):")
                 self.state = "install_ask_startup"
             elif is_no:
                 self.log_widget.write("Installation aborted.")
