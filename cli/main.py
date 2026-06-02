@@ -10,7 +10,7 @@ import subprocess
 def _print_help() -> None:
     print(
         "\nCOMMAND         DESCRIPTION\n"
-        "──────────────────────────────────────────────────────\n"
+        "──────────────────────────────────\n"
         "strap /install  Install Strap to %APPDATA%\\Strap\n"
         "strap /update   Check for and apply updates from GitHub\n"
         "strap /config   Configure Strap settings\n"

@@ -20,7 +20,10 @@ def load_user_config() -> dict:
         return DEFAULT_CONFIG.copy()
     try:
         with open(USER_CONFIG_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
+            cfg = json.load(f)
+            if isinstance(cfg, dict):
+                cfg["version"] = DEFAULT_CONFIG["version"]
+            return cfg
     except Exception:
         return DEFAULT_CONFIG.copy()
 
@@ -28,6 +31,9 @@ def load_user_config() -> dict:
 def save_user_config(config_data: dict) -> None:
     """Write config_data to user-config.json, creating dirs if needed."""
     os.makedirs(os.path.dirname(USER_CONFIG_PATH), exist_ok=True)
+    
+    config_data["version"] = DEFAULT_CONFIG["version"]
+    
     with open(USER_CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(config_data, f, indent=4)
 
@@ -75,10 +81,8 @@ def sync_schema(current_config: dict) -> dict:
             else:
                 synced[key] = current_config[key]
         else:
-            # New key added in a newer Strap version   use default
             synced[key] = default_val
 
-    # Enforce version strictly from schema
     synced["version"] = DEFAULT_CONFIG["version"]
 
     return synced

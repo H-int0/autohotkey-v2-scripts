@@ -143,9 +143,9 @@ class ForceKillPopup(_BasePopup):
     def help_text(self) -> str:
         return (
             "[b]CONFIG - [y1] Force Kill[/b]\n"
-            "─────────────────────────────────────────────\n"
-            "/config -y -1--1 text          Set text\n\n"
-            "/back or Esc                   Close\n\n"
+            "─────────────────────────\n"
+            "/config -y -1--1 text      Set text\n\n"
+            "/back or Esc               Close\n\n"
         )
 
     def process_cmd_input(self, raw: str) -> bool:
@@ -169,11 +169,11 @@ class ColorPickerPopup(_BasePopup):
     def help_text(self) -> str:
         return (
             "[b]CONFIG - [y2] Color Picker[/b]\n"
-            "─────────────────────────────────────────────\n"
-            "/config -y -2--1 --!           Flip value\n"
-            "/config -y -2--1 value         enable|disable\n\n"
-            "/config -y -2--2 text          Set Text\n\n"
-            "/back or Esc                   Close\n\n"
+            "─────────────────────────\n"
+            "/config -y -2--1 --!       Flip value\n"
+            "/config -y -2--1 value     enable|disable\n"
+            "/config -y -2--2 text      Set Text\n\n"
+            "/back or Esc               Close\n\n"
         )
 
     def process_cmd_input(self, raw: str) -> bool:
@@ -253,9 +253,9 @@ class TimezonePopup(_BasePopup):
         flag_no = f"-{self._flag} -{self._no}"
         return (
             f"[b]CONFIG - [{'u3' if not self._single else 'u4'}] {self.popup_title().split(' - ')[1]}[/b]\n"
-            f"─────────────────────────────────────────────\n"
-            f"/config {flag_no}--TZ_No. UTC_No.     Toggle by UTC\n\n"
-            f"/back or Esc                          Close\n\n"
+            f"─────────────────────────\n"
+            f"/config {flag_no}--TZ_No. UTC_No. Toggle by UTC\n\n"
+            f"/back or Esc                      Close\n\n"
         )
 
     def _refresh_list(self) -> None:
@@ -342,10 +342,10 @@ class UnsavedChangesPopup(_BasePopup):
 
     def help_text(self) -> str:
         return (
-            "/config --save                 Save changes\n"
-            "/config --save --exit          Save & go back\n"
-            "/config --abort                Discard changes\n\n"
-            "/back or Esc                   Close\n\n"
+            "/config --save             Save changes\n"
+            "/config --save --exit      Save & go back\n"
+            "/config --abort            Discard changes\n\n"
+            "/back or Esc               Close\n\n"
         )
 
     def process_cmd_input(self, raw: str) -> bool:

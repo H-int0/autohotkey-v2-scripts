@@ -68,7 +68,7 @@ class ConfigScreen(Screen):
         
         status = (
             f"[b]STATUS[/b]\n"
-            f"─────────────────────────────────────────────\n"
+            f"─────────────────────────\n"
             f"Installed:    {'Yes' if os.path.exists(INSTALL_DIR) else 'No'}\n"
             f"Version:      v{cfg.get('version', DEFAULT_CONFIG['version'])}\n"
             f"Startup:      {'Enabled' if is_startup_enabled() else 'Disabled'}\n"
@@ -79,7 +79,7 @@ class ConfigScreen(Screen):
         )
         commands = (
             "[b]COMMANDS[/b]\n"
-            "─────────────────────────────────────────────\n"
+            "─────────────────────────\n"
             "^ to chain    Ex: /run ^ /config\n"
             "/install      Install Strap\n"
             "/update       Update Strap\n"
@@ -101,52 +101,52 @@ class ConfigScreen(Screen):
         if not flag or not no:
             return (
                 "[b]CONFIG COMMANDS[/b]\n"
-                "─────────────────────────────────────────────\n"
-                "/config --save                 Save changes\n"
-                "/config --save --exit          Save & go back\n"
-                "/config --abort                Discard changes\n"
-                "/config -flag -No. value       Modify setting\n"
-                "/config -flag -No.             Open popup\n\n"
+                "─────────────────────────\n"
+                "/config --save             Save changes\n"
+                "/config --save --exit      Save & \n"
+                "/config --abort            Discardnges\n"
+                "/config -flag -No.         Open popup\n"
+                "/config -flag -No. value   Modify setting\n\n"
             )
         if flag == "z":
             names = {1:"NumPad Emulator", 2:"ALT Codes", 3:"TimeZone Switcher", 4:"Force Kill", 5:"Color Picker", 6:"Line Navigation"}
             return (
                 f"[b]CONFIG - [z{no}] {names.get(no, '')}[/b]\n"
-                f"─────────────────────────────────────────────\n"
-                f"/config -z -{no}                  Open popup\n"
-                f"/config -z -{no} --!              Flip value\n"
-                f"/config -z -{no} value            active|inactive\n\n"
+                f"─────────────────────────\n"
+                f"/config -z -{no}              Open popup\n"
+                f"/config -z -{no} --!          Flip value\n"
+                f"/config -z -{no} value        active | inactive\n\n"
             )
         if flag == "u":
             if no == 1:
                 return (
                     "[b]CONFIG - [u1] Tray Icon[/b]\n"
-                    "─────────────────────────────────────────────\n"
-                    "/config -u -1                  Open popup\n"
-                    "/config -u -1 --!              Flip value\n"
-                    "/config -u -1 value            visible|hidden\n\n"
+                    "─────────────────────────\n"
+                    "/config -u -1              Open popup\n"
+                    "/config -u -1 --!          Flip value\n"
+                    "/config -u -1 value        visible | hidden\n\n"
                 )
             if no == 2:
                 return (
                     "[b]CONFIG - [u2] Tooltip Timeout[/b]\n"
-                    "─────────────────────────────────────────────\n"
-                    "/config -u -2                  Open popup\n"
-                    "/config -u -2 time(in ms)      Set value\n\n"
+                    "─────────────────────────\n"
+                    "/config -u -2              Open popup\n"
+                    "/config -u -2 time(in ms)  Set value\n\n"
                 )
             if no == 3:
                 return (
                     "[b]CONFIG - [u3] Switching Timezones[/b]\n"
-                    "─────────────────────────────────────────────\n"
-                    "/config -u -3                  Open popup\n"
-                    "/config -u -3--<TZ No.>        Toggle timezone\n"
+                    "─────────────────────────\n"
+                    "/config -u -3              Open popup\n"
+                    "/config -u -3--<TZ No.>    Toggle timezone\n"
                     "  (adds if absent, removes if present)\n\n"
                 )
             if no == 4:
                 return (
                     "[b]CONFIG - [u4] TimeZone on Startup[/b]\n"
-                    "─────────────────────────────────────────────\n"
-                    "/config -u -4                  Open popup\n"
-                    "/config -u -4--<TZ No.>        Set startup TZ\n"
+                    "─────────────────────────\n"
+                    "/config -u -4              Open popup\n"
+                    "/config -u -4--<TZ No.>    Set startup TZ\n"
                     "  (same TZ again = reset to default)\n\n"
                 )
         return ""
@@ -294,11 +294,11 @@ class ConfigScreen(Screen):
                         "Configure - Tray Icon", ["visible", "hidden"],
                         "visible" if cfg("trayIconVisible", True) else "hidden",
                         "[b]CONFIG - [u1] Tray Icon[/b]\n"
-                        "─────────────────────────────────────────────\n"
-                        "/config -u -1                  Open popup\n"
-                        "/config -u -1 --!              Flip value\n"
-                        "/config -u -1 value            visible|hidden\n\n"
-                        "/back or Esc                   Close\n\n"
+                        "─────────────────────────\n"
+                        "/config -u -1              Open popup\n"
+                        "/config -u -1 --!          Flip value\n"
+                        "/config -u -1 value        visible|hidden\n\n"
+                        "/back or Esc               Close\n\n"
                     ),
                     lambda r: self._apply_result("trayIconVisible", r == "visible", r)
                 )
@@ -307,10 +307,10 @@ class ConfigScreen(Screen):
                     IntegerPopup(
                         "Configure - Tooltip Timeout", cfg("tooltipDuration", 2500), "1sec = 1000ms",
                         "[b]CONFIG - [u2] Tooltip Timeout[/b]\n"
-                        "─────────────────────────────────────────────\n"
-                        "/config -u -2                  Open popup\n"
-                        "/config -u -2 time(in ms)      Set value\n\n"
-                        "/back or Esc                   Close\n\n"
+                        "─────────────────────────\n"
+                        "/config -u -2              Open popup\n"
+                        "/config -u -2 time(in ms)  Set value\n\n"
+                        "/back or Esc               Close\n\n"
                     ),
                     lambda r: self._apply_result("tooltipDuration", r, r)
                 )
@@ -330,11 +330,11 @@ class ConfigScreen(Screen):
                         f"Configure - {names[no]}", ["active", "inactive"],
                         "active" if cfg("features", DEFAULT_CONFIG["features"]).get(fk, True) else "inactive",
                         f"[b]CONFIG - [z{no}] {names.get(no, '')}[/b]\n"
-                        f"─────────────────────────────────────────────\n"
-                        f"/config -z -{no}                  Open popup\n"
-                        f"/config -z -{no} --!              Flip value\n"
-                        f"/config -z -{no} value            active|inactive\n\n"
-                        f"/back or Esc                      Close\n\n"
+                        f"─────────────────────────\n"
+                        f"/config -z -{no}              Open popup\n"
+                        f"/config -z -{no} --!          Flip value\n"
+                        f"/config -z -{no} value        active|inactive\n\n"
+                        f"/back or Esc                  Close\n\n"
                     ),
                     lambda r, _fk=fk: self._apply_feat_result(_fk, r)
                 )
