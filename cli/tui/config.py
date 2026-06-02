@@ -587,11 +587,11 @@ class ConfigPanel(Static):
         def fl(k): return "active" if feat.get(k, True) else "inactive"
 
         def p_line(prefix, title, value, extra=""):
-            eprefix = prefix.replace("[", "\\[").replace("]", "\\]")
+            eprefix = prefix.replace("[", "\\[")
             raw_left = f"{eprefix} {title}"
-            pad = max(1, 37 - len(f"{prefix} {title}")) # calculate padding on unescaped len
+            pad = max(1, 37 - len(f"{prefix} {title}"))
             mark = "[bold yellow]*[/bold yellow]" if self._mark_bool(prefix[1:3]) else " "
-            return f"{mark}{raw_left}{' ' * pad}\\[{value}\\]{extra}"
+            return f"{mark}{raw_left}{' ' * pad}\\[{value}]{extra}"
 
         lines = [
             "[bold blue]Customize STRAP[/bold blue]",
@@ -611,8 +611,8 @@ class ConfigPanel(Static):
             "",
             "─" * 60,
             "Configure - Features\n",
-            f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y1') else ' '}\\[y1\\] Force Kill",
-            f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y2') else ' '}\\[y2\\] Color Picker",
+            f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y1') else ' '}\\[y1] Force Kill",
+            f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y2') else ' '}\\[y2] Color Picker",
         ]
         return "\n".join(lines)
 
@@ -681,14 +681,14 @@ class ConfigScreen(Screen):
     def compose(self) -> ComposeResult:
         with Horizontal():
             with Vertical(id="left-panel"):
-                # Scrollable wrapper for the text sections
                 with ScrollableContainer(id="config-left-content"):
                     yield Static("", id="config-status-text")
                     yield Static("", id="config-commands-text")
                     yield Static("", id="config-hints-text")
                 yield Static("SPDX-License-Identifier: GPL-3.0-or-later\nCopyright (C) 2026 H-int0", id="config-footer-text")
             with Vertical(id="right-panel"):
-                yield ConfigPanel(id="config-panel")
+                with ScrollableContainer(id="config-panel-container"):
+                    yield ConfigPanel(id="config-panel")
                 with Horizontal(id="config-prompt-row"):
                     yield Static(">>", id="config-prompt-prefix")
                     yield Input(placeholder="", id="config-prompt")
