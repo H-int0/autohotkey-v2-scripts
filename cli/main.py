@@ -1,11 +1,11 @@
+import sys
+import os
+import subprocess
+
 # =============================================================================
 # main.py
 # Entry point for the Strap CLI.
 # =============================================================================
-
-import sys
-import os
-import subprocess
 
 def _print_help() -> None:
     print(
@@ -55,7 +55,7 @@ def main() -> None:
 
     # If the user typed an argument in the terminal (e.g., strap /install)
     if len(sys.argv) > 1:
-        
+        # Join all arguments so spaces don't break the command chain
         raw_arg = " ".join(sys.argv[1:]).strip()
         
         # Normalize command by splitting the main command from the rest
@@ -76,7 +76,7 @@ def main() -> None:
             rest = parts[1].strip() if len(parts) > 1 else ""
             while True:
                 from tui.app import StrapApp
-                from tui.config import ConfigScreen
+                from tui.screen import ConfigScreen
                 app = StrapApp(start_screen=ConfigScreen(open_popup=rest if rest else None))
                 result = app.run()
                 if result != "reload":

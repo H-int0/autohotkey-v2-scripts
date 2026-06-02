@@ -5,7 +5,7 @@
 
 import os
 import json
-from .schema import DEFAULT_CONFIG, MIGRATIONS
+from config.schema import DEFAULT_CONFIG, MIGRATIONS
 
 # Dynamically point to AppData
 USER_CONFIG_PATH = os.path.join(os.environ["APPDATA"], "Strap", "user", "user-config.json")
