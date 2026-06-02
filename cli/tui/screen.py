@@ -163,36 +163,8 @@ class ConfigScreen(Screen):
             else: self._update_left_panel("", 0)
 
     def on_key(self, event) -> None:
-        if event.key == "escape": self._try_leave()
-        elif event.key == "tab":
-            if self.input.has_focus:
-                event.prevent_default()
-                self._autocomplete()
-
-    def _autocomplete(self) -> None:
-        val = self.input.value
-        if not val:
-            return
-        keywords = [
-            "/install", "/update", "/config", "/help", "/?", "/run", "/stop",
-            "/clear", "/restart", "/exit", "/config --save", "/config --save --exit",
-            "/config --abort", "true", "false", "active", "inactive",
-            "enable", "disable", "visible", "hidden"
-        ]
-
-        if val.endswith("/config --save --e") or val.endswith("/config --save --ex") or val.endswith("/config --save --exi"):
-            self.input.value = val.rsplit("/config --save", 1)[0] + "/config --save --exit"
-            self.input.cursor_position = len(self.input.value)
-            return
-            
-        parts = val.split()
-        if not parts: return
-        last_word = parts[-1].lower()
-        matches = [w for w in keywords if w.startswith(last_word)]
-        if matches:
-            parts[-1] = matches[0]
-            self.input.value = " ".join(parts) + " "
-            self.input.cursor_position = len(self.input.value)
+        if event.key == "escape": 
+            self._try_leave()
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         if event.input.id != "config-prompt": return
@@ -380,18 +352,12 @@ class ConfigScreen(Screen):
 
     def _apply_result(self, key, val, check_none):
         if check_none is None: return
-        if isinstance(check_none, tuple) and check_none[0] == "cmd":
-            self.route_command(check_none[1])
-            return
         self.panel.pending[key] = val
         self.panel.refresh_display()
         self._update_left_panel()
 
     def _apply_feat_result(self, feat_key, result):
         if result is None: return
-        if isinstance(result, tuple) and result[0] == "cmd":
-            self.route_command(result[1])
-            return
         c = dict(self.panel._effective("features", DEFAULT_CONFIG["features"]))
         c[feat_key] = (result == "active")
         self.panel.pending["features"] = c
@@ -399,11 +365,8 @@ class ConfigScreen(Screen):
         self._update_left_panel()
 
     def _apply_route_result(self, direct_key, result):
-        if result is None:
-            return
-        if isinstance(result, tuple) and result[0] == "cmd":
-            self.route_command(result[1])
-        else:
+        if result is None: return
+        if direct_key:
             self.panel.pending[direct_key] = result
         self.panel.refresh_display()
         self._update_left_panel()
@@ -413,7 +376,12 @@ class ConfigScreen(Screen):
         self.panel.write_to_disk()
         self.panel.refresh_display()
         self._update_left_panel()
-        if exit_after: self.app.pop_screen()
+        if exit_after:
+            while self.app.screen_stack:
+                top = self.app.screen_stack[-1]
+                self.app.pop_screen()
+                if top == self:
+                    break
 
     def _try_leave(self) -> None:
         if self.panel.pending_count() == 0:

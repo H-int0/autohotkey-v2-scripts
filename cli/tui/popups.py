@@ -1,5 +1,3 @@
-import re
-
 from textual.screen import ModalScreen
 from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.widgets import Static, Input, Button
@@ -49,6 +47,35 @@ class _BasePopup(ModalScreen):
                     try: under.query_one("#home-left-content").scroll_down(animate=False)
                     except: pass
 
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        if getattr(event.input, "id", None) == "popup-cmd-input":
+            raw = event.value.strip()
+            event.input.value = ""
+            if raw:
+                cl = raw.lower()
+                if cl in ("/back", "back"):
+                    self.dismiss(None) # Strictly close the popup, no extra saves
+                elif cl == "/exit":
+                    self.app.exit(result="exit")
+                elif cl == "/restart":
+                    self.app.exit(result="reload")
+                else:
+                    handled = self.process_cmd_input(raw)
+                    if not handled:
+                        if cl.startswith("/") or cl.startswith("-"):
+                            if len(self.app.screen_stack) > 1:
+                                under = self.app.screen_stack[-2]
+                                if hasattr(under, "route_command"):
+                                    under.route_command(raw)
+
+    def on_key(self, event) -> None:
+        if event.key == "escape":
+            event.prevent_default()
+            self.dismiss(None) # Strictly close the popup, no extra saves
+
+    def process_cmd_input(self, raw: str) -> bool:
+        return False
+
 class BooleanPopup(_BasePopup):
     def __init__(self, title: str, options: list[str], current: str, help_txt: str, **kwargs):
         super().__init__(**kwargs)
@@ -67,19 +94,17 @@ class BooleanPopup(_BasePopup):
 
     def help_text(self) -> str: return self._help_txt
 
-    def process_cmd_input(self, raw: str) -> None:
-        raw = raw.lower()
-        if raw.startswith("/") or raw.startswith("-"):
-            self.dismiss(("cmd", raw))
-            return
-        if raw.isdigit():
-            idx = int(raw) - 1
+    def process_cmd_input(self, raw: str) -> bool:
+        raw_lower = raw.lower()
+        if raw_lower.isdigit():
+            idx = int(raw_lower) - 1
             if 0 <= idx < len(self._options):
                 self.dismiss(self._options[idx])
-                return
-        if raw in self._options:
-            self.dismiss(raw)
-            return
+                return True
+        if raw_lower in self._options:
+            self.dismiss(raw_lower)
+            return True
+        return False
 
 class IntegerPopup(_BasePopup):
     def __init__(self, title: str, current: int, hint: str, help_txt: str, **kwargs):
@@ -97,12 +122,11 @@ class IntegerPopup(_BasePopup):
 
     def help_text(self) -> str: return self._help_txt
 
-    def process_cmd_input(self, raw: str) -> None:
-        if raw.startswith("/") or raw.startswith("-"):
-            self.dismiss(("cmd", raw))
-            return
+    def process_cmd_input(self, raw: str) -> bool:
         if raw.isdigit() and int(raw) > 0:
             self.dismiss(int(raw))
+            return True
+        return False
 
 class ForceKillPopup(_BasePopup):
     def __init__(self, current: str, **kwargs):
@@ -124,8 +148,8 @@ class ForceKillPopup(_BasePopup):
             "/back or Esc                   Close\n\n"
         )
 
-    def process_cmd_input(self, raw: str) -> None:
-        self.dismiss(("cmd", raw))
+    def process_cmd_input(self, raw: str) -> bool:
+        return False
 
 class ColorPickerPopup(_BasePopup):
     def __init__(self, msgbox: bool, msg: str, **kwargs):
@@ -152,8 +176,8 @@ class ColorPickerPopup(_BasePopup):
             "/back or Esc                   Close\n\n"
         )
 
-    def process_cmd_input(self, raw: str) -> None:
-        self.dismiss(("cmd", raw))
+    def process_cmd_input(self, raw: str) -> bool:
+        return False
 
 class TimezonePopup(_BasePopup):
     BINDINGS = []
@@ -209,7 +233,6 @@ class TimezonePopup(_BasePopup):
             time_str = _live_time(win_id)
             time_part = f"[{time_str}]" if time_str else ""
             
-            # Format: [24] (UTC +3) Russian Standard Time               [05:28, Dec-31-2029]
             raw_left = f"[{idx}] ({utc}) {win_id}"
             padding = max(1, 75 - len(raw_left))
             lines.append(f"{raw_left}{' ' * padding}{time_part}")
@@ -268,40 +291,40 @@ class TimezonePopup(_BasePopup):
                 self._active.append(win_id)
         self._refresh_list()
 
+        # Update pending state immediately so /config --save can be explicitly used while open
+        if len(self.app.screen_stack) > 1:
+            under = self.app.screen_stack[-2]
+            if hasattr(under, "panel"):
+                key = "startupTZID" if self._single else "timezones"
+                val = self._active[0] if self._single and self._active else (list(self._active) if not self._single else "")
+                under.panel.pending[key] = val
+                under.panel.refresh_display()
+                if hasattr(under, "_update_left_panel"):
+                    under._update_left_panel()
+
     def _resolve_tz_arg(self, arg: str) -> str | None:
         arg = arg.strip()
         if arg.startswith("-set--"): arg = arg[6:]
         if arg.isdigit() and 0 <= int(arg)-1 < len(TIMEZONE_CATALOG): return TIMEZONE_CATALOG[int(arg)-1][0]
         
-        # Normalize to spaces (e.g., "utc_+3" -> "utc +3")
         norm = arg.replace("_", " ").lower()
-        
-        # Search by Windows ID, Display Name, OR UTC value!
         for win_id, display, _, utc in TIMEZONE_CATALOG:
             if win_id.lower() == norm or display.lower() == norm or utc.lower() == norm: 
                 return win_id
         return None
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
-        # Prevent Enter key from closing popup if typing in the search box
         if event.input.id == "tz-search-input":
             event.prevent_default()
             return
-            
-        # Process command if typed in the bottom prompt
-        if event.input.id == "popup-cmd-input":
-            raw = event.value.strip()
-            event.input.value = ""
-            if raw:
-                self.process_cmd_input(raw)
+        super().on_input_submitted(event)
 
-    def process_cmd_input(self, raw: str) -> None:
-        if raw.startswith("/") or raw.startswith("-"):
-            self.dismiss(("cmd", raw))
-            return
+    def process_cmd_input(self, raw: str) -> bool:
         win_id = self._resolve_tz_arg(raw)
         if win_id:
             self._toggle_tz(win_id)
+            return True
+        return False
 
 class UnsavedChangesPopup(_BasePopup):
     def __init__(self, changes: dict[str, tuple], **kwargs):
@@ -325,8 +348,15 @@ class UnsavedChangesPopup(_BasePopup):
             "/back or Esc                   Close\n\n"
         )
 
-    def process_cmd_input(self, raw: str) -> None:
-        raw = raw.lower()
-        if raw in {"/config --save"}: self.dismiss("save")
-        elif raw in {"/config --!save", "/config --save --exit"}: self.dismiss("save_exit")
-        elif raw in {"/config --abort"}: self.dismiss("abort")
+    def process_cmd_input(self, raw: str) -> bool:
+        raw_lower = raw.lower()
+        if raw_lower in {"/config --save"}: 
+            self.dismiss("save")
+            return True
+        elif raw_lower in {"/config --!save", "/config --save --exit"}: 
+            self.dismiss("save_exit")
+            return True
+        elif raw_lower in {"/config --abort"}: 
+            self.dismiss("abort")
+            return True
+        return False
