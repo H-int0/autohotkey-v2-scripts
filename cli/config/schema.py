@@ -1,3 +1,5 @@
+import os
+
 # =============================================================================
 # schema.py
 # Defines the canonical structure of user-config.json.
@@ -6,8 +8,6 @@
 # - MIGRATIONS     : rename table for keys that changed names between versions
 #                    format: { "old_key": "new_key" }
 # =============================================================================
-
-import os
 
 DEFAULT_CONFIG = {
     # Strap version currently installed

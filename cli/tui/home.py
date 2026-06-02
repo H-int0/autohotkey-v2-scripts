@@ -1,13 +1,16 @@
 import os
 import subprocess
 from contextlib import redirect_stdout
+
 from textual import work
 from textual.screen import Screen
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.widgets import Static, Input, RichLog
+
 from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
+
 from ops.startup import is_startup_enabled
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")

@@ -1,11 +1,10 @@
+import re
+
 # =============================================================================
 # parser.py
 # Reads config.ahk and timezones-variables.ahk and returns Python dicts.
 # Used during first install to bootstrap user-config.json from the actual files.
 # =============================================================================
-
-import re
-
 
 def parse_config_ahk(ahk_content: str) -> dict:
     """

@@ -1,11 +1,12 @@
+import os
+import json
+
+from config.schema import DEFAULT_CONFIG, MIGRATIONS
+
 # =============================================================================
 # manager.py
 # Handles reading, writing, and schema-syncing user-config.json.
 # =============================================================================
-
-import os
-import json
-from config.schema import DEFAULT_CONFIG, MIGRATIONS
 
 # Dynamically point to AppData
 USER_CONFIG_PATH = os.path.join(os.environ["APPDATA"], "Strap", "user", "user-config.json")

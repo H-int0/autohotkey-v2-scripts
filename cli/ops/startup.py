@@ -1,12 +1,12 @@
+import os
+import subprocess
+
 # =============================================================================
 # startup.py
 # Creates or removes the Strap Windows startup shortcut (.lnk).
 # Uses PowerShell's WScript.Shell COM object same approach as the manual
 # install method documented in README / RECOVERY.md.
 # =============================================================================
-
-import os
-import subprocess
 
 STARTUP_DIR   = os.path.join(os.environ["APPDATA"], r"Microsoft\Windows\Start Menu\Programs\Startup")
 SHORTCUT_PATH = os.path.join(STARTUP_DIR, "Strap.lnk")

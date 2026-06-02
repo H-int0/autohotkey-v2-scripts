@@ -1,8 +1,10 @@
 import re
+
 from textual.screen import ModalScreen
 from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.widgets import Static, Input, Button
 from textual.app import ComposeResult
+
 from tui.tz_catalog import TIMEZONE_CATALOG, _UTC_OFFSETS, _live_time, _fmt_tz_entry
 
 # =============================================================================

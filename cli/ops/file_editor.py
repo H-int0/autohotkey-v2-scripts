@@ -1,6 +1,5 @@
 import re
 
-
 def update_config_ahk(config_data: dict, ahk_path: str) -> None:
     """
     Re-apply user-config values onto config.ahk.

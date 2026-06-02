@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 # Windows TZ ID  ->  IANA tz name mapping (subset used for live clock)
 # Only the most common ones; falls back gracefully if not found.
 # ---------------------------------------------------------------------------
+
 _WIN_TO_IANA: dict[str, str] = {
     "Eastern Standard Time":       "America/New_York",
     "Central Standard Time":       "America/Chicago",
