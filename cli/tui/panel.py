@@ -75,9 +75,21 @@ class ConfigPanel(Static):
         return "\n".join(lines)
 
     def _mark_bool(self, flag_no: str) -> bool:
+        z_map = {
+            "z1": "numpadEmulator", "z2": "altCodes", "z3": "timezoneSwitcher",
+            "z4": "forceKillTask", "z5": "colorPicker", "z6": "lineNavigation"
+        }
+        
+        if flag_no in z_map:
+            feat = z_map[flag_no]
+            if "features" in self.pending:
+                orig = self.cfg.get("features", DEFAULT_CONFIG["features"]).get(feat, True)
+                pend = self.pending["features"].get(feat, True)
+                return orig != pend
+            return False
+
         keys = {
             "u1": ["trayIconVisible"], "u2": ["tooltipDuration"], "u3": ["timezones"], "u4": ["startupTZID"],
-            "z1": ["features"], "z2": ["features"], "z3": ["features"], "z4": ["features"], "z5": ["features"], "z6": ["features"],
             "y1": ["msgEndTask"], "y2": ["colorPickerMsgBox", "msgColorPicker"]
         }
         for k in keys.get(flag_no, []):

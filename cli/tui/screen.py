@@ -75,6 +75,7 @@ class ConfigScreen(Screen):
             f"Auto start:   {'Yes' if is_startup_enabled() else 'No'}\n"
             f"AHK running:  {'Yes' if self._is_ahk_running() else 'No'}\n"
             f"Startup TZ:   {st_tz if st_tz else 'default'}\n\n"
+            f"Pending:      {pending}\n\n"
         )
         commands = (
             "[b]COMMANDS[/b]\n"
