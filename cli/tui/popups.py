@@ -33,17 +33,21 @@ class _BasePopup(ModalScreen):
 
     def on_mouse_scroll_up(self, event) -> None:
         if event.x < self.app.console.width * 0.3:
-            try: self.app.screen.query_one("#config-left-content").scroll_up()
-            except:
-                try: self.app.screen.query_one("#home-left-content").scroll_up()
-                except: pass
+            if len(self.app.screen_stack) > 1:
+                under = self.app.screen_stack[-2]
+                try: under.query_one("#config-left-content").scroll_up(animate=False)
+                except:
+                    try: under.query_one("#home-left-content").scroll_up(animate=False)
+                    except: pass
 
     def on_mouse_scroll_down(self, event) -> None:
         if event.x < self.app.console.width * 0.3:
-            try: self.app.screen.query_one("#config-left-content").scroll_down()
-            except:
-                try: self.app.screen.query_one("#home-left-content").scroll_down()
-                except: pass
+            if len(self.app.screen_stack) > 1:
+                under = self.app.screen_stack[-2]
+                try: under.query_one("#config-left-content").scroll_down(animate=False)
+                except:
+                    try: under.query_one("#home-left-content").scroll_down(animate=False)
+                    except: pass
 
 class BooleanPopup(_BasePopup):
     def __init__(self, title: str, options: list[str], current: str, help_txt: str, **kwargs):
