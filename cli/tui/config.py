@@ -192,9 +192,13 @@ _UTC_OFFSETS: list[str] = sorted(
 
 def _live_time(windows_tz_id: str) -> str:
     """Return 'HH:MM, MMM-DD-YYYY' for a Windows TZ ID, or '' on failure."""
-    iana = _WIN_TO_IANA.get(windows_tz_id)
-    if not iana:
-        return ""
+    iana = None
+    for k, v in _WIN_TO_IANA.items():
+        if k.replace(".", "").lower() == windows_tz_id.replace(".", "").lower():
+            iana = v
+            break
+            
+    if not iana: return ""
     try:
         now = datetime.now(ZoneInfo(iana))
         return now.strftime("%H:%M, %b-%d-%Y")
@@ -436,10 +440,14 @@ class TimezonePopup(_BasePopup):
             return "  none"
         lines = []
         for win_id in self._active:
-            idx = next((i + 1 for i, e in enumerate(TIMEZONE_CATALOG) if e[0] == win_id), "?")
+            idx, utc = "?", ""
+            for i, e in enumerate(TIMEZONE_CATALOG):
+                if e[0].replace(".", "").lower() == win_id.replace(".", "").lower():
+                    idx, utc = str(i + 1), e[3]
+                    break
+            
             time_str = _live_time(win_id)
             time_part = f"[{time_str}]" if time_str else ""
-            utc = next((e[3] for e in TIMEZONE_CATALOG if e[0] == win_id), "")
             
             # Format: [24] (UTC +3) Russian Standard Time               [05:28, Dec-31-2029]
             raw_left = f"[{idx}] ({utc}) {win_id}"
@@ -577,7 +585,14 @@ class ConfigPanel(Static):
         ttdur = p("tooltipDuration", 2500)
         
         tzs: list[str] = p("timezones", [])
-        utc_labels = [next((e[3] for e in TIMEZONE_CATALOG if e[0] == win_id), win_id) for win_id in tzs]
+        utc_labels = []
+        for win_id in tzs:
+            matched = win_id
+            for e in TIMEZONE_CATALOG:
+                if e[0].replace(".", "").lower() == win_id.replace(".", "").lower():
+                    matched = e[3]
+                    break
+            utc_labels.append(matched)
         tz_display = ", ".join(utc_labels) if utc_labels else "none"
         
         startup_tz = p("startupTZID", "")
