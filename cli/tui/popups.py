@@ -179,14 +179,7 @@ class TimezonePopup(_BasePopup):
                 yield Static("─" * 40, classes="popup-divider")
 
                 with Horizontal(id="tz-search-row"):
-                    yield Static("", id="tz-filter-tags")
                     yield Input(placeholder="Search timezones...", id="tz-search-input")
-                    yield Button("Filter ▾", id="tz-filter-btn")
-
-                with Vertical(id="tz-filter-dropdown"):
-                    for offset in _UTC_OFFSETS:
-                        safe_id = re.sub(r'[^a-zA-Z0-9_-]', '_', offset)
-                        yield Static(offset, classes="filter-option", id=f"fopt-{safe_id}")
 
                 with ScrollableContainer(id="tz-list"):
                     with Vertical(id="tz-saved-section"):
@@ -229,8 +222,6 @@ class TimezonePopup(_BasePopup):
                 q = self._search_query.lower()
                 if not any(q in s.lower() for s in [win_id, display, cities, utc]):
                     continue
-            if self._active_filter and utc != self._active_filter:
-                continue
             selected = win_id in self._active
             lines.append(_fmt_tz_entry(i, win_id, display, cities, utc, selected))
         return "\n\n".join(lines) if lines else "no results"
