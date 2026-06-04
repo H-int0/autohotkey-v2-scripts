@@ -283,6 +283,18 @@ class HomeScreen(Screen):
             self.log_widget.write("Strap does not appear to be installed properly. Cannot run.")
         self.process_next_command()
 
+    def _relaunch_ahk_from_shortcut(self) -> None:
+        """Kill AHK, then relaunch from shell:startup shortcut if present."""
+        import subprocess, os
+        from ops.startup import SHORTCUT_PATH
+        subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if os.path.exists(SHORTCUT_PATH):
+            try:
+                os.startfile(SHORTCUT_PATH)
+            except Exception:
+                pass
+
     def _run_create_startup_shortcut(self):
         import winreg
         try:
@@ -349,6 +361,17 @@ class HomeScreen(Screen):
             else:
                 self.log_widget.write("Please answer 'yes' or 'no':")
 
+        elif self.state == "ask_restart":
+            if is_yes:
+                self.app.exit(result="reload")
+            elif is_no:
+                self.log_widget.write("TUI not restarted. Restart it with `/restart` if the changes aren't reflected.")
+                self.state = "idle"
+                self.process_next_command()
+            else:
+                self.log_widget.write("Please answer 'yes' or 'no':")
+            return
+
         elif self.state == "uninstall_confirm":
             if is_yes:
                 self.state = "uninstalling"
@@ -377,7 +400,8 @@ class HomeScreen(Screen):
 
         with redirect_stdout(OutputRedirector(self.app, self.log_widget)):
             run(from_ps=False, enable_startup_flag=self.startup_confirmed)
-            
+
+        self._relaunch_ahk_from_shortcut()
         self.app.call_from_thread(self.finish_worker)
 
     @work(exclusive=True, thread=True)
@@ -458,7 +482,8 @@ class HomeScreen(Screen):
 
         with redirect_stdout(OutputRedirector(self.app, self.log_widget)):
             run_update()
-            
+
+        self._relaunch_ahk_from_shortcut()
         self.app.call_from_thread(self.finish_worker)
 
     @work(exclusive=True, thread=True)
@@ -473,6 +498,7 @@ class HomeScreen(Screen):
         with redirect_stdout(OutputRedirector(self.app, self.log_widget)):
             run_switch(version)
 
+        self._relaunch_ahk_from_shortcut()
         self.app.call_from_thread(self.finish_worker)
 
     def _show_versions(self) -> None:
@@ -602,7 +628,9 @@ class HomeScreen(Screen):
         self.input_widget.focus()
         
         if self.state in ("switching", "installing", "updating", "profile_switch"):
-            self.app.exit(result="reload")
+            self.state = "idle"
+            self.log_widget.write("\nDo you want to restart the TUI to reflect the changes? (y/n):")
+            self.state = "ask_restart"
             return
             
         self.state = "idle"

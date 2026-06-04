@@ -339,9 +339,10 @@ class ConfigScreen(Screen):
         from config.manager import get_active_profile_name, set_active_profile
         if get_active_profile_name() == "default":
             set_active_profile("ghost")
-            
+
         self.panel.apply_pending()
         self.panel.write_to_disk()
+        self._relaunch_ahk_from_shortcut()
         self.panel.refresh_display()
         self._update_left_panel()
         if exit_after:
@@ -353,7 +354,11 @@ class ConfigScreen(Screen):
 
     def _try_leave(self) -> None:
         if self.panel.pending_count() == 0:
-            self.app.pop_screen(); return
+            if len(self.app.screen_stack) <= 1:
+                self.app.push_screen("home")
+            else:
+                self.app.pop_screen()
+            return
         def handle(r):
             if r == "save":        self._do_save(exit_after=False)
             elif r == "save_exit": self._do_save(exit_after=True)
@@ -373,3 +378,14 @@ class ConfigScreen(Screen):
 
     def _stop_strap(self) -> None:
         subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    def _relaunch_ahk_from_shortcut(self) -> None:
+        """Kill AHK, then relaunch from shell:startup shortcut if present."""
+        from ops.startup import SHORTCUT_PATH
+        subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if os.path.exists(SHORTCUT_PATH):
+            try:
+                os.startfile(SHORTCUT_PATH)
+            except Exception:
+                pass
