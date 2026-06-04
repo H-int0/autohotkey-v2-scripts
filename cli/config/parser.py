@@ -13,7 +13,7 @@ def _load_feature_registry() -> list:
     if not os.path.exists(schema_path):
         return []
     try:
-        namespace = {}
+        namespace = {"__file__": schema_path}
         with open(schema_path, "r", encoding="utf-8") as f:
             exec(compile(f.read(), schema_path, "exec"), namespace)
         return namespace.get("FEATURE_REGISTRY", [])

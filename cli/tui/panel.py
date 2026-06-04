@@ -22,7 +22,7 @@ class ConfigPanel(Static):
         import os
         schema_path = os.path.join(os.environ["APPDATA"], "Strap", "cli", "config", "schema.py")
         try:
-            namespace = {}
+            namespace = {"__file__": schema_path}
             with open(schema_path, "r", encoding="utf-8") as f:
                 exec(compile(f.read(), schema_path, "exec"), namespace)
             return namespace.get("FEATURE_REGISTRY", [])

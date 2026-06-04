@@ -197,7 +197,7 @@ def _load_new_defaults(version: str) -> dict | None:
     if not os.path.exists(schema_path):
         return None
     try:
-        namespace = {}
+        namespace = {"__file__": schema_path}
         with open(schema_path, "r", encoding="utf-8") as f:
             exec(compile(f.read(), schema_path, "exec"), namespace)
         return namespace.get("DEFAULT_CONFIG", {}).copy()
