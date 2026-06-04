@@ -40,3 +40,16 @@ def disable_startup() -> None:
     """Remove the Strap startup shortcut if it exists."""
     if os.path.exists(SHORTCUT_PATH):
         os.remove(SHORTCUT_PATH)
+
+def run_from_startup_shortcut() -> bool:
+    """Kill AHK if running, then launch from shell:startup shortcut if it exists. Returns True if launched."""
+    import subprocess
+    subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if os.path.exists(SHORTCUT_PATH):
+        try:
+            os.startfile(SHORTCUT_PATH)
+            return True
+        except Exception:
+            return False
+    return False
