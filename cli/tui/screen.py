@@ -18,7 +18,7 @@ from tui.help_text import (
     CONFIG_U3_TEXT, CONFIG_U4_TEXT
 )
 
-INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
+INSTALL_DIR = os.path.join(os.environ.get("APPDATA", ""), "Strap")
 
 # =============================================================================
 # ConfigScreen
@@ -55,6 +55,13 @@ class ConfigScreen(Screen):
         if self._open_popup_cmd:
             self.call_after_refresh(self.route_command, self._open_popup_cmd)
 
+    def _get_installed_version(self) -> str:
+        try:
+            with open(os.path.join(INSTALL_DIR, "VERSION"), "r", encoding="utf-8") as f:
+                return f.read().strip()
+        except Exception:
+            return DEFAULT_CONFIG["version"]
+
     def _is_ahk_running(self) -> bool:
         try:
             result = subprocess.check_output(
@@ -72,7 +79,7 @@ class ConfigScreen(Screen):
         pending = self.panel.pending_count() if hasattr(self, "panel") else 0
         
         status_text = get_status_text(
-            version=cfg.get('version', DEFAULT_CONFIG['version']),
+            version=self._get_installed_version(),
             is_installed=os.path.exists(INSTALL_DIR),
             startup_enabled=is_startup_enabled(),
             ahk_running=self._is_ahk_running(),
@@ -81,9 +88,12 @@ class ConfigScreen(Screen):
         )
 
         hints = self._build_hints(focused_flag, focused_no)
-        self.query_one("#config-status-text", Static).update(status_text)
-        self.query_one("#config-commands-text", Static).update(COMMANDS_TEXT)
-        self.query_one("#config-hints-text", Static).update(hints)
+        try:
+            self.query_one("#config-status-text", Static).update(status_text)
+            self.query_one("#config-commands-text", Static).update(COMMANDS_TEXT)
+            self.query_one("#config-hints-text", Static).update(hints)
+        except Exception:
+            pass
 
     def _build_hints(self, flag: str, no: int) -> str:
         if not flag or not no:
@@ -100,7 +110,7 @@ class ConfigScreen(Screen):
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "config-prompt":
             val = event.value.strip().lower()
-            for prefix in ("strap ", "/strap ", "/config "):
+            for prefix in ("strap ", "/strap ", "starp ", "/starp ", "/config "):
                 if val.startswith(prefix):
                     val = val[len(prefix):].strip()
                     break
@@ -112,12 +122,20 @@ class ConfigScreen(Screen):
         if event.key == "escape": 
             self._try_leave()
 
+    def on_resize(self, event) -> None:
+        if hasattr(self, "input"):
+            self.input.refresh()
+
+    def on_click(self, event) -> None:
+        if hasattr(self, "input"):
+            self.input.focus()
+
     def on_input_submitted(self, event: Input.Submitted) -> None:
         if event.input.id != "config-prompt": return
         raw = event.value.strip()
         event.input.value = ""
         if not raw: return
-        for p in ("strap ", "/strap "):
+        for p in ("strap ", "/strap ", "starp ", "/starp "):
             if raw.lower().startswith(p):
                 raw = raw[len(p):].strip()
                 break
@@ -129,19 +147,29 @@ class ConfigScreen(Screen):
 
         if cl == "/exit":
             self.app.exit(result="exit"); return
+        
         if cl == "/restart":
             self.app.exit(result="reload"); return
+        
         if cl in ("/run", "run"):
             self._run_strap(); return
+        
         if cl in ("/stop", "stop"):
             self._stop_strap(); return
+        
         if cl in ("/back", "back"):
             self._try_leave(); return
-
+        
+        if cl in ("/home", "home"):
+            self.app.pop_screen()
+            return
+        
         if cl == "/config --save":
             self._do_save(exit_after=False); return
+        
         if cl in ("/config --save --exit", "/config --!save"):
             self._do_save(exit_after=True); return
+        
         if cl == "/config --abort":
             self.panel.discard_pending()
             self.panel.refresh_display()
@@ -149,6 +177,7 @@ class ConfigScreen(Screen):
 
         if cl.startswith("/config"):
             self._handle_config_args(cmd[7:].strip()); return
+        
         if cl.startswith("-"):
             self._handle_config_args(cmd); return
 
@@ -233,54 +262,57 @@ class ConfigScreen(Screen):
 
     def _open_popup(self, flag: str, no: int) -> None:
         cfg = self.panel._effective
-        if flag == "u":
-            if no == 1:
-                self.app.push_screen(
-                    BooleanPopup(
-                        "Configure - Tray Icon", ["visible", "hidden"],
-                        "visible" if cfg("trayIconVisible", True) else "hidden",
-                        CONFIG_U1_TEXT.rstrip() + "\n\n/back or Esc               (Close)\n\n"
-                    ),
-                    lambda r: self._apply_result("trayIconVisible", r == "visible", r)
-                )
-            elif no == 2:
-                self.app.push_screen(
-                    IntegerPopup(
-                        "Configure - Tooltip Timeout", cfg("tooltipDuration", 2500), "1sec = 1000ms",
-                        CONFIG_U2_TEXT.rstrip() + "\n\n/back or Esc               (Close)\n\n"
-                    ),
-                    lambda r: self._apply_result("tooltipDuration", r, r)
-                )
-            elif no == 3:
-                self._active_tz_popup = TimezonePopup("u", 3, cfg("timezones", []), False)
-                self.app.push_screen(self._active_tz_popup, lambda r: self._apply_result("timezones", r, r))
-            elif no == 4:
-                st = cfg("startupTZID", "")
-                self._active_tz_popup = TimezonePopup("u", 4, [st] if st else [], True)
-                self.app.push_screen(self._active_tz_popup, lambda r: self._apply_result("startupTZID", r[0] if r else "", r))
-        elif flag == "z":
-            f_map = {1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation"}
-            names = {1: "NumPad Emulator", 2: "ALT Codes", 3: "TimeZone Switcher", 4: "Force Kill", 5: "Color Picker", 6: "Line Navigation"}
-            if fk := f_map.get(no):
-                self.app.push_screen(
-                    BooleanPopup(
-                        f"Configure - {names[no]}", ["active", "inactive"],
-                        "active" if cfg("features", DEFAULT_CONFIG["features"]).get(fk, True) else "inactive",
-                        get_config_z_text(no).rstrip() + "\n\n/back or Esc                  (Close)\n\n"
-                    ),
-                    lambda r, _fk=fk: self._apply_feat_result(_fk, r)
-                )
-        elif flag == "y":
-            if no == 1:
-                self.app.push_screen(
-                    ForceKillPopup(cfg("msgEndTask", "EVAPORATED!")),
-                    lambda r: self._apply_route_result("msgEndTask", r)
-                )
-            elif no == 2:
-                self.app.push_screen(
-                    ColorPickerPopup(cfg("colorPickerMsgBox", False), cfg("msgColorPicker", "Copied to Clipboard")),
-                    lambda r: self._apply_route_result(None, r)
-                )
+        try:
+            if flag == "u":
+                if no == 1:
+                    self.app.push_screen(
+                        BooleanPopup(
+                            "Configure - Tray Icon", ["visible", "hidden"],
+                            "visible" if cfg("trayIconVisible", True) else "hidden",
+                            CONFIG_U1_TEXT.rstrip() + "\n\n/back or Esc               (Close)\n\n"
+                        ),
+                        lambda r: self._apply_result("trayIconVisible", r == "visible", r)
+                    )
+                elif no == 2:
+                    self.app.push_screen(
+                        IntegerPopup(
+                            "Configure - Tooltip Timeout", cfg("tooltipDuration", 2500), "1sec = 1000ms",
+                            CONFIG_U2_TEXT.rstrip() + "\n\n/back or Esc               (Close)\n\n"
+                        ),
+                        lambda r: self._apply_result("tooltipDuration", r, r)
+                    )
+                elif no == 3:
+                    self._active_tz_popup = TimezonePopup("u", 3, cfg("timezones", []), False)
+                    self.app.push_screen(self._active_tz_popup, lambda r: self._apply_result("timezones", r, r))
+                elif no == 4:
+                    st = cfg("startupTZID", "")
+                    self._active_tz_popup = TimezonePopup("u", 4, [st] if st else [], True)
+                    self.app.push_screen(self._active_tz_popup, lambda r: self._apply_result("startupTZID", r[0] if r else "", r))
+            elif flag == "z":
+                f_map = {1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation"}
+                names = {1: "NumPad Emulator", 2: "ALT Codes", 3: "TimeZone Switcher", 4: "Force Kill", 5: "Color Picker", 6: "Line Navigation"}
+                if fk := f_map.get(no):
+                    self.app.push_screen(
+                        BooleanPopup(
+                            f"Configure - {names[no]}", ["active", "inactive"],
+                            "active" if cfg("features", DEFAULT_CONFIG["features"]).get(fk, True) else "inactive",
+                            get_config_z_text(no).rstrip() + "\n\n/back or Esc                  (Close)\n\n"
+                        ),
+                        lambda r, _fk=fk: self._apply_feat_result(_fk, r)
+                    )
+            elif flag == "y":
+                if no == 1:
+                    self.app.push_screen(
+                        ForceKillPopup(cfg("msgEndTask", "EVAPORATED!")),
+                        lambda r: self._apply_route_result("msgEndTask", r)
+                    )
+                elif no == 2:
+                    self.app.push_screen(
+                        ColorPickerPopup(cfg("colorPickerMsgBox", False), cfg("msgColorPicker", "Copied to Clipboard")),
+                        lambda r: self._apply_route_result(None, r)
+                    )
+        except Exception:
+            pass
 
     def _apply_result(self, key, val, check_none):
         if check_none is None: return
@@ -304,6 +336,10 @@ class ConfigScreen(Screen):
         self._update_left_panel()
 
     def _do_save(self, exit_after: bool) -> None:
+        from config.manager import get_active_profile_name, set_active_profile
+        if get_active_profile_name() == "default":
+            set_active_profile("ghost")
+            
         self.panel.apply_pending()
         self.panel.write_to_disk()
         self.panel.refresh_display()
@@ -325,7 +361,10 @@ class ConfigScreen(Screen):
                 self.panel.discard_pending()
                 self.panel.refresh_display()
                 self._update_left_panel()
-        self.app.push_screen(UnsavedChangesPopup(self.panel.pending_summary()), handle)
+        try:
+            self.app.push_screen(UnsavedChangesPopup(self.panel.pending_summary()), handle)
+        except Exception:
+            self.app.pop_screen()
 
     def _run_strap(self) -> None:
         if os.path.exists(t:=os.path.join(INSTALL_DIR, "core", "source.ahk")):
