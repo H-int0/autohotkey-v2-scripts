@@ -18,11 +18,28 @@ FEATURE_REGISTRY = [
     {"key": "lineNavigation",   "ahk_var": "LineNavEnabled",         "label": "Line Navigation",    "default": True},
 ]
 
+def _read_version() -> str:
+    import os
+
+    _here = os.path.dirname(os.path.abspath(__file__))
+    for candidate in [
+        os.path.join(_here, "..", "..", "VERSION"),
+        os.path.join(os.environ["APPDATA"], "Strap", "VERSION"),
+    ]:
+        try:
+            with open(os.path.normpath(candidate), "r", encoding="utf-8") as f:
+                return f.read().strip()
+        except OSError:
+            pass
+    return "0.0.0"
+
 DEFAULT_CONFIG = {
     # Strap version currently installed
-    "version": "0.4.0",
+    "version": _read_version(),
 
-    # Absolute path to the Strap install directory
+    # Absolute path to the active Strap install directory.
+    # This always points to %APPDATA%\Strap the running version.
+    # Archived versions live in C:\Users\USERNAME\.strap_versions\
     "installedPath": os.path.join(os.environ["APPDATA"], "Strap"),
 
     # Whether a startup shortcut exists in shell:startup
@@ -32,7 +49,7 @@ DEFAULT_CONFIG = {
     # UI:  True  = Visible  (A_IconHidden := 0 in AHK)
     # UI:  False = Hidden   (A_IconHidden := 1 in AHK)
     # Note: AHK's value is the logical inverse of this flag.
-    "trayIconVisible": True,
+    "trayIconVisible": False,
 
     # --- [u2] Tooltip Timeout ---
     # Positive integer, milliseconds. 1 sec = 1000 ms.
@@ -74,7 +91,7 @@ DEFAULT_CONFIG = {
 # Format:
 #   "old_key_name": "new_key_name"
 #
-# For nested keys (e.g. inside "features"), use dot notation:
+# For nested keys (e.g., inside "features"), use dot notation:
 #   "features.oldName": "features.newName"
 # -----------------------------------------------------------------------------
 MIGRATIONS = {
