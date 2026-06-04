@@ -5,31 +5,60 @@
 COMMANDS_TEXT = (
     "[b]COMMANDS[/b]\n"
     "─────────────────────────\n"
-    "^ to chain    (Ex: /run ^ /config)\n\n"
-    "/install      (Install Strap)\n"
-    "/update       (Update Strap)\n"
-    "/config       (Configure)\n"
-    "/help, /?     (Show commands)\n"
-    "/run          (Launch Startup)\n"
-    "/stop         (Stop AHK script)\n"
-    "/clear        (Clear terminal)\n"
-    "/restart      (Restart TUI)\n"
-    "/exit         (Quit application)\n\n"
+    "Use ^ to chain       (e.g., /run ^ /config)\n\n"
+    "/install             (Install Strap)\n"
+    "/update              (Check for updates)\n"
+    "/install --ls        (List versions on GitHub)\n"
+    "/install vX.X.X      (Install specific version)\n"
+    "/switch              (Switch version)\n"
+    "/version             (Current versions)\n"
+    "/version --ls        (List local versions)\n"
+    "/uninstall           (Uninstall Strap)\n\n"
+    "/run                 (Launch strap)\n"
+    "/stop                (Stop strap)\n"
+    "/run shr             (Add to startup)\n"
+    "/run -d shr          (Remove from startup)\n\n"
+    "/config              (Configure)\n\n"
+    "/help, /?            (Show commands)\n"
+    "/clear               (Clear terminal)\n"
+    "/back                (Go back)\n"
+    "/home                (Go to home screen)\n"
+    "/restart             (Restart TUI)\n"
+    "/exit                (Exit immediately)\n\n"
+    "/profile             (Manage profiles)\n"
+    "/profile --ls        (List all profiles)\n"
+    "/profile name        (Create new profile)\n"
+    "/profile --use name  (Switch profile)\n"
+    "/profile --d name    (Delete profile)\n\n"
 )
 
 TERMINAL_COMMANDS_TEXT = (
-    "\nCOMMAND         DESCRIPTION\n"
-    "──────────────────────────────────\n"
-    "strap /install  Install Strap to %APPDATA%\\Strap\n"
-    "strap /update   Check for and apply updates from GitHub\n"
-    "strap /config   Configure Strap settings\n"
-    "strap /help     Show this help message\n"
-    "strap /run      Launch Startup\n"
-    "strap /stop     Stop running AHK scripts\n"
-    "strap /clear    Clear terminal\n"
-    "strap /restart  Restart TUI\n"
-    "strap /exit     Exit immediately\n"
+    "\nCOMMAND                        DESCRIPTION\n"
+    "────────────────────────────────────────────────────────\n"
+    "strap /install                 Install Strap\n"
+    "strap /update                  Check for and download updates from GitHub\n"
+    "strap /install --ls            List available versions on GitHub\n"
+    "strap /install vX.X.X          Install specific version from GitHub\n\n"
+    "strap /switch vX.X.X           Switch active version\n"
+    "strap /version                 Current versions\n"
+    "strap /version --ls            List local versions\n"
+    "strap /uninstall               Uninstall Strap\n"
+    "strap /run                     Run strap\n"
+    "strap /stop                    Stop strap\n"
+    "strap /run shr                 Add to startup\n"
+    "strap /run -d shr              Remove from startup\n"
+    "strap /config                  Configure Strap settings\n"
+    "strap /help, /?                Show commands\n"
+    "strap /clear                   Clear terminal\n"
+    "strap /restart                 Restart TUI\n"
+    "strap /exit                    Exit immediately\n\n"
+    "strap /profile                 Manage profiles\n"
+    "strap /profile --ls            List all profiles\n"
+    "strap /profile name            Create new profile\n"
+    "strap /profile --use name      Switch active profile\n"
+    "strap /profile --d name        Delete profile\n"
 )
+
 
 CONFIG_COMMANDS_TEXT = (
     "[b]CONFIG COMMANDS[/b]\n"
@@ -57,8 +86,19 @@ def get_status_text(version: str, is_installed: bool, startup_enabled: bool, ahk
     return base
 
 def get_config_z_text(no: int) -> str:
-    from config.schema import FEATURE_REGISTRY
-    name = FEATURE_REGISTRY[no - 1]["label"] if 0 < no <= len(FEATURE_REGISTRY) else ""
+    import os
+    import sys
+    sys.path.insert(0, os.path.join(os.environ["APPDATA"], "Strap", "cli"))
+    try:
+        schema_path = os.path.join(os.environ["APPDATA"], "Strap", "cli", "config", "schema.py")
+        namespace = {}
+        with open(schema_path, "r", encoding="utf-8") as f:
+            exec(compile(f.read(), schema_path, "exec"), namespace)
+        registry = namespace.get("FEATURE_REGISTRY", [])
+    except Exception:
+        from config.schema import FEATURE_REGISTRY
+        registry = FEATURE_REGISTRY
+    name = registry[no - 1]["label"] if 0 < no <= len(registry) else ""
     return (
         f"[b]CONFIG - [z{no}] {name}[/b]\n"
         f"─────────────────────────\n"
