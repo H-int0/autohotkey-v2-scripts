@@ -35,22 +35,22 @@ class _BasePopup(ModalScreen):
             pass
 
     def on_mouse_scroll_up(self, event) -> None:
-        if event.x < self.app.console.width * 0.3:
+        if getattr(event, "screen_x", getattr(event, "x", 0)) < self.app.size.width * 0.35:
             if len(self.app.screen_stack) > 1:
                 under = self.app.screen_stack[-2]
                 try: under.query_one("#config-left-content").scroll_up(animate=False)
-                except:
+                except Exception:
                     try: under.query_one("#home-left-content").scroll_up(animate=False)
-                    except: pass
+                    except Exception: pass
 
     def on_mouse_scroll_down(self, event) -> None:
-        if event.x < self.app.console.width * 0.3:
+        if getattr(event, "screen_x", getattr(event, "x", 0)) < self.app.size.width * 0.35:
             if len(self.app.screen_stack) > 1:
                 under = self.app.screen_stack[-2]
                 try: under.query_one("#config-left-content").scroll_down(animate=False)
-                except:
+                except Exception:
                     try: under.query_one("#home-left-content").scroll_down(animate=False)
-                    except: pass
+                    except Exception: pass
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         if getattr(event.input, "id", None) == "popup-cmd-input":
