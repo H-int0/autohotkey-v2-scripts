@@ -193,12 +193,19 @@ class HomeScreen(Screen):
 
         elif c == "/config" or c.startswith("/config "):
             rest = cmd[7:].strip()
-            try:
-                from tui.screen import ConfigScreen
-                self.app.push_screen(ConfigScreen(open_popup=rest if rest else None))
-            except Exception as e:
-                self.log_widget.write(f"Error launching screen: {e}")
+            if rest:
+                from config.manager import apply_headless_config
+                res = apply_headless_config(rest)
+                self.log_widget.write(res)
+                self.log_widget.write("")
                 self.process_next_command()
+            else:
+                try:
+                    from tui.screen import ConfigScreen
+                    self.app.push_screen(ConfigScreen())
+                except Exception as e:
+                    self.log_widget.write(f"Error launching screen: {e}")
+                    self.process_next_command()
 
         elif c in ("/help", "/?"):
             clean_commands = COMMANDS_TEXT.replace("[b]", "").replace("[/b]", "")
@@ -658,8 +665,7 @@ class HomeScreen(Screen):
             self.app.exit(result="exit")
 
     def on_resize(self, event) -> None:
-        if hasattr(self, "input_widget"):
-            self.input_widget.refresh()
+        pass
 
     def on_click(self, event) -> None:
         if hasattr(self, "input_widget"):

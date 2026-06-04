@@ -123,8 +123,7 @@ class ConfigScreen(Screen):
             self._try_leave()
 
     def on_resize(self, event) -> None:
-        if hasattr(self, "input"):
-            self.input.refresh()
+        pass
 
     def on_click(self, event) -> None:
         if hasattr(self, "input"):

@@ -286,7 +286,11 @@ def main() -> None:
         elif cmd == "/uninstall":
             cli_uninstall()
         elif cmd == "/config":
-            print("Use 'strap' (without arguments) to open the TUI, then use /config inside it.")
+            if rest:
+                from config.manager import apply_headless_config
+                print(apply_headless_config(rest))
+            else:
+                print("Use 'strap' (without arguments) to open the TUI, then use /config inside it.")
 
         elif cmd in ("/help", "/?"):
             _print_help()
