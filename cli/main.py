@@ -290,7 +290,12 @@ def main() -> None:
                 from config.manager import apply_headless_config
                 print(apply_headless_config(rest))
             else:
-                print("Use 'strap' (without arguments) to open the TUI, then use /config inside it.")
+                while True:
+                    from tui.app import StrapApp
+                    app = StrapApp(start_screen="config")
+                    result = app.run()
+                    if result != "reload":
+                        break
 
         elif cmd in ("/help", "/?"):
             _print_help()

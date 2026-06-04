@@ -51,7 +51,6 @@ class ConfigScreen(Screen):
         self.panel = self.query_one("#config-panel", ConfigPanel)
         self.input = self.query_one("#config-prompt", Input)
         self._update_left_panel()
-        self.app.set_focus(None)
         if self._open_popup_cmd:
             self.call_after_refresh(self.route_command, self._open_popup_cmd)
 
@@ -126,9 +125,7 @@ class ConfigScreen(Screen):
         pass
 
     def on_click(self, event) -> None:
-        if getattr(event, "control", None) and getattr(event.control, "id", None) == "config-prompt":
-            return
-        self.app.set_focus(None)
+        pass
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         if event.input.id != "config-prompt": return
@@ -358,18 +355,15 @@ class ConfigScreen(Screen):
         self.panel.refresh_display()
         self._update_left_panel()
         if exit_after:
-            while self.app.screen_stack:
-                top = self.app.screen_stack[-1]
-                self.app.pop_screen()
-                if top == self:
-                    break
+            self.app.pop_screen()
+            if len(self.app.screen_stack) <= 1:
+                self.app.push_screen("home")
 
     def _try_leave(self) -> None:
         if self.panel.pending_count() == 0:
+            self.app.pop_screen()
             if len(self.app.screen_stack) <= 1:
                 self.app.push_screen("home")
-            else:
-                self.app.pop_screen()
             return
         def handle(r):
             if r == "save":        self._do_save(exit_after=False)
