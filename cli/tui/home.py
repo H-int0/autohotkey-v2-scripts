@@ -16,7 +16,7 @@ from tui.help_text import (
     CONFIG_U3_TEXT, CONFIG_U4_TEXT
 )
 
-INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
+INSTALL_DIR = os.path.join(os.environ.get("APPDATA", ""), "Strap")
 
 # =============================================================================
 # Home Screen
@@ -32,6 +32,13 @@ class HomeScreen(Screen):
         self.reinstall_confirmed = False
         self.startup_confirmed = False
 
+    def _get_installed_version(self) -> str:
+        try:
+            with open(os.path.join(INSTALL_DIR, "VERSION"), "r", encoding="utf-8") as f:
+                return f.read().strip()
+        except Exception:
+            return DEFAULT_CONFIG["version"]
+
     def _is_ahk_running(self) -> bool:
         try:
             out = subprocess.check_output(
@@ -45,19 +52,24 @@ class HomeScreen(Screen):
     def update_status(self, focused_flag: str = "", focused_no: int = 0):
         cfg = load_user_config()
         st_tz = cfg.get("startupTZID", "")
+        pending = self.panel.pending_count() if hasattr(self, "panel") else 0
         
         status_text = get_status_text(
-            version=cfg.get('version', DEFAULT_CONFIG['version']),
+            version=self._get_installed_version(),
             is_installed=os.path.exists(INSTALL_DIR),
             startup_enabled=is_startup_enabled(),
             ahk_running=self._is_ahk_running(),
-            st_tz=st_tz
+            st_tz=st_tz,
+            pending_count=pending
         )
 
         hints = self._build_hints(focused_flag, focused_no)
-        self.query_one("#status-text", Static).update(status_text)
-        self.query_one("#commands-text", Static).update(COMMANDS_TEXT)
-        self.query_one("#hints-text", Static).update(hints)
+        try:
+            self.query_one("#status-text", Static).update(status_text)
+            self.query_one("#commands-text", Static).update(COMMANDS_TEXT)
+            self.query_one("#hints-text", Static).update(hints)
+        except Exception:
+            pass
 
     def _build_hints(self, flag: str, no: int) -> str:
         if not flag or not no:
