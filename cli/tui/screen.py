@@ -135,10 +135,14 @@ class ConfigScreen(Screen):
         raw = event.value.strip()
         event.input.value = ""
         if not raw: return
+        _raw_orig = raw
         for p in ("strap ", "/strap ", "starp ", "/starp "):
             if raw.lower().startswith(p):
-                raw = raw[len(p):].strip()
+                raw = raw[len(p):]
                 break
+        if "  " in raw:
+            return
+        raw = raw.strip()
         self.route_command(raw)
 
     def route_command(self, raw: str) -> None:
@@ -184,6 +188,11 @@ class ConfigScreen(Screen):
     def _handle_config_args(self, args: str) -> None:
         args = args.strip()
         if not args: return
+        # Detect auto-save flag: -!u... means save immediately after applying
+        auto_save = args.startswith("-!")
+        if auto_save:
+            args = "-" + args[2:]  # strip the ! so parsing proceeds normally
+
         m = re.match(r"^-([uzy])\s+-(\d+)(?:--(.+?))?(?:\s+(.+))?$", args, re.IGNORECASE)
         if not m:
             m = re.match(r"^-([uzy])\s+-(\d+)\s+(.+)$", args, re.IGNORECASE)
@@ -194,12 +203,15 @@ class ConfigScreen(Screen):
 
         self._update_left_panel(flag, no)
         if not value and not sub: self._open_popup(flag, no); return
-        
+
         if flag == "u" and no in (3, 4) and not value and sub:
             value = sub
             sub = None
 
         self._apply_value(flag, no, sub, value)
+
+        if auto_save:
+            self._do_save(exit_after=False)
 
     def _apply_value(self, flag: str, no: int, sub: str | None, value: str) -> None:
         v, vl = value.strip(), value.strip().lower()

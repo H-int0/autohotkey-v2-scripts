@@ -172,12 +172,17 @@ def cli_profile(subargs: str) -> None:
             print(f"[√] Profile '{arg}' is now active.")
         else:
             print(f"[×] Profile '{arg}' does not exist.")
-    else:
+    elif subl == "--cr":
+        if not arg:
+            print("Usage: strap /profile --cr <name>")
+            return
         try:
-            create_profile(sub)
-            print(f"[√] Profile '{sub}' created.")
+            create_profile(arg)
+            print(f"[√] Profile '{arg}' created.")
         except ValueError as e:
             print(f"[×] {e}")
+    else:
+        print(f"Unknown profile subcommand: '{sub}'. Use --ls, --cr, --use, --d.")
 
 def cli_uninstall() -> None:
     print("\n>> STRAP UNINSTALLER\n")
@@ -271,24 +276,26 @@ def main() -> None:
             cli_update()
         elif cmd == "/switch":
             cli_switch(rest)
-        elif cmd == "/versions" or cmd == "/version":
-            cli_version()
+        elif cmd in ("/versions", "/version"):
+            if rest == "--ls":
+                cli_version()
+            else:
+                cli_version()
         elif cmd == "/profile":
             cli_profile(rest)
         elif cmd == "/uninstall":
             cli_uninstall()
         elif cmd == "/config":
-            while True:
-                from tui.app import StrapApp
-                from tui.screen import ConfigScreen
-                app = StrapApp(start_screen=ConfigScreen(open_popup=rest if rest else None))
-                result = app.run()
-                if result != "reload":
-                    break
+            print("Use 'strap' (without arguments) to open the TUI, then use /config inside it.")
+
         elif cmd in ("/help", "/?"):
             _print_help()
         elif cmd == "/run":
-            if rest == "-d shr":
+            if rest == "--cr shr":
+                from ops.startup import enable_startup
+                enable_startup()
+                print("[√] Startup shortcut created.")
+            elif rest in ("--d shr", "-d shr"):
                 from ops.startup import disable_startup
                 disable_startup()
                 print("Startup shortcut removed.")

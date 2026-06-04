@@ -141,14 +141,25 @@ class HomeScreen(Screen):
 
         cmd = self.command_queue.pop(0)
         
+        # Reject fused prefix, must have exactly one space after prefix
+        _raw_cmd = cmd
         for prefix in ("strap ", "/strap ", "starp ", "/starp "):
             if cmd.lower().startswith(prefix):
-                cmd = cmd[len(prefix):].strip()
+                cmd = cmd[len(prefix):]  # don't strip preserve original spacing
                 break
-            
+
+        # Reject double-spaces anywhere in the command
+        if "  " in cmd:
+            self.log_widget.write(f">> {_raw_cmd}")
+            self.log_widget.write("Invalid: only single spaces are allowed between command parts.")
+            self.process_next_command()
+            return
+
+        cmd = cmd.strip()
+
         if not cmd.startswith("/"):
-            self.log_widget.write(f">> {cmd}")
-            self.log_widget.write("Invalid command format. Commands must strictly begin with '/' (e.g.,, /help).")
+            self.log_widget.write(f">> {_raw_cmd}")
+            self.log_widget.write("Invalid command format. Commands must strictly begin with '/' (e.g., /help).")
             self.process_next_command()
             return
             
@@ -196,6 +207,7 @@ class HomeScreen(Screen):
             self.process_next_command()
 
         elif c in ("/back", "back"):
+            self.log_widget.write("Already on home screen.")
             self.log_widget.write("")
             self.process_next_command()
 
@@ -203,12 +215,12 @@ class HomeScreen(Screen):
             self.run_strap_shortcut()
             self.log_widget.write("")
 
-        elif c == "/run shr":
+        elif c == "/run --cr shr":
             self._run_create_startup_shortcut()
             self.log_widget.write("")
             self.process_next_command()
-            
-        elif c == "/run -d shr":
+
+        elif c in ("/run --d shr", "/run -d shr"):
             from ops.startup import disable_startup
             disable_startup()
             self.log_widget.write("Startup shortcut removed.")
@@ -239,7 +251,7 @@ class HomeScreen(Screen):
                 self.input_widget.disabled = True
                 self.run_switch_worker(rest)
 
-        elif c in ("/version", "/versions"):
+        elif c in ("/version", "/versions") or c in ("/version --ls", "/versions --ls"):
             self._show_versions()
             self.log_widget.write("")
             self.process_next_command()
@@ -574,12 +586,17 @@ class HomeScreen(Screen):
                 else:
                     self.log_widget.write(f"[×] Profile '{arg}' does not exist.")
 
+        elif subl == "--cr":
+            if not arg:
+                self.log_widget.write("Usage: /profile --cr name")
+            else:
+                try:
+                    create_profile(arg)
+                    self.log_widget.write(f"[√] Profile '{arg}' created.")
+                except ValueError as e:
+                    self.log_widget.write(f"[×] {e}")
         else:
-            try:
-                create_profile(sub)
-                self.log_widget.write(f"[√] Profile '{sub}' created.")
-            except ValueError as e:
-                self.log_widget.write(f"[×] {e}")
+            self.log_widget.write(f"Unknown profile subcommand: '{sub}'. Use --ls, --cr, --use, --d.")
 
         self.log_widget.write("")
         self.process_next_command()
