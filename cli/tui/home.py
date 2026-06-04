@@ -606,7 +606,11 @@ class HomeScreen(Screen):
             self.log_widget.write(f"Unknown profile subcommand: '{sub}'. Use --ls, --cr, --use, --d.")
 
         self.log_widget.write("")
-        self.process_next_command()
+        if self.state == "profile_switch":
+            self.log_widget.write("Do you want to restart the TUI to reflect the changes? (y/n):")
+            self.state = "ask_restart"
+        else:
+            self.process_next_command()
 
     @work(exclusive=True, thread=True)
     def run_uninstall_worker(self) -> None:
