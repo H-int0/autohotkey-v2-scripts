@@ -1,89 +1,130 @@
 import re
-
-from config.schema import FEATURE_REGISTRY
+import os
 
 # =============================================================================
 # file_editor.py
-# edits the config.ahk
+# Rewrites config.ahk and timezones-variables.ahk from a user-config dir
+#
+# Version-safety rules:
+#
+#   - Every write is gated on the key actually existing in config_data.
+#     If the active profile has a key the current version doesn't know about
+#     (e.g., user is on an older version), that key is simply skipped.
+#
+#   - FEATURE_REGISTRY is loaded from the active version's schema.py at
+#     runtime (not via import) to avoid stale cache when versions are switched.
+#
+#   - re.sub only fires when the pattern is found in the AHK file, so unknown
+#     vars in config_data that have no counterpart in config.ahk are harmless.
 # =============================================================================
+
+INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
+
+
+def _load_feature_registry() -> list:
+    """
+    Load FEATURE_REGISTRY from the active version's schema.py via exec so we
+    always get the registry that matches the currently installed version, not
+    whatever was imported at process start.
+    Falls back to an empty list if schema can't be loaded.
+    """
+    schema_path = os.path.join(INSTALL_DIR, "cli", "config", "schema.py")
+    if not os.path.exists(schema_path):
+        return []
+    try:
+        namespace = {}
+        with open(schema_path, "r", encoding="utf-8") as f:
+            exec(compile(f.read(), schema_path, "exec"), namespace)
+        return namespace.get("FEATURE_REGISTRY", [])
+    except Exception:
+        return []
 
 
 def update_config_ahk(config_data: dict, ahk_path: str) -> None:
     """
     Re-apply user-config values onto config.ahk.
-    Called after every --save or update to keep config.ahk in sync with
-    user-config.json.
+    Only writes a value if the corresponding key exists in config_data  
+    missing keys (e.g., profile from a newer version on an older install, or
+    vice versa) are silently skipped so the AHK file keeps its existing value.
 
-    Writes:
-        A_IconHidden            <- inverted: trayIconVisible True  -> 0
-                                                              False -> 1
-        Config_TooltipDuration  <- tooltipDuration (int)
-        NumpadEmulatorEnabled   <- features.numpadEmulator   (0/1)
-        AltCodesEnabled         <- features.altCodes         (0/1)
-        TimezoneSwitcherEnabled <- features.timezoneSwitcher (0/1)
-        ForceKillEnabled        <- features.forceKillTask    (0/1)
-        ColorPickerEnabled      <- features.colorPicker      (0/1)
-        LineNavEnabled          <- features.lineNavigation   (0/1)
-        Msg_EndTask             <- msgEndTask   (string)
-        Msg_ColorPicker         <- msgColorPicker (string)
-        ColorPickerMsgBox       <- colorPickerMsgBox (0/1)
-        StartupTZID             <- startupTZID (string)
+    Mapping:
+        trayIconVisible     -> A_IconHidden            (inverted: True->0, False->1)
+        tooltipDuration     -> Config_TooltipDuration
+        startupTZID         -> StartupTZID
+        features.*          -> FeatureNameEnabled vars (via FEATURE_REGISTRY)
+        msgEndTask          -> Msg_EndTask
+        msgColorPicker      -> Msg_ColorPicker
+        colorPickerMsgBox   -> ColorPickerMsgBox
     """
     with open(ahk_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     # --- [u1] Tray Icon ---
-    # UI True (visible) -> AHK 0; UI False (hidden) -> AHK 1
-    ahk_icon = 0 if config_data.get("trayIconVisible", True) else 1
-    content = re.sub(
-        r"(A_IconHidden\s*:=\s*)\d+",
-        rf"\g<1>{ahk_icon}",
-        content, flags=re.IGNORECASE
-    )
-
-    # --- [u2] Tooltip Timeout ---
-    content = re.sub(
-        r"(Config_TooltipDuration\s*:=\s*)\d+",
-        rf"\g<1>{config_data.get('tooltipDuration', 2500)}",
-        content, flags=re.IGNORECASE
-    )
-
-    # --- [u4] Timezone on Startup ---
-    content = re.sub(
-        r'(StartupTZID\s*:=\s*)".*?"',
-        rf'\g<1>"{config_data.get("startupTZID", "")}"',
-        content, flags=re.IGNORECASE
-    )
-
-    # --- [z1-z6] Feature toggles ---
-    features = config_data.get("features", {})
-    for f in FEATURE_REGISTRY:
-        ahk_val = 1 if features.get(f["key"], f["default"]) else 0
+    if "trayIconVisible" in config_data:
+        ahk_icon = 0 if config_data["trayIconVisible"] else 1
         content = re.sub(
-            rf"({re.escape(f['ahk_var'])}\s*:=\s*)\d+",
-            rf"\g<1>{ahk_val}",
+            r"(A_IconHidden\s*:=\s*)\d+",
+            rf"\g<1>{ahk_icon}",
             content, flags=re.IGNORECASE
         )
 
-    # --- [y1] Force Kill tooltip text ---
-    content = re.sub(
-        r'(Msg_EndTask\s*:=\s*)".*?"',
-        rf'\g<1>"{config_data.get("msgEndTask", "EVAPORATED!")}"',
-        content, flags=re.IGNORECASE
-    )
+    # --- [u2] Tooltip Duration ---
+    if "tooltipDuration" in config_data:
+        content = re.sub(
+            r"(Config_TooltipDuration\s*:=\s*)\d+",
+            rf"\g<1>{config_data['tooltipDuration']}",
+            content, flags=re.IGNORECASE
+        )
+
+    # --- [u4] Startup Timezone ---
+    if "startupTZID" in config_data:
+        content = re.sub(
+            r'(StartupTZID\s*:=\s*)".*?"',
+            rf'\g<1>"{config_data["startupTZID"]}"',
+            content, flags=re.IGNORECASE
+        )
+
+    # --- [z1-z6] Feature toggles ---
+    # Load registry from the active version's schema so we never write a toggle that doesn't exist in the currently installed AHK files
+    features = config_data.get("features", {})
+    if features:
+        for entry in _load_feature_registry():
+            key     = entry.get("key")
+            ahk_var = entry.get("ahk_var")
+            default = entry.get("default", True)
+            if key not in features:
+                # This feature doesn't exist in the profile's config   skip it
+                continue
+            ahk_val = 1 if features[key] else 0
+            content = re.sub(
+                rf"({re.escape(ahk_var)}\s*:=\s*)\d+",
+                rf"\g<1>{ahk_val}",
+                content, flags=re.IGNORECASE
+            )
+
+    # --- [y1] Force Kill message ---
+    if "msgEndTask" in config_data:
+        content = re.sub(
+            r'(Msg_EndTask\s*:=\s*)".*?"',
+            rf'\g<1>"{config_data["msgEndTask"]}"',
+            content, flags=re.IGNORECASE
+        )
 
     # --- [y2] Color Picker settings ---
-    content = re.sub(
-        r'(Msg_ColorPicker\s*:=\s*)".*?"',
-        rf'\g<1>"{config_data.get("msgColorPicker", "Copied to Clipboard")}"',
-        content, flags=re.IGNORECASE
-    )
-    ahk_msgbox = 1 if config_data.get("colorPickerMsgBox", False) else 0
-    content = re.sub(
-        r"(ColorPickerMsgBox\s*:=\s*)\d+",
-        rf"\g<1>{ahk_msgbox}",
-        content, flags=re.IGNORECASE
-    )
+    if "msgColorPicker" in config_data:
+        content = re.sub(
+            r'(Msg_ColorPicker\s*:=\s*)".*?"',
+            rf'\g<1>"{config_data["msgColorPicker"]}"',
+            content, flags=re.IGNORECASE
+        )
+
+    if "colorPickerMsgBox" in config_data:
+        ahk_msgbox = 1 if config_data["colorPickerMsgBox"] else 0
+        content = re.sub(
+            r"(ColorPickerMsgBox\s*:=\s*)\d+",
+            rf"\g<1>{ahk_msgbox}",
+            content, flags=re.IGNORECASE
+        )
 
     with open(ahk_path, "w", encoding="utf-8") as f:
         f.write(content)
@@ -93,19 +134,16 @@ def update_timezones_variables_ahk(timezones: list, ahk_path: str) -> None:
     """
     Re-apply the active timezone list onto timezones-variables.ahk.
 
-    `timezones` is the list of active Windows TZ ID strings from user-config.json,
-    e.g. ["Eastern Standard Time", "Russian Standard Time"].
-
     For each TZ_* var in the file:
         - Set to 1 if its reconstructed TZ ID is in the active list.
         - Set to 0 otherwise.
 
-    The TZ var name is derived by replacing spaces with underscores and
-    prepending TZ_, which is exactly how the file was originally generated.
-    E.g. "Eastern Standard Time" <-> TZ_Eastern_Standard_Time
+    TZ var name convention:
+        "Eastern Standard Time" <-> TZ_Eastern_Standard_Time
+
+    Vars in the file that have no match in the timezones list are set to 0,
+    not removed   the file structure is always preserved.
     """
-    # Build a lookup set of underscore-form names for O(1) membership checks
-    # e.g. "Eastern Standard Time" -> "Eastern_Standard_Time"
     active_set = {tz.replace(" ", "_") for tz in timezones}
 
     pattern = re.compile(
@@ -117,10 +155,9 @@ def update_timezones_variables_ahk(timezones: list, ahk_path: str) -> None:
         content = f.read()
 
     def _replace(m):
-        prefix   = m.group(1)          # everything up to and including ":= "
-        var_name = m.group(2)          # e.g. "Eastern_Standard_Time"
-        new_val  = "1" if var_name in active_set else "0"
-        return prefix + new_val
+        prefix   = m.group(1)
+        var_name = m.group(2)
+        return prefix + ("1" if var_name in active_set else "0")
 
     content = pattern.sub(_replace, content)
 
