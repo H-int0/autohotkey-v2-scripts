@@ -653,7 +653,7 @@ class HomeScreen(Screen):
     def finish_worker(self):
         self.log_widget.write("")
         self.input_widget.disabled = False
-        self.input_widget.focus()
+        self.app.set_focus(None)
         
         if self.state in ("switching", "installing", "updating", "profile_switch"):
             self.state = "idle"
@@ -672,5 +672,6 @@ class HomeScreen(Screen):
         pass
 
     def on_click(self, event) -> None:
-        if hasattr(self, "input_widget"):
-            self.input_widget.focus()
+        if getattr(event, "control", None) and getattr(event.control, "id", None) == "prompt":
+            return
+        self.app.set_focus(None)
