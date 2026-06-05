@@ -5,6 +5,7 @@ from config.manager import load_user_config, save_user_config
 from config.schema import DEFAULT_CONFIG
 from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
 from tui.tz_catalog import TIMEZONE_CATALOG
+from features import FEATURE_REGISTRY
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
 
@@ -17,18 +18,6 @@ class ConfigPanel(Static):
         super().__init__(**kwargs)
         self.cfg = load_user_config()
         self.pending: dict[str, object] = {}
-
-    def _feature_registry(self) -> list:
-        import os
-        schema_path = os.path.join(os.environ["APPDATA"], "Strap", "cli", "config", "schema.py")
-        try:
-            namespace = {"__file__": schema_path}
-            with open(schema_path, "r", encoding="utf-8") as f:
-                exec(compile(f.read(), schema_path, "exec"), namespace)
-            return namespace.get("FEATURE_REGISTRY", [])
-        except Exception:
-            from config.schema import FEATURE_REGISTRY
-            return FEATURE_REGISTRY
 
     def _effective(self, key: str, default=None):
         return self.pending.get(key, self.cfg.get(key, default))
@@ -53,7 +42,7 @@ class ConfigPanel(Static):
         startup_tz = p("startupTZID", "")
         startup_tz_display = startup_tz if startup_tz else "default"
         
-        registry = self._feature_registry()
+        registry = FEATURE_REGISTRY
         feat = p("features", {f["key"]: f["default"] for f in registry})
 
         def p_line(prefix, title, value, extra=""):
@@ -82,7 +71,7 @@ class ConfigPanel(Static):
         return "\n".join(lines)
 
     def _mark_bool(self, flag_no: str) -> bool:
-        z_map = {f"z{i+1}": f["key"] for i, f in enumerate(self._feature_registry())}
+        z_map = {f"z{i+1}": f["key"] for i, f in enumerate(FEATURE_REGISTRY)}
         
         if flag_no in z_map:
             feat = z_map[flag_no]
@@ -110,7 +99,7 @@ class ConfigPanel(Static):
         count = 0
         for key, val in self.pending.items():
             if key == "features":
-                orig = self.cfg.get("features", {f["key"]: f["default"] for f in self._feature_registry()})
+                orig = self.cfg.get("features", {f["key"]: f["default"] for f in FEATURE_REGISTRY})
                 count += sum(1 for k, v in val.items() if orig.get(k) != v)
             else:
                 count += 1
@@ -118,7 +107,7 @@ class ConfigPanel(Static):
 
     def pending_summary(self) -> dict[str, tuple]:
         summary = {}
-        registry = self._feature_registry()
+        registry = FEATURE_REGISTRY
         feature_labels = {f["key"]: f["label"] for f in registry}
         label_map = {
             "trayIconVisible": "Tray Icon",

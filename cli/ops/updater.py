@@ -4,6 +4,10 @@ import shutil
 import zipfile
 import requests
 
+import importlib
+import features
+importlib.reload(features)
+
 from config.schema   import DEFAULT_CONFIG
 from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
 from ops.startup     import is_startup_enabled, enable_startup, disable_startup

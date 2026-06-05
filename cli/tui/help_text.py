@@ -1,3 +1,5 @@
+from features import FEATURE_REGISTRY
+
 # =============================================================================
 # all help texts are in here
 # =============================================================================
@@ -86,19 +88,9 @@ def get_status_text(version: str, is_installed: bool, startup_enabled: bool, ahk
     return base
 
 def get_config_z_text(no: int) -> str:
-    import os
-    import sys
-    sys.path.insert(0, os.path.join(os.environ["APPDATA"], "Strap", "cli"))
-    try:
-        schema_path = os.path.join(os.environ["APPDATA"], "Strap", "cli", "config", "schema.py")
-        namespace = {}
-        with open(schema_path, "r", encoding="utf-8") as f:
-            exec(compile(f.read(), schema_path, "exec"), namespace)
-        registry = namespace.get("FEATURE_REGISTRY", [])
-    except Exception:
-        from config.schema import FEATURE_REGISTRY
-        registry = FEATURE_REGISTRY
-    name = registry[no - 1]["label"] if 0 < no <= len(registry) else ""
+    # Safely get the label if the feature exists
+    name = FEATURE_REGISTRY[no - 1]["label"] if 0 < no <= len(FEATURE_REGISTRY) else ""
+    
     return (
         f"[b]CONFIG - [z{no}] {name}[/b]\n"
         f"─────────────────────────\n"
