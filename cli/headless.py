@@ -3,7 +3,7 @@ import os
 from config.manager import load_user_config, save_user_config, get_active_profile_name, set_active_profile
 from config.schema import DEFAULT_CONFIG
 from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
-from data.timezones import TIMEZONE_CATALOG
+from data.timezones_catalog import TIMEZONE_CATALOG
 from ops.process import stop_ahk
 
 # ==============================================================================
