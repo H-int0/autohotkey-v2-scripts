@@ -10,8 +10,10 @@ from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
 from ops.startup import is_startup_enabled
 from tui.widgets.config_panel import ConfigPanel
-from tui.popups import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup, TimezonePopup, UnsavedChangesPopup
-from data.timezones import TIMEZONE_CATALOG
+from tui.popups.settings import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup
+from tui.popups.timezones import TimezonePopup
+from tui.popups.alerts import UnsavedChangesPopup
+from data.timezones_catalog import TIMEZONE_CATALOG
 from tui.constants import (
     COMMANDS_TEXT, CONFIG_COMMANDS_TEXT, get_status_text, 
     get_config_z_text, CONFIG_U1_TEXT, CONFIG_U2_TEXT, 
