@@ -287,7 +287,7 @@ def main() -> None:
             cli_uninstall()
         elif cmd == "/config":
             if rest:
-                from config.manager import apply_headless_config
+                from headless import apply_headless_config
                 print(apply_headless_config(rest))
             else:
                 while True:

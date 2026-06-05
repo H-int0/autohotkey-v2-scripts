@@ -194,7 +194,7 @@ class HomeScreen(Screen):
         elif c == "/config" or c.startswith("/config "):
             rest = cmd[7:].strip()
             if rest:
-                from config.manager import apply_headless_config
+                from headless import apply_headless_config
                 res = apply_headless_config(rest)
                 self.log_widget.write(res)
                 self.log_widget.write("")
