@@ -1,7 +1,7 @@
 from textual.app import App
 
-from tui.home   import HomeScreen
-from tui.screen import ConfigScreen
+from tui.screens.home   import HomeScreen
+from tui.screens.config import ConfigScreen
 
 class StrapApp(App):
     CSS = """

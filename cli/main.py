@@ -6,7 +6,7 @@ import winreg
 import ctypes
 import requests
 
-from tui.help_text import TERMINAL_COMMANDS_TEXT
+from tui.constants import TERMINAL_COMMANDS_TEXT
 from ops.updater import GITHUB_API
 
 # =============================================================================
