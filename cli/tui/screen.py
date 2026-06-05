@@ -11,7 +11,7 @@ from config.schema import DEFAULT_CONFIG
 from ops.startup import is_startup_enabled
 from tui.panel import ConfigPanel
 from tui.popups import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup, TimezonePopup, UnsavedChangesPopup
-from tui.tz_catalog import TIMEZONE_CATALOG
+from data.timezones import TIMEZONE_CATALOG
 from tui.help_text import (
     COMMANDS_TEXT, CONFIG_COMMANDS_TEXT, get_status_text, 
     get_config_z_text, CONFIG_U1_TEXT, CONFIG_U2_TEXT, 

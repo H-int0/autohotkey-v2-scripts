@@ -2,7 +2,7 @@ from textual.screen import ModalScreen
 from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.widgets import Static, Input, Button
 from textual.app import ComposeResult
-from tui.tz_catalog import TIMEZONE_CATALOG, _live_time, _fmt_tz_entry
+from data.timezones import TIMEZONE_CATALOG, _live_time, _fmt_tz_entry
 from tui.help_text import POPUP_FORCE_KILL, POPUP_COLOR_PICKER, get_popup_tz_text, POPUP_UNSAVED
 
 # =============================================================================

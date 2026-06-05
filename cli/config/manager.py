@@ -225,7 +225,7 @@ def apply_headless_config(args: str) -> str:
     import re, os, subprocess
     from config.schema import DEFAULT_CONFIG
     from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
-    from tui.tz_catalog import TIMEZONE_CATALOG
+    from data.timezones import TIMEZONE_CATALOG
 
     INSTALL_DIR = os.path.join(os.environ.get("APPDATA", ""), "Strap")
     cfg = load_user_config()

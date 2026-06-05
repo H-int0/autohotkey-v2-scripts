@@ -4,7 +4,7 @@ from textual.widgets import Static
 from config.manager import load_user_config, save_user_config
 from config.schema import DEFAULT_CONFIG
 from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
-from tui.tz_catalog import TIMEZONE_CATALOG
+from data.timezones import TIMEZONE_CATALOG
 from features import FEATURE_REGISTRY
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
