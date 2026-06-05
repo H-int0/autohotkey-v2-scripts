@@ -192,8 +192,8 @@ def cli_uninstall() -> None:
         return
 
     print("Terminating AHK processes...")
-    subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    from ops.process import stop_ahk
+    stop_ahk()
 
     print("Removing startup shortcut...")
     from ops.startup import disable_startup
@@ -301,8 +301,8 @@ def main() -> None:
             _print_help()
         elif cmd == "/run":
             if rest == "--cr shr":
-                from ops.startup import enable_startup
-                enable_startup()
+                from ops.process import start_ahk
+                start_ahk()
                 print("[√] Startup shortcut created.")
             elif rest in ("--d shr", "-d shr"):
                 from ops.startup import disable_startup
@@ -317,7 +317,8 @@ def main() -> None:
                 else:
                     print("Strap does not appear to be installed. Run 'strap /install' first.")
         elif cmd == "/stop":
-            subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            from ops.process import stop_ahk
+            stop_ahk()
             print("AHK scripts terminated.")
         elif cmd == "/clear":
             os.system("cls")

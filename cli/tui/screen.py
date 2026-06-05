@@ -153,10 +153,10 @@ class ConfigScreen(Screen):
             self.app.exit(result="reload"); return
         
         if cl in ("/run", "run"):
-            self._run_strap(); return
+            from ops.process import start_ahk; start_ahk(); return
         
         if cl in ("/stop", "stop"):
-            self._stop_strap(); return
+            from ops.process import stop_ahk; stop_ahk(); return
         
         if cl in ("/back", "back"):
             self._try_leave(); return
@@ -388,8 +388,7 @@ class ConfigScreen(Screen):
     def _relaunch_ahk_from_shortcut(self) -> None:
         """Kill AHK, then relaunch from shell:startup shortcut if present."""
         from ops.startup import SHORTCUT_PATH
-        subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        from ops.process import stop_ahk; stop_ahk()
         if os.path.exists(SHORTCUT_PATH):
             try:
                 os.startfile(SHORTCUT_PATH)

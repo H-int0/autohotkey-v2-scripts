@@ -628,8 +628,7 @@ class HomeScreen(Screen):
             def flush(self): pass
 
         redir = OutputRedirector(self.app, self.log_widget)
-        subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        from ops.process import stop_ahk; stop_ahk()
         disable_startup()
 
         try:

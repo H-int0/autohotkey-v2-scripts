@@ -313,7 +313,8 @@ def apply_headless_config(args: str) -> str:
     if os.path.exists(c_ahk): update_config_ahk(cfg, c_ahk)
     if os.path.exists(t_vars): update_timezones_variables_ahk(cfg.get("timezones", []), t_vars)
     
-    subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    from ops.process import stop_ahk
+    stop_ahk()
     shortcut = os.path.join(os.environ.get("APPDATA", ""), r"Microsoft\Windows\Start Menu\Programs\Startup\Strap.lnk")
     if os.path.exists(shortcut):
         try: os.startfile(shortcut)
