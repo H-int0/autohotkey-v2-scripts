@@ -1,24 +1,8 @@
 import re
 import os
+from features import FEATURE_REGISTRY
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
-
-
-def _load_feature_registry() -> list:
-    """
-    Load FEATURE_REGISTRY from the active version's schema.py at runtime.
-    Falls back to empty list if schema can't be loaded.
-    """
-    schema_path = os.path.join(INSTALL_DIR, "cli", "config", "schema.py")
-    if not os.path.exists(schema_path):
-        return []
-    try:
-        namespace = {"__file__": schema_path}
-        with open(schema_path, "r", encoding="utf-8") as f:
-            exec(compile(f.read(), schema_path, "exec"), namespace)
-        return namespace.get("FEATURE_REGISTRY", [])
-    except Exception:
-        return []
 
 # =============================================================================
 # parser.py
@@ -64,7 +48,7 @@ def parse_config_ahk(ahk_content: str) -> dict:
 
     # [z1-z6] Feature toggles   AHK 1 = enabled = True
     features = {}
-    for f in _load_feature_registry():
+    for f in FEATURE_REGISTRY:
         val = find(rf"{f['ahk_var']}\s*:=\s*(\d+)", int)
         if val is not None:
             features[f["key"]] = bool(val)

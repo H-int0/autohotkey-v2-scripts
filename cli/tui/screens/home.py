@@ -10,7 +10,7 @@ from textual.widgets import Static, Input, RichLog
 from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
 from ops.startup import is_startup_enabled
-from tui.help_text import (
+from tui.constants import (
     COMMANDS_TEXT, CONFIG_COMMANDS_TEXT, get_status_text, 
     get_config_z_text, CONFIG_U1_TEXT, CONFIG_U2_TEXT, 
     CONFIG_U3_TEXT, CONFIG_U4_TEXT
@@ -23,7 +23,7 @@ INSTALL_DIR = os.path.join(os.environ.get("APPDATA", ""), "Strap")
 # =============================================================================
 
 class HomeScreen(Screen):
-    CSS_PATH = "home.tcss"
+    CSS_PATH = "../styles/home.tcss"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -194,14 +194,14 @@ class HomeScreen(Screen):
         elif c == "/config" or c.startswith("/config "):
             rest = cmd[7:].strip()
             if rest:
-                from config.manager import apply_headless_config
+                from headless import apply_headless_config
                 res = apply_headless_config(rest)
                 self.log_widget.write(res)
                 self.log_widget.write("")
                 self.process_next_command()
             else:
                 try:
-                    from tui.screen import ConfigScreen
+                    from tui.screens.config import ConfigScreen
                     self.app.push_screen(ConfigScreen())
                 except Exception as e:
                     self.log_widget.write(f"Error launching screen: {e}")
@@ -628,8 +628,7 @@ class HomeScreen(Screen):
             def flush(self): pass
 
         redir = OutputRedirector(self.app, self.log_widget)
-        subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        from ops.process import stop_ahk; stop_ahk()
         disable_startup()
 
         try:

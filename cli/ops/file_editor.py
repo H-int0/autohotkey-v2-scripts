@@ -1,5 +1,6 @@
 import re
 import os
+from features import FEATURE_REGISTRY
 
 # =============================================================================
 # file_editor.py
@@ -19,26 +20,6 @@ import os
 # =============================================================================
 
 INSTALL_DIR = os.path.join(os.environ["APPDATA"], "Strap")
-
-
-def _load_feature_registry() -> list:
-    """
-    Load FEATURE_REGISTRY from the active version's schema.py via exec so we
-    always get the registry that matches the currently installed version, not
-    whatever was imported at process start.
-    Falls back to an empty list if schema can't be loaded.
-    """
-    schema_path = os.path.join(INSTALL_DIR, "cli", "config", "schema.py")
-    if not os.path.exists(schema_path):
-        return []
-    try:
-        namespace = {"__file__": schema_path}
-        with open(schema_path, "r", encoding="utf-8") as f:
-            exec(compile(f.read(), schema_path, "exec"), namespace)
-        return namespace.get("FEATURE_REGISTRY", [])
-    except Exception:
-        return []
-
 
 def update_config_ahk(config_data: dict, ahk_path: str) -> None:
     """
@@ -88,7 +69,7 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
     # Load registry from the active version's schema so we never write a toggle that doesn't exist in the currently installed AHK files
     features = config_data.get("features", {})
     if features:
-        for entry in _load_feature_registry():
+        for entry in FEATURE_REGISTRY:
             key     = entry.get("key")
             ahk_var = entry.get("ahk_var")
             default = entry.get("default", True)

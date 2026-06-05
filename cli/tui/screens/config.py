@@ -9,10 +9,12 @@ from textual.widgets import Static, Input
 from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
 from ops.startup import is_startup_enabled
-from tui.panel import ConfigPanel
-from tui.popups import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup, TimezonePopup, UnsavedChangesPopup
-from tui.tz_catalog import TIMEZONE_CATALOG
-from tui.help_text import (
+from tui.widgets.config_panel import ConfigPanel
+from tui.popups.settings import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup
+from tui.popups.timezones import TimezonePopup
+from tui.popups.alerts import UnsavedChangesPopup
+from data.timezones_catalog import TIMEZONE_CATALOG
+from tui.constants import (
     COMMANDS_TEXT, CONFIG_COMMANDS_TEXT, get_status_text, 
     get_config_z_text, CONFIG_U1_TEXT, CONFIG_U2_TEXT, 
     CONFIG_U3_TEXT, CONFIG_U4_TEXT
@@ -25,7 +27,7 @@ INSTALL_DIR = os.path.join(os.environ.get("APPDATA", ""), "Strap")
 # =============================================================================
 
 class ConfigScreen(Screen):
-    CSS_PATH = "config.tcss"
+    CSS_PATH = "../styles/config.tcss"
     _active_tz_popup: TimezonePopup | None = None
 
     def __init__(self, open_popup: str | None = None, **kwargs):
@@ -153,10 +155,10 @@ class ConfigScreen(Screen):
             self.app.exit(result="reload"); return
         
         if cl in ("/run", "run"):
-            self._run_strap(); return
+            from ops.process import start_ahk; start_ahk(); return
         
         if cl in ("/stop", "stop"):
-            self._stop_strap(); return
+            from ops.process import stop_ahk; stop_ahk(); return
         
         if cl in ("/back", "back"):
             self._try_leave(); return
@@ -388,8 +390,7 @@ class ConfigScreen(Screen):
     def _relaunch_ahk_from_shortcut(self) -> None:
         """Kill AHK, then relaunch from shell:startup shortcut if present."""
         from ops.startup import SHORTCUT_PATH
-        subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        from ops.process import stop_ahk; stop_ahk()
         if os.path.exists(SHORTCUT_PATH):
             try:
                 os.startfile(SHORTCUT_PATH)

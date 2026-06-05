@@ -1,0 +1,110 @@
+import re
+import os
+from config.manager import load_user_config, save_user_config, get_active_profile_name, set_active_profile
+from config.schema import DEFAULT_CONFIG
+from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
+from data.timezones_catalog import TIMEZONE_CATALOG
+from ops.process import stop_ahk
+
+# ==============================================================================
+# HEADLESS CONFIGURATION ROUTING
+# - Handles the execution of headless config commands passed via the CLI.
+#
+# ==============================================================================
+
+def apply_headless_config(args: str) -> str:
+    """Parse headless config arguments and apply them directly to the active profile."""
+
+    INSTALL_DIR = os.path.join(os.environ.get("APPDATA", ""), "Strap")
+    cfg = load_user_config()
+    
+    args = args.strip()
+    if args in ("--save", "--abort", "--!save", "--save --exit"):
+        return "No pending changes in headless mode."
+    
+    auto_save = args.startswith("-!")
+    if auto_save:
+        args = "-" + args[2:]
+
+    m = re.match(r"^-([uzy])\s+-(\d+)(?:--(.+?))?(?:\s+(.+))?$", args, re.IGNORECASE)
+    if not m:
+        m = re.match(r"^-([uzy])\s+-(\d+)\s+(.+)$", args, re.IGNORECASE)
+        if not m: return f"Invalid config arguments: {args}"
+        flag, no, sub, value = m.group(1).lower(), int(m.group(2)), "", m.group(3).strip()
+    else:
+        flag, no, sub, value = m.group(1).lower(), int(m.group(2)), m.group(3), (m.group(4) or "").strip()
+
+    if flag == "u" and no in (3, 4) and not value and sub:
+        value = sub
+        sub = None
+
+    if not value and not sub:
+        return f"Value required for headless config: {args}"
+
+    v, vl = value.strip(), value.strip().lower()
+    def parse_bool(s: str) -> bool | None:
+        if s in {"1", "t", "true", "enable", "enabled", "active", "yes", "show", "visible"}: return True
+        if s in {"0", "f", "false", "disable", "disabled", "inactive", "no", "hide", "hidden"}: return False
+        return None
+
+    def _resolve_tz(arg):
+        arg = arg.strip()
+        if arg.startswith("-set--"): arg = arg[6:]
+        if arg.isdigit() and 0 <= int(arg)-1 < len(TIMEZONE_CATALOG): return TIMEZONE_CATALOG[int(arg)-1][0]
+        norm = arg.replace("_", " ").lower()
+        for win_id, display, _, utc in TIMEZONE_CATALOG:
+            if win_id.lower() == norm or display.lower() == norm or utc.lower() == norm: return win_id
+        return None
+
+    if flag == "u":
+        if no == 1:
+            if vl == "--!": cfg["trayIconVisible"] = not cfg.get("trayIconVisible", True)
+            elif parse_bool(vl) is not None: cfg["trayIconVisible"] = parse_bool(vl)
+        elif no == 2 and v.isdigit() and int(v) > 0: cfg["tooltipDuration"] = int(v)
+        elif no == 3:
+            win_id = _resolve_tz(sub if sub else v)
+            if win_id:
+                current = list(cfg.get("timezones", []))
+                if win_id in current: current.remove(win_id)
+                else: current.append(win_id)
+                cfg["timezones"] = current
+        elif no == 4:
+            win_id = _resolve_tz(sub if sub else v)
+            if win_id:
+                cfg["startupTZID"] = "" if cfg.get("startupTZID", "") == win_id else win_id
+    elif flag == "z":
+        fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation"}
+        fk = fk_map.get(no)
+        if fk:
+            c_feats = cfg.get("features", DEFAULT_CONFIG["features"])
+            if vl == "--!": c_feats[fk] = not c_feats.get(fk, True)
+            elif parse_bool(vl) is not None: c_feats[fk] = parse_bool(vl)
+            cfg["features"] = c_feats
+    elif flag == "y":
+        if no == 1 and (not sub or sub == "1"):
+            if vl == '""' or vl == "''": v = ""
+            cfg["msgEndTask"] = v
+        elif no == 2:
+            if sub == "1":
+                if vl == "--!": cfg["colorPickerMsgBox"] = not cfg.get("colorPickerMsgBox", False)
+                elif parse_bool(vl) is not None: cfg["colorPickerMsgBox"] = parse_bool(vl)
+            elif sub == "2":
+                if vl == '""' or vl == "''": v = ""
+                cfg["msgColorPicker"] = v
+
+    if get_active_profile_name() == "default":
+        set_active_profile("ghost")
+
+    save_user_config(cfg)
+    c_ahk = os.path.join(INSTALL_DIR, "core", "config.ahk")
+    t_vars = os.path.join(INSTALL_DIR, "core", "config-dependencies", "timezones-variables.ahk")
+    if os.path.exists(c_ahk): update_config_ahk(cfg, c_ahk)
+    if os.path.exists(t_vars): update_timezones_variables_ahk(cfg.get("timezones", []), t_vars)
+    
+    stop_ahk()
+    shortcut = os.path.join(os.environ.get("APPDATA", ""), r"Microsoft\Windows\Start Menu\Programs\Startup\Strap.lnk")
+    if os.path.exists(shortcut):
+        try: os.startfile(shortcut)
+        except Exception: pass
+
+    return f"Config updated successfully: -{flag} -{no}"
