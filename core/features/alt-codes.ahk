@@ -33,7 +33,7 @@ if (!AltCodesEnabled)
     global altBuffer := ""
 }
 
-; Capture digits while Alt is held — ignore CapsLock state
+; Capture digits while Alt is held ignore CapsLock state
 *!1::AppendToBuffer("1")
 *!2::AppendToBuffer("2")
 *!3::AppendToBuffer("3")
