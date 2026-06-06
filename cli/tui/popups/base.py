@@ -25,6 +25,8 @@ from textual.widgets import Static, Input
 from textual.app import ComposeResult
 
 class _BasePopup(ModalScreen):
+    CSS_PATH = "../styles/config.tcss"
+
     def popup_title(self) -> str: return ""
     def help_text(self) -> str: return ""
     def input_placeholder(self) -> str: return "Type command..."

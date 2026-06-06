@@ -24,88 +24,97 @@
    Styles for ConfigScreen, ConfigPanel, and all config popups.
    ============================================================================= */
 
+ConfigScreen {
+    background: #0d0d0f;
+}
+
 ConfigScreen #left-panel {
     width: 30%;
-    border-right: tall $primary;
+    border-right: tall #1e2030;
     height: 100%;
-    padding: 1 2;
-    background: $surface-darken-1;
+    /* No bottom padding — footer docks inside and padding would clip it */
+    padding: 1 2 0 2;
+    background: #111116;
 }
 
 ConfigScreen #right-panel {
     width: 70%;
     height: 100%;
-    background: $surface;
+    background: #0d0d0f;
 }
 
 #config-status-text {
     height: auto;
     margin-bottom: 1;
-    color: $text;
+    color: #c8ccd8;
 }
 
 #config-commands-text {
     height: auto;
     margin-bottom: 1;
-    color: $text-muted;
+    color: #565970;
 }
 
 #config-left-content {
     height: 1fr;
     overflow-y: auto;
     overflow-x: hidden;
+    /* Bottom padding so scrollable content clears the footer */
+    padding-bottom: 1;
 }
 
 #config-hints-text {
     height: auto;
-    color: $accent 70%;
+    color: #5c7fbf 90%;
 }
 
 #config-footer-text {
     dock: bottom;
-    color: $text-muted 60%;
-    height: 2;
+    color: #3a3d4f;
+    height: 3;
     content-align: left bottom;
-    border-top: solid $primary 20%;
+    border-top: solid #1e2030;
+    background: #0e0e13;
     padding: 0 1;
 }
 
 /* ---------------------------------------------------------------------------
-   Config panel (right side the settings list)
+   Config panel (right side — the settings list)
    --------------------------------------------------------------------------- */
 
 #config-title {
     text-style: bold;
-    color: $accent;
+    color: #5c7fbf;
     margin-bottom: 1;
     padding-bottom: 1;
-    border-bottom: solid $primary 30%;
+    border-bottom: solid #1e2030;
 }
 
 #config-panel-container {
     height: 1fr;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 1;
+    padding: 1 2;
 }
 
 #config-panel {
     height: auto;
+    color: #c8ccd8;
 }
 
 #config-prompt-row {
     dock: bottom;
-    border-top: tall $primary;
+    border-top: tall #1e2030;
     height: 3;
     align: left middle;
-    background: $surface-darken-1;
-    padding: 0 1;
+    background: #111116;
+    padding: 0 2;
 }
 
 #config-prompt-prefix {
     width: auto;
     padding: 0 1;
-    color: $accent;
+    color: #5c7fbf;
     text-style: bold;
 }
 
@@ -113,6 +122,7 @@ ConfigScreen #right-panel {
     width: 1fr;
     border: none;
     background: transparent;
+    color: #c8ccd8;
 }
 
 /* ---------------------------------------------------------------------------
@@ -131,23 +141,24 @@ _BasePopup {
 
 .config-popup {
     height: 1fr;
-    background: $surface;
-    padding: 0 1;
+    background: #0f0f14;
+    border-left: tall #1e2030;
+    padding: 0 2;
 }
 
 .popup-prompt-row {
     dock: bottom;
-    border-top: tall $primary;
+    border-top: tall #1e2030;
     height: 3;
     align: left middle;
-    background: $surface-darken-1;
-    padding: 0 1;
+    background: #111116;
+    padding: 0 2;
 }
 
 .popup-prompt-prefix {
     width: auto;
     padding: 0 1;
-    color: $accent;
+    color: #5c7fbf;
     text-style: bold;
 }
 
@@ -155,18 +166,19 @@ _BasePopup {
     width: 1fr;
     border: none;
     background: transparent;
+    color: #c8ccd8;
 }
 
 .popup-title {
     text-style: bold;
-    color: $accent;
+    color: #5c7fbf;
     margin-bottom: 1;
     padding-bottom: 1;
-    border-bottom: solid $primary 30%;
+    border-bottom: solid #1e2030;
 }
 
 .popup-divider {
-    color: $text-muted 40%;
+    color: #2a2d3e;
     margin-bottom: 1;
 }
 
@@ -176,11 +188,11 @@ _BasePopup {
 }
 
 .popup-help {
-    border-top: solid $primary 30%;
+    border-top: solid #1e2030;
     padding-top: 1;
     margin-top: 1;
     height: auto;
-    color: $text-muted;
+    color: #565970;
 }
 
 /* ---------------------------------------------------------------------------
@@ -190,13 +202,13 @@ _BasePopup {
 #tz-saved-section {
     height: auto;
     margin-bottom: 1;
-    border-bottom: dashed $primary 50%;
+    border-bottom: dashed #2a2d3e;
     padding-bottom: 1;
 }
 
 #tz-saved-title {
     text-style: bold;
-    color: $accent;
+    color: #5c7fbf;
     margin-bottom: 1;
 }
 
@@ -208,8 +220,9 @@ _BasePopup {
 
 #tz-search-input {
     width: 1fr;
-    border: tall $primary;
-    background: $surface-darken-1;
+    border: tall #2a2d3e;
+    background: #111116;
+    color: #c8ccd8;
 }
 
 #tz-filter-btn {
@@ -221,12 +234,12 @@ _BasePopup {
     width: auto;
     height: auto;
     margin-bottom: 1;
-    color: $accent 70%;
+    color: #5c7fbf 70%;
 }
 
 #tz-filter-dropdown {
-    background: $surface-darken-1;
-    border: tall $primary;
+    background: #111116;
+    border: tall #2a2d3e;
     width: 20;
     height: auto;
     max-height: 12;
@@ -246,14 +259,15 @@ _BasePopup {
 .option-row {
     height: 1;
     padding: 0 1;
+    color: #c8ccd8;
 }
 
 .option-row:hover {
-    background: $accent 15%;
-    color: $text;
+    background: #1e2030;
+    color: #e8eaf2;
 }
 
 .option-row.--selected {
-    color: $accent;
+    color: #5c7fbf;
     text-style: bold;
 }
