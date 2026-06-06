@@ -1,0 +1,259 @@
+/* GNU GENERAL PUBLIC LICENSE
+ *
+ * Copyright (C) 2026 H-int0
+ * GitHub: <https://github.com/H-int0/>
+ * License: <https://github.com/H-int0/autohotkey-v2-scripts/blob/main/LICENSE/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * ==================================================================================== */
+
+/* =============================================================================
+   config.tcss
+   Styles for ConfigScreen, ConfigPanel, and all config popups.
+   ============================================================================= */
+
+ConfigScreen #left-panel {
+    width: 30%;
+    border-right: tall $primary;
+    height: 100%;
+    padding: 1 2;
+    background: $surface-darken-1;
+}
+
+ConfigScreen #right-panel {
+    width: 70%;
+    height: 100%;
+    background: $surface;
+}
+
+#config-status-text {
+    height: auto;
+    margin-bottom: 1;
+    color: $text;
+}
+
+#config-commands-text {
+    height: auto;
+    margin-bottom: 1;
+    color: $text-muted;
+}
+
+#config-left-content {
+    height: 1fr;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#config-hints-text {
+    height: auto;
+    color: $accent 70%;
+}
+
+#config-footer-text {
+    dock: bottom;
+    color: $text-muted 60%;
+    height: 2;
+    content-align: left bottom;
+    border-top: solid $primary 20%;
+    padding: 0 1;
+}
+
+/* ---------------------------------------------------------------------------
+   Config panel (right side the settings list)
+   --------------------------------------------------------------------------- */
+
+#config-title {
+    text-style: bold;
+    color: $accent;
+    margin-bottom: 1;
+    padding-bottom: 1;
+    border-bottom: solid $primary 30%;
+}
+
+#config-panel-container {
+    height: 1fr;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 1;
+}
+
+#config-panel {
+    height: auto;
+}
+
+#config-prompt-row {
+    dock: bottom;
+    border-top: tall $primary;
+    height: 3;
+    align: left middle;
+    background: $surface-darken-1;
+    padding: 0 1;
+}
+
+#config-prompt-prefix {
+    width: auto;
+    padding: 0 1;
+    color: $accent;
+    text-style: bold;
+}
+
+#config-prompt {
+    width: 1fr;
+    border: none;
+    background: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   Popup styling
+   --------------------------------------------------------------------------- */
+
+_BasePopup {
+    align: right top;
+    background: transparent;
+}
+
+.popup-right-panel {
+    width: 70%;
+    height: 100%;
+}
+
+.config-popup {
+    height: 1fr;
+    background: $surface;
+    padding: 0 1;
+}
+
+.popup-prompt-row {
+    dock: bottom;
+    border-top: tall $primary;
+    height: 3;
+    align: left middle;
+    background: $surface-darken-1;
+    padding: 0 1;
+}
+
+.popup-prompt-prefix {
+    width: auto;
+    padding: 0 1;
+    color: $accent;
+    text-style: bold;
+}
+
+.popup-prompt-row Input {
+    width: 1fr;
+    border: none;
+    background: transparent;
+}
+
+.popup-title {
+    text-style: bold;
+    color: $accent;
+    margin-bottom: 1;
+    padding-bottom: 1;
+    border-bottom: solid $primary 30%;
+}
+
+.popup-divider {
+    color: $text-muted 40%;
+    margin-bottom: 1;
+}
+
+.popup-scroll {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+.popup-help {
+    border-top: solid $primary 30%;
+    padding-top: 1;
+    margin-top: 1;
+    height: auto;
+    color: $text-muted;
+}
+
+/* ---------------------------------------------------------------------------
+   Timezone popup extras
+   --------------------------------------------------------------------------- */
+
+#tz-saved-section {
+    height: auto;
+    margin-bottom: 1;
+    border-bottom: dashed $primary 50%;
+    padding-bottom: 1;
+}
+
+#tz-saved-title {
+    text-style: bold;
+    color: $accent;
+    margin-bottom: 1;
+}
+
+#tz-search-row {
+    height: 3;
+    align: left middle;
+    margin-bottom: 1;
+}
+
+#tz-search-input {
+    width: 1fr;
+    border: tall $primary;
+    background: $surface-darken-1;
+}
+
+#tz-filter-btn {
+    width: auto;
+    margin-left: 1;
+}
+
+#tz-filter-tags {
+    width: auto;
+    height: auto;
+    margin-bottom: 1;
+    color: $accent 70%;
+}
+
+#tz-filter-dropdown {
+    background: $surface-darken-1;
+    border: tall $primary;
+    width: 20;
+    height: auto;
+    max-height: 12;
+    overflow-y: auto;
+    display: none;
+}
+
+#tz-list {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+/* ---------------------------------------------------------------------------
+   Boolean popup option rows
+   --------------------------------------------------------------------------- */
+
+.option-row {
+    height: 1;
+    padding: 0 1;
+}
+
+.option-row:hover {
+    background: $accent 15%;
+    color: $text;
+}
+
+.option-row.--selected {
+    color: $accent;
+    text-style: bold;
+}

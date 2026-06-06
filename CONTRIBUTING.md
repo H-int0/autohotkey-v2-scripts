@@ -1,28 +1,31 @@
 # Contributing to STRAP
 
-This document describes the end-to-end pipeline for adding a new feature to Strap, from writing the first line of code to merging into `main`.
+This document covers the end-to-end pipeline for adding a new feature to Strap from writing the first line of AHK code to merging into `dev`, including how to register the feature in the CLI/TUI.
+
+> [!TIP]
+> Want to understand the codebase first? Try checking out [REFERENCE.md](REFERENCE.md). It breaks down how every part of the codebase works, from the AHK core to the CLI/TUI internals.
 
 ---
 
-> [!NOTE]
-> Review the [Feature Integration Safety Guide](INTEGRATION_GUIDE.md) for rules on timer patterns, hotkey structure, and thread safety.
-
----
-
-## Table of contents
+## Table of Contents
 
 - [Commit Text](#commit-text)
-- [The Module Template](#the-module-template)
-- [Step-by-Step Pipeline](#step-by-step-pipeline)
-  - [STEP 1: Write the Standalone Module](#step-1-write-the-standalone-module)
-  - [STEP 2: Test the Standalone Module](#step-2-test-the-standalone-module)
-  - [STEP 3: Update `source.ahk` (if needed)](#step-3-update-sourceahk-if-needed)
-  - [STEP 4: Integration Testing in `source.ahk`](#step-4-integration-testing-in-sourceahk)
-  - [STEP 5: Add New Config Entries to `source-dependencies/config.ahk`](#step-5-add-new-config-entries-to-source-dependenciesconfigahk)
-  - [STEP 6: Write the Source Dependency](#step-6-write-the-source-dependency)
-  - [STEP 7: Integrate into `source.ahk`](#step-7-integrate-into-sourceahk)
-  - [STEP 8: Integration testing in `source.ahk`](#step-8-integration-testing-in-sourceahk)
-  - [STEP 9: Merge the feature to `dev`](#step-9-merge-the-feature-to-dev)
+- [Testing the PowerShell Installer](#testing-the-powershell-installer)
+- [How do I make a Code Contribution?](#how-do-i-make-a-code-contribution)
+- [STEP 1: Initial Setup](#step-1-initial-setup)
+  - [1.1 Make a Fork](#11-make-a-fork)
+  - [1.2 Clone your fork and Add the upstream Remote](#12-clone-your-fork-and-add-the-upstream-remote)
+  - [1.3 Create a Branch](#13-create-a-branch)
+- [STEP 2: Write the AHK Script](#step-2-write-the-ahk-script)
+- [STEP 3: Test the AHK Script](#step-3-test-the-ahk-script)
+- [STEP 4: Integrating the Feature in the CLI/TUI](#step-4-integrating-the-feature-in-the-clitui)
+  - [4.1 How a Feature Flows Through the Codebase](#41-how-a-feature-flows-through-the-codebase)
+  - [4.2 Feature types (from the perspective of CLI)](#42-feature-types-from-the-perspective-of-cli)
+  - [4.3 Files that Update AUTOMATICALLY](#43-files-that-update-automatically)
+  - [4.4 Files That Require MANUAL Updates](#44-files-that-require-manual-updates)
+  - [4.5 Some Non-Obvious Constraints](#45-some-non-obvious-constraints)
+- [STEP 5: Test the CLI Integration](#step-5-test-the-cli-integration)
+- [STEP 6: Create Pull Request](#step-6-create-pull-request)
 
 ---
 
@@ -30,9 +33,7 @@ This document describes the end-to-end pipeline for adding a new feature to Stra
 
 ### Format
 
-Every commit text follows this structure:
-
-```cmd
+```bash
 type: short description in lowercase
 ```
 
@@ -40,191 +41,247 @@ type: short description in lowercase
 
 | Type | Used for |
 | --- | --- |
-| `feat` | Adding something new like a new page, project, section, or file. |
-| `fix` | Correcting a bug, broken link, typo, or anything that was wrong. |
-| `docs` | Changes to documentation only. |
-| `refactor` | Restructuring or reorganizing existing code without changing what it does. |
-| `chore` | Maintenance work config changes, folder setup, `.gitignore` updates, perhaps adding files, etc. |
-| `style` | Formatting, whitespace, or styling changes that do not affect logic or content. |
+| `feat` | New features |
+| `fix` | Fixing anything that was wrong |
+| `docs` | Documentation |
+| `refactor` | Code restructuring |
+| `chore` | Maintenance work, folder setup, etc |
+| `style` | Formatting, styling changes, etc |
 
 ---
 
-## The Module Template
+## Testing the PowerShell Installer
 
-Every standalone module in `modules/` follows the same structure. Here it is as a skeleton use this when writing any new feature:
+To verify the full PowerShell install flow end-to-end without re-running `install.ps1`:
 
-```ahk
-; MIT License...
-; ...
-
-; ===========================================================================================================================================================================
-
-#Requires AutoHotkey v2.0
-#UseHook True
-#MaxThreadsBuffer True
-
-ProcessSetPriority "High"
-#^/::Reload
-#+/::ExitApp
-
-
-; =====================================================================================
-; CONFIG: TRAY ICON VISIBILITY
-; =====================================================================================
-; ...
-A_IconHidden := 1
-; A_IconHidden := 0...
-
-
-; ===========================================================================================================================================================================
-; >> SECTION
-; ===========================================================================================================================================================================
-
-if !IsSet(HelpEntries)
-    global HelpEntries := []
-HelpEntries.Push("
-(
-> FEATURE NAME:
-    Hotkey   →  description
-)")
-
-; =====================================================================================
-; CONFIG: FEATURE NAME
-; =====================================================================================
-;
-; ...
-;
-FeatureEnabled := true
-; FeatureEnabled := false...
-
-
-; =========================================================
-; FEATURE: FEATURE NAME
-; =========================================================
-
-#HotIf FeatureEnabled
-
-; ... hotkeys and logic here ...
-
-#HotIf
-
-; ===========================================================================================================================================================================
-; >> SECTION
-; ===========================================================================================================================================================================
-
-
-; =========================================================
-; ACCESSIBILITY: TOGGLE TRAY ICON (Win + Ctrl + \)
-; =========================================================
-
-#HotIf
-#^\::
-{
-    if (A_IconHidden)
-        A_IconHidden := 0
-    else
-        A_IconHidden := 1
-}
-#HotIf
-
-; ===========================================================================================================================================================================
-
-; =========================================================
-; STRAP HELP BOX (Win + /)
-; =========================================================
-
-; ... ToggleHelpBox / UpdateHelpBox boilerplate ...
+```bash
+# Replace with your file path
+cd C:\path_to_strap\autohotkey-v2-scripts-main
+  
+python cli/main.py /install --from-ps
 ```
 
-## Step-by-Step Pipeline
+> [!NOTE]
+> `--from-ps` is an internal flag passed automatically by `install.ps1`. It tells the CLI that file copying and PATH setup are already done so it skips those and only handles profile creation and the startup prompt.
 
-### STEP 1: Write the Standalone Module
+## How do I make a Code Contribution?
 
-Create `modules/<feature-name>.ahk` following the module template above.
+## STEP 1: Initial Setup
 
----
+### 1.1 Make a Fork
 
-### STEP 2: Test the Standalone Module
+- Fork the repo on GitHub
 
-- Run `modules/<feature-name>.ahk` directly in AHK.
+### 1.2 Clone your fork and Add the upstream Remote
 
-If any check fails: fix, re-run, and repeat until all pass. Then continue.
+```bash
+git clone https://github.com/<your-username>/autohotkey-v2-scripts.git
+cd autohotkey-v2-scripts
 
----
+git remote add upstream https://github.com/H-int0/autohotkey-v2-scripts.git
+```
 
-### STEP 3: Update `source.ahk` (if needed)
+### 1.3 Create a Branch
 
-Check whether the new feature requires any changes to `distribution/source.ahk`. This is needed when the feature introduces:
+```bash
+git checkout dev
+git pull origin dev
+git checkout -b feat/<feature-name>
+```
 
-- New **global variables** that must be declared at the top of the script (e.g. the color picker required `cpGuiGlobal`, `cSwatchGlobal`, etc.).
-- New **tooltip message globals** (e.g. `Msg_EndTask`, `Msg_ColorPicker`).
-- New **config blocks** in the tooltips section or elsewhere in the preamble.
+## STEP 2: Write the AHK Script
 
-> If no changes are needed, skip to [STEP 5](#step-5-add-new-config-entries-to-source-dependenciesconfigahk).
+- Create `core/features/<feature-name>.ahk`.
+- Only put what is unique to the feature in it, anything shared belongs in `source.ahk`.
+- Add any new config variables to `core/config.ahk`.
+- If the feature needs a large variable list (e.g. a timezone list), put it under `core/config-dependencies/`.
 
----
+## STEP 3: Test the AHK Script
 
-### STEP 4: Integration Testing in `source.ahk`
+(Recommended) Test order:
 
-Before moving forward, you must verify that the new feature plays nicely with the rest of the ecosystem.
+1. New feature alone (hosted by `source.ahk`)
+2. Each existing feature alone
+3. New feature alongside all existing features
 
-- Test `source.ahk` with Existing source-dependencies Only
-  - Before touching anything new, verify that `source.ahk` still works correctly with the existing source-dependencies enabled.
+## STEP 4: Integrating the Feature in the CLI/TUI
 
-> This is your baseline. If this fails, something in [STEP 3](#step-3-update-sourceahk-if-needed) broke the file fix it before continuing.
+### 4.1 How a Feature Flows Through the Codebase
 
----
+- When a feature is defined, it is assigned an index (e.g., `z7`). Here is the lifecycle of a feature toggle:
 
-### STEP 5: Add New Config Entries to `source-dependencies/config.ahk`
+  1. **Definition**: Registered in `cli/features.py`.
 
-- If the new feature introduces config variables that users should be able to control from `source-dependencies/config.ahk` (in `distribution/`), add them now.
+  2. **Schema & Defaults**: `cli/config/schema.py` reads the registry and automatically injects it into `DEFAULT_CONFIG["features"]`.
 
----
+  3. **Profile Creation/Update**: `ops/updater.py` merges missing schema keys into existing user profiles.
 
-### STEP 6: Write the Source Dependency
+  4. **TUI Display**: `tui/widgets/config_panel.py` dynamically builds the UI list and determines if a value changed by enumerating the registry.
 
-Create `distribution/source-dependencies/source-<feature-name>.ahk`.
+  5. **State Mutation (CLI)**: `cli/headless.py` intercepts `strap /config -z 7`, mapping `7` to the feature key.
 
-The source dependency is a **stripped-down** version of the module it contains only what is needed when running inside `source.ahk`.
+  6. **State Mutation (TUI)**: `tui/screens/config.py` intercepts UI interactions, mappings `7` to the feature key to open a `BooleanPopup`.
 
----
+  7. **Disk Write**: `ops/file_editor.py` iterates over the registry, mapping the JSON boolean back to a `0` or `1`, and replaces the value in `core/config.ahk` via RegEx.
 
-### STEP 7: Integrate into `source.ahk`
+### 4.2 Feature types (from the perspective of CLI)
 
-Open `distribution/source.ahk` and make the following changes:
+- **Type 1: toggle-only features**
+  - A single on/off switch. Represented as a `z`-flag in the config UI.
+  - Examples: Numpad Emulator, ALT Codes, Line Navigation, Timezone Switcher, Force Kill, Color Picker.
+- **Type 2: features with sub-settings**
+  - Has an on/off toggle plus additional configurable values. Represented as a `y`-flag.
+  - Currently: Force Kill (`y1` tooltip text) and Color Picker (`y2` msgbox toggle + tooltip text).
 
-- **Add globals (if any)**
-  - If the feature requires module-level globals, declare them near the top of `source.ahk`, before the `#Include` directives. Follow the existing pattern:
+  > Only add a `y`-flag entry if the feature has settings beyond a simple enable/disable.
 
-- **Add the `#Include` line**
-  - Add a new `#Include` line in the `SELECT FEATURES TO LOAD`, after the existing includes:
+### 4.3 Files that Update AUTOMATICALLY
 
-    ```ahk
-    #Include source-dependencies/source-<feature-name>.ahk
+- You **do not** need to edit the following files. They adapt automatically based on the central registry:
+
+  - **`cli/config/schema.py`**: Automatically constructs the `"features"` dictionary.
+
+  - **`cli/config/parser.py`**: Automatically parses initial installations using the registered `ahk_var`.
+
+  - **`ops/file_editor.py`**: Automatically writes to `config.ahk`.
+
+  - **`tui/widgets/config_panel.py`**: Automatically renders the TUI list and handles `[z*]` display tags.
+
+  - **`tui/constants.py`**: Automatically resolves the UI hint text.
+
+### 4.4 Files That Require MANUAL Updates
+
+1. `cli/features.py`
+    - Add your new feature to the end of the `FEATURE_REGISTRY`.
+    - **Insertion order strictly dictates the `z` index.** Adding a feature as the 7th item makes it `z7`.
+
+2. `cli/headless.py`
+    - To support `strap /config -z 7`, you must map the new integer index (`7`) to your feature's `"key"`.
+    - Find `apply_headless_config` and update `fk_map`:
+
+      ```python
+      # Before
+      fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation"}
+
+      # After
+      fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation", 7:"NewFeature"}
+      ```
+
+3. `tui/screens/config.py`
+    - The TUI screen has two separate routing maps that **must** be updated.
+     1. **Update `_apply_value` routing:**
+
+         ```python
+         fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation", 7:"NewFeature"}
+         ```
+
+     2. **Update `_open_popup` routing:**
+        - Here, you must map the index to the string `"key"`, AND the index to the UI Label.
+
+          ```python
+          f_map = {1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation", 7: "NewFeature"}
+
+          names = {1: "NumPad Emulator", 2: "ALT Codes", 3: "TimeZone Switcher", 4: "Force Kill", 5: "Color Picker", 6: "Line Navigation", 7: "My New Feature"}
+          ```
+
+> [!NOTE]
+> **`ops/file_editor.py`** updates the AHK file using a strict RegEx substitution:
+>
+> ```python
+> content = re.sub(rf"({re.escape(ahk_var)}\s*:=\s*)\d+", rf"\g<1>{ahk_val}", content, flags=re.IGNORECASE)
+> ```
+>
+> **Constraint:** `re.sub` *only* works if the text already exists. The Python script will NOT inject missing variables. You must manually add your variable to `core/config.ahk`.
+
+### 4.5 Some Non-Obvious Constraints
+
+- **Index coupling**
+  - `no - 1` in `tui/constants.py`, `enumerate(registry, 1)` inside `config_panel.py`, and the `fk_map` integer keys, they all depend on exact insertion order in `FEATURE_REGISTRY`.
+  - Try not to reorder existing entries if it's unnecessary.
+- **Variable name sync**
+  - The `ahk_var` string in `FEATURE_REGISTRY` (e.g. `"NewFeatureEnabled"`) must exactly match the left side of the `:=` assignment in `core/config.ahk`. A typo will of course cause a failure.
+- **Schema migration**
+  - Adding a new feature key to the nested `features` dict does NOT require a `MIGRATIONS` entry. `_add_missing_keys` handles it recursively.
+  - `MIGRATIONS` is only for renaming or deleting existing keys.
+
+## STEP 5: Test the CLI Integration
+
+1. Run `strap /config` verify the new feature appears in the TUI list with the correct label and `z` index.
+2. Toggle it via TUI confirm `core/config.ahk` updates correctly.
+3. Toggle it via CLI (`strap /config -z <index>`) confirm same result.
+4. Restart Strap verify the toggle state persists.
+5. Switch profiles confirm the feature key exists in all profiles with the correct default.
+6. Switch versions confirm the key is added to profiles missing it.
+7. Run `python cli/main.py /install --from-ps` to verify profile creation and startup prompt behave correctly as if launched by `install.ps1`.
+
+## STEP 6: Create Pull Request
+
+Once all steps pass, the changes is ready to be merged.
+
+1. Push your changes to your remote repository:
+
+    ```bash
+    git push origin <branch-name>
     ```
 
----
+2. Open a PR on GitHub against `dev` (**not `main`**).
 
-### STEP 8: Integration testing in `source.ahk`
+3. Fill out the PR template.
 
-- **Test `source.ahk` with Existing source-dependencies Only**
-  - Before touching anything new, verify that `source.ahk` still works correctly with the existing source-dependencies enabled.
-  > This is your baseline. If this fails, something in [STEP 5](#step-5-add-new-config-entries-to-source-dependenciesconfigahk) or [STEP 7](#step-7-integrate-into-sourceahk) broke the `source.ahk`. Fix it before continuing.
+    > [!TIP]
+    > Don't worry if your pull request isn't perfect, no pull request ever is! The maintainer will work with you to fix any issues and get it merged ^-^
 
-- **Test `source.ahk` with the New `source-dependencies-*` Alone**
-  - Disable the other features in `source.ahk` and test only the new feature.
-  - If this fails, the issue is in the source-dependencies itself.
-  > It means something in [STEP 6](#step-6-write-the-source-dependency) broke the `source.ahk`. Fix it before continuing.
+    <!-- markdownlint-disable -->
+    <details>
+      <summary> </summary>
+      <pre>
 
-- **Test `source.ahk` with New `source-dependencies-*` + All Existing source-dependencies Together**
-  - Enable other features in `source.ahk` and test if the `source.ahk` works as intended with the new feature.
-  - This is the critical integration test. If it fails, fix it before continuing.
+        ## What changed?
+        <!--
+        List the files you modified and what you did to each one.
+        Example:
+        - `cli/features.py` added new feature entry to FEATURE_REGISTRY
+        - `cli/headless.py` updated fk_map with new index
+        Reference any related issue:
+        -->
 
----
+        ## Why?
+        <!--
+        Explain the problem or gap this addresses.
+        What was broken, missing, or could be improved?
+        -->
 
-### STEP 9: Merge the feature to `dev`
+        ## How to test it?
+        <!--
+        Walk the reviewer through verifying your change step by step.
+        Example:
+        1. Run `strap /config`
+        2. Confirm the new feature appears at index z7
+        3. Toggle it and check that config.ahk updates correctly
+        -->
 
-- Once all the 8 steps pass, the feature is now ready to be merged into `dev`.
+        ## Anything that could break?
+        <!--
+        List any side effects, edge cases, or areas you're unsure about.
+        If you skipped any testing steps from CONTRIBUTING, explain why.
+        Leave blank if none.
+        -->
+
+        ## Questions for the maintainer?
+        <!--
+        Anything you're unsure about or want feedback on before this gets merged.
+        Leave blank if none.
+        -->
+
+        ## Anything else?
+        <!--
+        Screenshots, context, links, or anything else worth mentioning.
+        Leave blank if none.
+        -->
+
+      </pre>
+    </details>
+    <!-- markdownlint-enable -->
 
 ---
 
