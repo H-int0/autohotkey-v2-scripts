@@ -737,11 +737,10 @@ Type any command into the `>>` prompt. Commands must start with `/`. Inside the 
 
   ```bash
   /config -u -3                   # Open timezone picker popup
-  /config -u -3 UTC_No.           # Toggle by catalog number
-  /config -u -3 --TZ_No. UTC_No.  # Toggle by slot number
+  /config -u -3 "UTC_+/-No."      # Toggle a timezone in the switcher cycle
   ```
 
-- The timezone picker popup shows a searchable list of all 139 timezones with live current times for active ones. You can search by name, UTC offset, or city. Opening the popup and using commands inside it both update pending state in real time.
+- The timezone picker popup shows a searchable list of all timezones with live current times for active ones. You can search by name, UTC offset, or city. Opening the popup and using commands inside it both update pending state in real time.
 
 ---
 
@@ -749,8 +748,7 @@ Type any command into the `>>` prompt. Commands must start with `/`. Inside the 
 
   ```bash
   /config -u -4                   # Open timezone picker popup (single-select)
-  /config -u -4 UTC_No.           # Set startup timezone
-  /config -u -4--TZ_No. UTC_No.   # Set by slot number
+  /config -u -3 "UTC_+/-No."      # Set startup timezone (same value again = reset)
   ```
 
 ---

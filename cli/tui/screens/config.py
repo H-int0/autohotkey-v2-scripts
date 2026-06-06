@@ -222,7 +222,12 @@ class ConfigScreen(Screen):
             flag, no, sub, value = m.group(1).lower(), int(m.group(2)), m.group(3), (m.group(4) or "").strip()
 
         self._update_left_panel(flag, no)
-        if not value and not sub: self._open_popup(flag, no); return
+        if not value and not sub: 
+            if getattr(self, "_active_tz_popup", None) and self._active_tz_popup in self.app.screen_stack:
+                if flag == "u" and no in (3, 4):
+                    return
+            self._open_popup(flag, no)
+            return
 
         if flag == "u" and no in (3, 4) and not value and sub:
             value = sub
@@ -274,22 +279,50 @@ class ConfigScreen(Screen):
         win_id = self._resolve_tz_arg(tz_arg)
         if not win_id: return
         current: list[str] = list(self.panel._effective(cfg_key, []))
-        if win_id in current: current.remove(win_id)
-        else: current.append(win_id)
-        self.panel.pending[cfg_key] = current
+        
+        # Heal config: Convert any broken strings like "UTC_+3" into actual Windows IDs
+        healed_current = []
+        for tz in current:
+            resolved = self._resolve_tz_arg(tz)
+            if resolved and resolved not in healed_current:
+                healed_current.append(resolved)
+                
+        healed_lower = [tz.lower() for tz in healed_current]
+        
+        if win_id.lower() in healed_lower:
+            healed_current = [tz for tz in healed_current if tz.lower() != win_id.lower()]
+        else:
+            healed_current.append(win_id)
+            
+        self.panel.pending[cfg_key] = healed_current
+        
+        if getattr(self, "_active_tz_popup", None) and self._active_tz_popup in self.app.screen_stack:
+            if self._active_tz_popup._flag == "u" and self._active_tz_popup._no == 3:
+                self._active_tz_popup._active = list(healed_current)
+                self._active_tz_popup._refresh_list()
 
     def _toggle_startup_tz(self, tz_arg: str) -> None:
         win_id = self._resolve_tz_arg(tz_arg)
         if not win_id: return
-        self.panel.pending["startupTZID"] = "" if self.panel._effective("startupTZID", "") == win_id else win_id
+        
+        current_st = self.panel._effective("startupTZID", "")
+        resolved_st = self._resolve_tz_arg(current_st) if current_st else ""
+        
+        self.panel.pending["startupTZID"] = "" if resolved_st and resolved_st.lower() == win_id.lower() else win_id
+        
+        if getattr(self, "_active_tz_popup", None) and self._active_tz_popup in self.app.screen_stack:
+            if self._active_tz_popup._flag == "u" and self._active_tz_popup._no == 4:
+                new_val = self.panel.pending["startupTZID"]
+                self._active_tz_popup._active = [new_val] if new_val else []
+                self._active_tz_popup._refresh_list()
 
     def _resolve_tz_arg(self, arg: str) -> str | None:
-        arg = arg.strip()
-        if arg.startswith("-set--"): arg = arg[6:]
-        if arg.isdigit() and 0 <= int(arg)-1 < len(TIMEZONE_CATALOG): return TIMEZONE_CATALOG[int(arg)-1][0]
-        norm = arg.replace("_", " ").lower()
+        arg = arg.strip(' "\'')
+        # Strip all spaces and underscores to make "UTC_+3", "UTC +3", and "UTC+3" identical
+        norm = arg.replace("_", "").replace(" ", "").lower()
         for win_id, display, _, utc in TIMEZONE_CATALOG:
-            if win_id.lower() == norm or display.lower() == norm or utc.lower() == norm: return win_id
+            if win_id.replace(" ", "").lower() == norm or utc.replace(" ", "").lower() == norm:
+                return win_id
         return None
 
     def _open_popup(self, flag: str, no: int) -> None:

@@ -354,157 +354,46 @@ Each time you cycle, a small tooltip appears near your cursor showing the new Ti
   | Sydney | +10 |
   | Eastern Time | -5 |
 
----
+**Supported Timezones:**
 
-> [!WARNING]
-> Be careful the List below is Long. It contains 139 different TimeZones supported by Strap.
-
-<details>
-  <summary>Supported Timezones</summary>
-
-  | Label | UTC Offset | Windows ID |
-  | --- | --- | --- |
-  | Dateline Standard Time | -12 | `Dateline Standard Time` |
-  | UTC-11 | -11 | `UTC-11` |
-  | Aleutian Standard Time | -10 | `Aleutian Standard Time` |
-  | Hawaiian Standard Time | -10 | `Hawaiian Standard Time` |
-  | Marquesas Standard Time | -9:30 | `Marquesas Standard Time` |
-  | Alaskan Standard Time | -9 | `Alaskan Standard Time` |
-  | UTC-09 | -9 | `UTC-09` |
-  | Pacific Standard Time (Mexico) | -8 | `Pacific Standard Time (Mexico)` |
-  | UTC-08 | -8 | `UTC-08` |
-  | Pacific Standard Time | -8 | `Pacific Standard Time` |
-  | US Mountain Standard Time | -7 | `US Mountain Standard Time` |
-  | Mountain Standard Time (Mexico) | -7 | `Mountain Standard Time (Mexico)` |
-  | Mountain Standard Time | -7 | `Mountain Standard Time` |
-  | Yukon Standard Time | -7 | `Yukon Standard Time` |
-  | Central America Standard Time | -6 | `Central America Standard Time` |
-  | Central Standard Time | -6 | `Central Standard Time` |
-  | Easter Island Standard Time | -6 | `Easter Island Standard Time` |
-  | Central Standard Time (Mexico) | -6 | `Central Standard Time (Mexico)` |
-  | Canada Central Standard Time | -6 | `Canada Central Standard Time` |
-  | SA Pacific Standard Time | -5 | `SA Pacific Standard Time` |
-  | Eastern Standard Time (Mexico) | -5 | `Eastern Standard Time (Mexico)` |
-  | Eastern Standard Time | -5 | `Eastern Standard Time` |
-  | Haiti Standard Time | -5 | `Haiti Standard Time` |
-  | Cuba Standard Time | -5 | `Cuba Standard Time` |
-  | US Eastern Standard Time | -5 | `US Eastern Standard Time` |
-  | Turks And Caicos Standard Time | -5 | `Turks And Caicos Standard Time` |
-  | Paraguay Standard Time | -4 | `Paraguay Standard Time` |
-  | Atlantic Standard Time | -4 | `Atlantic Standard Time` |
-  | Venezuela Standard Time | -4 | `Venezuela Standard Time` |
-  | Central Brazilian Standard Time | -4 | `Central Brazilian Standard Time` |
-  | SA Western Standard Time | -4 | `SA Western Standard Time` |
-  | Pacific SA Standard Time | -4 | `Pacific SA Standard Time` |
-  | Tocantins Standard Time | -3 | `Tocantins Standard Time` |
-  | E. South America Standard Time | -3 | `E. South America Standard Time` |
-  | SA Eastern Standard Time | -3 | `SA Eastern Standard Time` |
-  | Argentina Standard Time | -3 | `Argentina Standard Time` |
-  | Greenland Standard Time | -3 | `Greenland Standard Time` |
-  | Montevideo Standard Time | -3 | `Montevideo Standard Time` |
-  | Magallanes Standard Time | -3 | `Magallanes Standard Time` |
-  | Saint Pierre Standard Time | -3 | `Saint Pierre Standard Time` |
-  | Bahia Standard Time | -3 | `Bahia Standard Time` |
-  | UTC-02 | -2 | `UTC-02` |
-  | Mid-Atlantic Standard Time | -2 | `Mid-Atlantic Standard Time` |
-  | Azores Standard Time | -1 | `Azores Standard Time` |
-  | Cape Verde Standard Time | -1 | `Cape Verde Standard Time` |
-  | UTC | +0 | `UTC` |
-  | GMT Standard Time | +0 | `GMT Standard Time` |
-  | Greenwich Standard Time | +0 | `Greenwich Standard Time` |
-  | Sao Tome Standard Time | +0 | `Sao Tome Standard Time` |
-  | Morocco Standard Time | +1 | `Morocco Standard Time` |
-  | W. Europe Standard Time | +1 | `W. Europe Standard Time` |
-  | Central Europe Standard Time | +1 | `Central Europe Standard Time` |
-  | Romance Standard Time | +1 | `Romance Standard Time` |
-  | Central European Standard Time | +1 | `Central European Standard Time` |
-  | W. Central Africa Standard Time | +1 | `W. Central Africa Standard Time` |
-  | Jordan Standard Time | +2 | `Jordan Standard Time` |
-  | GTB Standard Time | +2 | `GTB Standard Time` |
-  | Middle East Standard Time | +2 | `Middle East Standard Time` |
-  | Egypt Standard Time | +2 | `Egypt Standard Time` |
-  | E. Europe Standard Time | +2 | `E. Europe Standard Time` |
-  | Syria Standard Time | +2 | `Syria Standard Time` |
-  | West Bank Standard Time | +2 | `West Bank Standard Time` |
-  | South Africa Standard Time | +2 | `South Africa Standard Time` |
-  | FLE Standard Time | +2 | `FLE Standard Time` |
-  | Israel Standard Time | +2 | `Israel Standard Time` |
-  | Kaliningrad Standard Time | +2 | `Kaliningrad Standard Time` |
-  | Sudan Standard Time | +2 | `Sudan Standard Time` |
-  | Libya Standard Time | +2 | `Libya Standard Time` |
-  | Namibia Standard Time | +2 | `Namibia Standard Time` |
-  | Arabic Standard Time | +3 | `Arabic Standard Time` |
-  | Turkey Standard Time | +3 | `Turkey Standard Time` |
-  | Arab Standard Time | +3 | `Arab Standard Time` |
-  | Belarus Standard Time | +3 | `Belarus Standard Time` |
-  | Russian Standard Time | +3 | `Russian Standard Time` |
-  | E. Africa Standard Time | +3 | `E. Africa Standard Time` |
-  | Iran Standard Time | +3:30 | `Iran Standard Time` |
-  | Arabian Standard Time | +4 | `Arabian Standard Time` |
-  | Astrakhan Standard Time | +4 | `Astrakhan Standard Time` |
-  | Azerbaijan Standard Time | +4 | `Azerbaijan Standard Time` |
-  | Russia Time Zone 3 | +4 | `Russia Time Zone 3` |
-  | Mauritius Standard Time | +4 | `Mauritius Standard Time` |
-  | Saratov Standard Time | +4 | `Saratov Standard Time` |
-  | Georgian Standard Time | +4 | `Georgian Standard Time` |
-  | Volgograd Standard Time | +4 | `Volgograd Standard Time` |
-  | Caucasus Standard Time | +4 | `Caucasus Standard Time` |
-  | Afghanistan Standard Time | +4:30 | `Afghanistan Standard Time` |
-  | West Asia Standard Time | +5 | `West Asia Standard Time` |
-  | Ekaterinburg Standard Time | +5 | `Ekaterinburg Standard Time` |
-  | Pakistan Standard Time | +5 | `Pakistan Standard Time` |
-  | Qyzylorda Standard Time | +5 | `Qyzylorda Standard Time` |
-  | India Standard Time | +5:30 | `India Standard Time` |
-  | Sri Lanka Standard Time | +5:30 | `Sri Lanka Standard Time` |
-  | Nepal Standard Time | +5:45 | `Nepal Standard Time` |
-  | Central Asia Standard Time | +6 | `Central Asia Standard Time` |
-  | Bangladesh Standard Time | +6 | `Bangladesh Standard Time` |
-  | Omsk Standard Time | +6 | `Omsk Standard Time` |
-  | Myanmar Standard Time | +6:30 | `Myanmar Standard Time` |
-  | SE Asia Standard Time | +7 | `SE Asia Standard Time` |
-  | Altai Standard Time | +7 | `Altai Standard Time` |
-  | W. Mongolia Standard Time | +7 | `W. Mongolia Standard Time` |
-  | North Asia Standard Time | +7 | `North Asia Standard Time` |
-  | N. Central Asia Standard Time | +7 | `N. Central Asia Standard Time` |
-  | Tomsk Standard Time | +7 | `Tomsk Standard Time` |
-  | China Standard Time | +8 | `China Standard Time` |
-  | North Asia East Standard Time | +8 | `North Asia East Standard Time` |
-  | Singapore Standard Time | +8 | `Singapore Standard Time` |
-  | W. Australia Standard Time | +8 | `W. Australia Standard Time` |
-  | Taipei Standard Time | +8 | `Taipei Standard Time` |
-  | Ulaanbaatar Standard Time | +8 | `Ulaanbaatar Standard Time` |
-  | Aus Central W. Standard Time | +8:45 | `Aus Central W. Standard Time` |
-  | Transbaikal Standard Time | +9 | `Transbaikal Standard Time` |
-  | Tokyo Standard Time | +9 | `Tokyo Standard Time` |
-  | North Korea Standard Time | +9 | `North Korea Standard Time` |
-  | Korea Standard Time | +9 | `Korea Standard Time` |
-  | Yakutsk Standard Time | +9 | `Yakutsk Standard Time` |
-  | Cen. Australia Standard Time | +9:30 | `Cen. Australia Standard Time` |
-  | AUS Central Standard Time | +9:30 | `AUS Central Standard Time` |
-  | E. Australia Standard Time | +10 | `E. Australia Standard Time` |
-  | AUS Eastern Standard Time | +10 | `AUS Eastern Standard Time` |
-  | West Pacific Standard Time | +10 | `West Pacific Standard Time` |
-  | Tasmania Standard Time | +10 | `Tasmania Standard Time` |
-  | Vladivostok Standard Time | +10 | `Vladivostok Standard Time` |
-  | Lord Howe Standard Time | +10:30 | `Lord Howe Standard Time` |
-  | Bougainville Standard Time | +11 | `Bougainville Standard Time` |
-  | Russia Time Zone 10 | +11 | `Russia Time Zone 10` |
-  | Magadan Standard Time | +11 | `Magadan Standard Time` |
-  | Norfolk Standard Time | +11 | `Norfolk Standard Time` |
-  | Sakhalin Standard Time | +11 | `Sakhalin Standard Time` |
-  | Central Pacific Standard Time | +11 | `Central Pacific Standard Time` |
-  | Russia Time Zone 11 | +12 | `Russia Time Zone 11` |
-  | New Zealand Standard Time | +12 | `New Zealand Standard Time` |
-  | UTC+12 | +12 | `UTC+12` |
-  | Fiji Standard Time | +12 | `Fiji Standard Time` |
-  | Kamchatka Standard Time | +12 | `Kamchatka Standard Time` |
-  | Chatham Islands Standard Time | +12:45 | `Chatham Islands Standard Time` |
-  | UTC+13 | +13 | `UTC+13` |
-  | Tonga Standard Time | +13 | `Tonga Standard Time` |
-  | Samoa Standard Time | +13 | `Samoa Standard Time` |
-  | Line Islands Standard Time | +14 | `Line Islands Standard Time` |
-
-</details>
+| Label | UTC Offset | Windows ID |
+| --- | --- | --- |
+| Dateline Standard Time | -12 | `Dateline Standard Time` |
+| UTC-11 | -11 | `UTC-11` |
+| Hawaiian Standard Time | -10 | `Hawaiian Standard Time` |
+| Marquesas Standard Time | -9:30 | `Marquesas Standard Time` |
+| Alaskan Standard Time | -9 | `Alaskan Standard Time` |
+| Pacific Standard Time | -8 | `Pacific Standard Time` |
+| US Mountain Standard Time | -7 | `US Mountain Standard Time` |
+| Central Standard Time | -6 | `Central Standard Time` |
+| Eastern Standard Time | -5 | `Eastern Standard Time` |
+| Atlantic Standard Time | -4 | `Atlantic Standard Time` |
+| Venezuela Standard Time | -4 | `Venezuela Standard Time` |
+| E. South America Standard Time | -3 | `E. South America Standard Time` |
+| Argentina Standard Time | -3 | `Argentina Standard Time` |
+| UTC-02 | -2 | `UTC-02` |
+| Azores Standard Time | -1 | `Azores Standard Time` |
+| GMT Standard Time | +0 | `GMT Standard Time` |
+| W. Europe Standard Time | +1 | `W. Europe Standard Time` |
+| Israel Standard Time | +2 | `Israel Standard Time` |
+| Russian Standard Time | +3 | `Russian Standard Time` |
+| Iran Standard Time | +3:30 | `Iran Standard Time` |
+| Arabian Standard Time | +4 | `Arabian Standard Time` |
+| Afghanistan Standard Time | +4:30 | `Afghanistan Standard Time` |
+| Pakistan Standard Time | +5 | `Pakistan Standard Time` |
+| India Standard Time | +5:30 | `India Standard Time` |
+| Nepal Standard Time | +5:45 | `Nepal Standard Time` |
+| Central Asia Standard Time | +6 | `Central Asia Standard Time` |
+| Myanmar Standard Time | +6:30 | `Myanmar Standard Time` |
+| SE Asia Standard Time | +7 | `SE Asia Standard Time` |
+| China Standard Time | +8 | `China Standard Time` |
+| Tokyo Standard Time | +9 | `Tokyo Standard Time` |
+| Cen. Australia Standard Time | +9:30 | `Cen. Australia Standard Time` |
+| AUS Eastern Standard Time | +10 | `AUS Eastern Standard Time` |
+| Central Pacific Standard Time | +11 | `Central Pacific Standard Time` |
+| New Zealand Standard Time | +12 | `New Zealand Standard Time` |
+| Tonga Standard Time | +13 | `Tonga Standard Time` |
+| Line Islands Standard Time | +14 | `Line Islands Standard Time` |
 
 ---
 
@@ -721,14 +610,9 @@ Type any command into the `>>` prompt.
 
 ```bash
 /config -u -1 value                 # Tray icon (visible | hidden)
-
 /config -u -2 time                  # Tooltip timeout in ms
-
-/config -u -3 UTC_No.               # Toggle a timezone in the switcher cycle
-/config -u -3 --TZ_No. UTC_No.      # Toggle by TZ slot number
-
-/config -u -4 UTC_No.               # Set startup timezone (same value again = reset)
-/config -u -4 --TZ_No. UTC_No.      # Set startup TZ by slot number
+/config -u -3 "UTC_+/-No."          # Toggle a timezone in the switcher cycle
+/config -u -3 "UTC_+/-No."          # Set startup timezone (same value again = reset)
 ```
 
 #### 2. Configure settings with -z {flag}

@@ -175,4 +175,18 @@ Format: [version]: release date, followed by what changed.
 
 ---
 
+## [v0.4.1] 2026-06-06
+
+### Changed in [v0.4.1]
+
+- Reduce Timezone list down to 36.
+- Improve Visuals of TUI.
+- Change how the Timezone command work by simplifying it to the format `/config -{flag} -{Config No.} "{UTC_+/-OffSet}"`.
+
+### Fixed in [v0.4.1]
+
+- Fix timezone specific commands not working.
+
+---
+
 ~*[@H-int0](https://github.com/H-int0)*

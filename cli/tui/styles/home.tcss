@@ -23,18 +23,23 @@
    home.tcss
    ============================================================================= */
 
+HomeScreen {
+    background: #0d0d0f;
+}
+
 #left-panel {
     width: 30%;
-    border-right: tall $primary;
+    border-right: tall #1e2030;
     height: 100%;
-    padding: 1 2;
-    background: $surface-darken-1;
+    /* No bottom padding — footer docks inside and padding would clip it */
+    padding: 1 2 0 2;
+    background: #111116;
 }
 
 #right-panel {
     width: 70%;
     height: 100%;
-    background: $surface;
+    background: #0d0d0f;
 }
 
 .panel-title {
@@ -47,57 +52,65 @@
 
 #status-text {
     height: auto;
-    margin-bottom: 2;
-    color: $text;
+    margin-bottom: 1;
+    color: #c8ccd8;
 }
 
 #commands-text {
     height: auto;
     margin-bottom: 1;
-    color: $text-muted;
+    color: #565970;
 }
 
 #home-left-content {
     height: 1fr;
     overflow-y: auto;
     overflow-x: hidden;
+    /* Bottom padding here so scrollable content clears the footer */
+    padding-bottom: 1;
 }
 
 #hints-text {
     height: auto;
-    color: $accent 70%;
+    color: #5c7fbf 90%;
 }
 
 #footer-text {
     dock: bottom;
-    color: $text-muted 60%;
-    height: 2;
+    color: #3a3d4f;
+    height: 3;
     content-align: left bottom;
-    border-top: solid $primary 20%;
+    border-top: solid #1e2030;
+    background: #0e0e13;
     padding: 0 1;
 }
+
+/* ---------------------------------------------------------------------------
+   Right panel — log + prompt
+   --------------------------------------------------------------------------- */
 
 RichLog {
     width: 1fr;
     height: 1fr;
-    padding: 1 2;
+    padding: 1 3;
     background: transparent;
     border: none;
+    color: #c8ccd8;
 }
 
 #prompt-row {
     dock: bottom;
-    border-top: tall $primary;
+    border-top: tall #1e2030;
     height: 3;
     align: left middle;
-    background: $surface-darken-1;
-    padding: 0 1;
+    background: #111116;
+    padding: 0 2;
 }
 
 #prompt-prefix {
     width: auto;
     padding: 0 1;
-    color: $accent;
+    color: #5c7fbf;
     text-style: bold;
 }
 
@@ -105,4 +118,5 @@ RichLog {
     width: 1fr;
     border: none;
     background: transparent;
+    color: #c8ccd8;
 }
