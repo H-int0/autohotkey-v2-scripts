@@ -84,7 +84,6 @@ ToggleHelpBox() {
         helpGuiGlobal := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
         helpGuiGlobal.BackColor := "000000"
         
-        ; Set standard margins and crisp font matching the color picker
         helpGuiGlobal.MarginX := 12
         helpGuiGlobal.MarginY := 12
         helpGuiGlobal.SetFont("cWhite s8", "Consolas")
@@ -104,11 +103,10 @@ ToggleHelpBox() {
         helpGuiGlobal.Add("Text", "", helpText)
         helpGuiGlobal.Show("NoActivate Hide")
         
-        ; Set window transparency opacity (225 out of 255)
         WinSetTransparent(225, helpGuiGlobal.Hwnd)
         
         UpdateHelpBox()
-        SetTimer(UpdateHelpBox, 10) ; Live updates every 10ms
+        SetTimer(UpdateHelpBox, 10)
     }
 }
 
@@ -118,11 +116,9 @@ UpdateHelpBox() {
         CoordMode("Mouse", "Screen")
         MouseGetPos(&mX, &mY)
         
-        ; Fetch UI size and screen boundaries for clamping
         WinGetPos(, , &guiW, &guiH, helpGuiGlobal.Hwnd)
         MonitorGetWorkArea(1, , , &screenW, &screenH)
         
-        ; Position bottom-right of cursor, matching color picker logic
         guiX := Min(mX + 10, screenW - guiW - 2)
         guiY := Min(mY + 10, screenH - guiH - 2)
         
@@ -163,7 +159,6 @@ TrackToolTipPos()
         CoordMode("ToolTip", "Screen")
         MouseGetPos(&mX, &mY)
         
-        ; Only redraw if the mouse actually moved or the text changed
         if (mX != lastX || mY != lastY || ActiveToolTipText != lastText)
         {
             ToolTip(ActiveToolTipText)

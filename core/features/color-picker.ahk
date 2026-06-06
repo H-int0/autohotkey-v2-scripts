@@ -133,7 +133,6 @@ UpdateColorPicker() {
         cRgbGlobal.Value := "rgb: " lastRgbGlobal
         cXyGlobal.Value  := "(x, y): (" lastXGlobal ", " lastYGlobal ")"
 
-        ; Clamp GUI position to stay within screen work area
         WinGetPos(, , &guiW, &guiH, cpGuiGlobal)
         MonitorGetWorkArea(1, , , &screenW, &screenH)
         guiX := Min(mX + 5, screenW - guiW - 2)
@@ -153,7 +152,7 @@ SetSystemCursor(mode) {
                    32649, 32650, 32651]
 
     if (mode = "restore") {
-        DllCall("SystemParametersInfo", "UInt", 0x0057, "UInt", 0, "Ptr", 0, "UInt", 0) ; SPI_SETCURSORS
+        DllCall("SystemParametersInfo", "UInt", 0x0057, "UInt", 0, "Ptr", 0, "UInt", 0)
         defaultCursors.Clear()
         return
     }

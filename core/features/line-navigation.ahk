@@ -34,15 +34,12 @@ if (LineNavEnabled)
 
 #HotIf LineNavEnabled
 
-; --- Move (shift+Alt) ---
 +!Left::Send  "{Home}"
 +!Right::Send "{End}"
 
-; --- Select (Shift+Win) ---
 +#Left::Send  "+{Home}"
 +#Right::Send "+{End}"
 
-; --- Delete (Alt) ---
 !Backspace::Send "+{Home}{Backspace}"
 !Delete::Send    "+{End}{Delete}"
 

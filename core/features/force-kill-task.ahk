@@ -81,13 +81,11 @@ if (ForceKillEnabled)
     }
 
     if (!isResponding) {
-        ; Window is frozen: use native ProcessClose to forcefully terminate
         try {
             ProcessClose(pid)
             ShowToolTip(Msg_EndTask)
         }
     } else {
-        ; Window is healthy: ask it to close gracefully (Alt+F4 behavior)
         try {
             WinClose("ahk_id " activeHwnd)
             WinWaitClose("ahk_id " activeHwnd,, 5)
