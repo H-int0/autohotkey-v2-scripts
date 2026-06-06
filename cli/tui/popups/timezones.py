@@ -161,8 +161,36 @@ class TimezonePopup(_BasePopup):
         super().on_input_submitted(event)
 
     def process_cmd_input(self, raw: str) -> bool:
+        import re
+        cmd = raw.strip()
+        
+        # Strip /config if present so we can match the core flag
+        if cmd.lower().startswith("/config"):
+            cmd = cmd[7:].strip()
+            
+        m = re.match(rf"^-!?u\s+-{self._no}(?:--(.+?))?(?:\s+(.+))?$", cmd, re.IGNORECASE)
+        tz_arg = None
+        if m:
+            sub = m.group(1)
+            value = (m.group(2) or "").strip()
+            if not value and sub:
+                tz_arg = sub
+            elif value:
+                tz_arg = value
+                
+        if tz_arg:
+            win_id = self._resolve_tz_arg(tz_arg)
+            if win_id:
+                self._toggle_tz(win_id)
+                if cmd.lower().startswith("-!") and len(self.app.screen_stack) > 1:
+                    under = self.app.screen_stack[-2]
+                    if hasattr(under, "_do_save"):
+                        under._do_save(exit_after=False)
+                return True
+                
         win_id = self._resolve_tz_arg(raw)
         if win_id:
             self._toggle_tz(win_id)
             return True
+            
         return False

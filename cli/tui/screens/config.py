@@ -222,7 +222,12 @@ class ConfigScreen(Screen):
             flag, no, sub, value = m.group(1).lower(), int(m.group(2)), m.group(3), (m.group(4) or "").strip()
 
         self._update_left_panel(flag, no)
-        if not value and not sub: self._open_popup(flag, no); return
+        if not value and not sub: 
+            if getattr(self, "_active_tz_popup", None) and self._active_tz_popup in self.app.screen_stack:
+                if flag == "u" and no in (3, 4):
+                    return
+            self._open_popup(flag, no)
+            return
 
         if flag == "u" and no in (3, 4) and not value and sub:
             value = sub
@@ -277,11 +282,22 @@ class ConfigScreen(Screen):
         if win_id in current: current.remove(win_id)
         else: current.append(win_id)
         self.panel.pending[cfg_key] = current
+        
+        if getattr(self, "_active_tz_popup", None) and self._active_tz_popup in self.app.screen_stack:
+            if self._active_tz_popup._flag == "u" and self._active_tz_popup._no == 3:
+                self._active_tz_popup._active = list(current)
+                self._active_tz_popup._refresh_list()
 
     def _toggle_startup_tz(self, tz_arg: str) -> None:
         win_id = self._resolve_tz_arg(tz_arg)
         if not win_id: return
         self.panel.pending["startupTZID"] = "" if self.panel._effective("startupTZID", "") == win_id else win_id
+        
+        if getattr(self, "_active_tz_popup", None) and self._active_tz_popup in self.app.screen_stack:
+            if self._active_tz_popup._flag == "u" and self._active_tz_popup._no == 4:
+                new_val = self.panel.pending["startupTZID"]
+                self._active_tz_popup._active = [new_val] if new_val else []
+                self._active_tz_popup._refresh_list()
 
     def _resolve_tz_arg(self, arg: str) -> str | None:
         arg = arg.strip()

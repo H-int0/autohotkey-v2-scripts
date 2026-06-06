@@ -86,7 +86,14 @@ class _BasePopup(ModalScreen):
             raw = event.value.strip()
             event.input.value = ""
             if raw:
-                cl = raw.lower()
+                # Strip strap prefix first so popup commands work identically
+                cmd_to_process = raw
+                for p in ("strap ", "/strap ", "starp ", "/starp "):
+                    if cmd_to_process.lower().startswith(p):
+                        cmd_to_process = cmd_to_process[len(p):].strip()
+                        break
+                
+                cl = cmd_to_process.lower()
                 if cl in ("/back", "back"):
                     self.dismiss(None) # Strictly close the popup, no extra saves
                 elif cl == "/exit":
@@ -94,13 +101,13 @@ class _BasePopup(ModalScreen):
                 elif cl == "/restart":
                     self.app.exit(result="reload")
                 else:
-                    handled = self.process_cmd_input(raw)
+                    handled = self.process_cmd_input(cmd_to_process)
                     if not handled:
                         if cl.startswith("/") or cl.startswith("-"):
                             if len(self.app.screen_stack) > 1:
                                 under = self.app.screen_stack[-2]
                                 if hasattr(under, "route_command"):
-                                    under.route_command(raw)
+                                    under.route_command(cmd_to_process)
 
     def on_key(self, event) -> None:
         if event.key == "escape":
