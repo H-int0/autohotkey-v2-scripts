@@ -7,6 +7,7 @@ Format: [version]: release date, followed by what changed.
 
 ## Unreleased
 
+- Auto download python and other dependencies
 - **Features**
   - Battery Plan Switcher
   - Vim Arrow Keys
@@ -14,8 +15,9 @@ Format: [version]: release date, followed by what changed.
   - System Temperatures & Fan Speed Monitor
   - Printscreen to Menu button
   - Select Multiple CLipboard
-- **Utilities**
-  - CLI Interface
+- CLI
+  - Add new commands such as '/uninstall --hard', and much more
+  - command history
 
 ---
 
@@ -128,6 +130,48 @@ Format: [version]: release date, followed by what changed.
 - Tooltips now position themselves beside the cursor automatically instead of using a fixed offset.
 - Reduced the size of the `>> STRAP HELP` box.
 - Removed unused config sections.
+
+---
+
+## [v0.4.0] 2026-06-06
+
+### Added in [v0.4.0]
+
+- **CLI/TUI alpha-v0.1.0 release**
+  - Strap now ships with a full Python-based terminal interface for managing everything without touching config files directly.
+    - `strap /run`, `/stop`, `/config`, `/profile`, `/install`, `/update`, `/switch`, `/version`, `/uninstall`, `/help`, etc.
+    - Config screen with live feature toggles, sub-settings, and pending change tracking
+    - Profile system `default`, `ghost`, and named profiles, all persisted across version switches
+    - Version management install, archive, and switch between multiple versions locally
+    - Startup shortcut management with `/run --cr shr` and `/run --d shr`
+    - Command chaining with `^`
+    - Auto-save flag (`-!`) for instant headless config changes
+    - PowerShell one-liner bootstrapper (`install.ps1`) and `strap.bat` global command
+
+### Changed in [v0.4.0]
+
+- **Repo structure** `distribution/` and `modules/` replaced by `core/` (AHK) and `cli/` (Python).
+- **Feature toggling** features are no longer enabled/disabled by commenting `#Include` lines in `source.ahk`. All toggling is now done through `config.ahk` boolean vars controlled with the CLI/TUI.
+- **Configuration** Manual configuration is now replaced by the CLI/TUI config system. Settings are managed with `strap /config` instead of editing files directly.
+- **ALT Codes** feature is now separated from the numpad-emulator feature for more stability.
+- **Timezone list** expanded from 30 to 139 timezones.
+- **Startup shortcut** now created and managed by the CLI (`/run --cr shr`) with PowerShell `WScript.Shell` instead of manual steps.
+- **Installation** replaced manual clone + double-click setup with a PowerShell one-liner bootstrapper. ZIP fallback still available via `python cli/main.py /install`.
+
+### Fixed in [v0.4.0]
+
+- ALT codes are now more stable
+- Fixed Numpad-Emulator breaking after smashing multiple Numrow keys at once.
+
+### Removed in [v0.4.0]
+
+- `distribution/` directory and `modules/` directory system.
+
+### Known Bugs in [v0.4.0]
+
+- Resizing the TUI window spawns multiple cursors
+- Command chaining (`^`) does not work in the terminal TUI only
+- Commands are whitespace-tolerant (extra spaces between arguments are ignored)
 
 ---
 
