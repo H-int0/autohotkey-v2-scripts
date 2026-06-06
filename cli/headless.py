@@ -69,12 +69,12 @@ def apply_headless_config(args: str) -> str:
         return None
 
     def _resolve_tz(arg):
-        arg = arg.strip()
-        if arg.startswith("-set--"): arg = arg[6:]
-        if arg.isdigit() and 0 <= int(arg)-1 < len(TIMEZONE_CATALOG): return TIMEZONE_CATALOG[int(arg)-1][0]
-        norm = arg.replace("_", " ").lower()
+        arg = arg.strip(' "\'')
+        # Strip all spaces and underscores to make "UTC_+3", "UTC +3", and "UTC+3" identical
+        norm = arg.replace("_", "").replace(" ", "").lower()
         for win_id, display, _, utc in TIMEZONE_CATALOG:
-            if win_id.lower() == norm or display.lower() == norm or utc.lower() == norm: return win_id
+            if win_id.replace(" ", "").lower() == norm or utc.replace(" ", "").lower() == norm:
+                return win_id
         return None
 
     if flag == "u":
@@ -86,13 +86,26 @@ def apply_headless_config(args: str) -> str:
             win_id = _resolve_tz(sub if sub else v)
             if win_id:
                 current = list(cfg.get("timezones", []))
-                if win_id in current: current.remove(win_id)
-                else: current.append(win_id)
-                cfg["timezones"] = current
+                # Heal config: Convert any broken strings like "UTC_+3" into actual Windows IDs
+                healed_current = []
+                for tz in current:
+                    resolved = _resolve_tz(tz)
+                    if resolved and resolved not in healed_current:
+                        healed_current.append(resolved)
+                
+                healed_lower = [tz.lower() for tz in healed_current]
+                if win_id.lower() in healed_lower:
+                    healed_current = [tz for tz in healed_current if tz.lower() != win_id.lower()]
+                else:
+                    healed_current.append(win_id)
+                cfg["timezones"] = healed_current
         elif no == 4:
             win_id = _resolve_tz(sub if sub else v)
             if win_id:
-                cfg["startupTZID"] = "" if cfg.get("startupTZID", "") == win_id else win_id
+                current_st = cfg.get("startupTZID", "")
+                resolved_st = _resolve_tz(current_st) if current_st else ""
+                cfg["startupTZID"] = "" if resolved_st and resolved_st.lower() == win_id.lower() else win_id
+                
     elif flag == "z":
         fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation"}
         fk = fk_map.get(no)
