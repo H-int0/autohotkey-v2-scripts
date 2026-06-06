@@ -21,10 +21,7 @@ GITHUB_API   = "https://api.github.com/repos/H-int0/autohotkey-v2-scripts/tags"
 
 _SWITCH_KEEP = {"bin"}
 _SKIP_ON_COPY = {
-    ".git", ".github", ".gitignore", "bin", "__pycache__",
-    "CHANGELOG.md", "CONFIGURE.md", "CONTRIBUTING.md",
-    "FEATURES.md", "INTEGRATION_GUIDE.md",
-    "PULL_REQUEST_TEMPLATE.md",
+    ".git", ".github", "bin", "__pycache__"
 }
 
 def run_update() -> None:

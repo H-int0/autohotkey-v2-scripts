@@ -1,7 +1,8 @@
 # =============================================================================
 # install.ps1
 # Strap bootstrapper run with:
-#    powershell -Command "irm https://raw.githubusercontent.com/H-int0/autohotkey-v2-scripts/main/install.ps1 | iex"
+#    powershell -ExecutionPolicy Bypass -Command "irm 'https://raw.githubusercontent.com/H-int0/autohotkey-v2-scripts/main/install.ps1' | iex"
+#    irm 'https://raw.githubusercontent.com/H-int0/autohotkey-v2-scripts/main/install.ps1' | iex
 #
 # What this does:
 #   1. Checks for Python
@@ -21,10 +22,7 @@ $BIN_DIR      = Join-Path $INSTALL_DIR "bin"
 $BAT_PATH     = Join-Path $BIN_DIR "strap.bat"
 
 $SKIP = @(
-    ".git", ".github", ".gitignore", "bin", "__pycache__",
-    "CHANGELOG.md", "CONFIGURE.md", "CONTRIBUTING.md",
-    "FEATURES.md", "INTEGRATION_GUIDE.md",
-    "PULL_REQUEST_TEMPLATE.md"
+".git", ".github", "bin", "__pycache__"
 )
 
 Write-Host ""

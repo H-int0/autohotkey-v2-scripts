@@ -19,10 +19,7 @@ DEFAULT_CONFIG_PATH = os.path.join(PROFILE_DEFAULT, "user-config.json")
 GHOST_CONFIG_PATH   = os.path.join(PROFILE_GHOST,   "user-config.json")
 
 _SKIP_ON_COPY = {
-    ".git", ".github", ".gitignore", "bin", "__pycache__",
-    "CHANGELOG.md", "CONFIGURE.md", "CONTRIBUTING.md",
-    "FEATURES.md", "INTEGRATION_GUIDE.md",
-    "PULL_REQUEST_TEMPLATE.md",
+".git", ".github", "bin", "__pycache__"
 }
 
 def run(from_ps: bool = False, enable_startup_flag: bool = False) -> None:
