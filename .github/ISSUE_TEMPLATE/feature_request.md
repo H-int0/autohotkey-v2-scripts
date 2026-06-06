@@ -1,29 +1,17 @@
 ---
 name: Feature Request
-about: Suggest a new feature or improvement
+about: Have an idea for Strap? Share it here.
 labels: enhancement
 ---
 
-# Summary
+## What's your idea?
+<!-- Describe the feature you'd like to see. What should it do? -->
 
-A brief description of the feature you'd like.
+## Why do you want it?
+<!-- What problem does it solve for you? What's annoying or missing right now? -->
 
-## Problem it Solves
+## Is this related to an existing feature?
+<!-- Is there something in Strap that already does something similar but not quite right? What would you change about it? -->
 
-What problem or limitation does this address?
-
----
-
-## Proposed Solution
-
-How do you think it should work?
-
----
-
-## Alternatives Considered
-
-Any other approaches you thought of.
-
-## Additional Context
-
-Anything else worth mentioning.
+## Anything else?
+<!-- Examples, mockups, or any other context that might help. (optional) -->
