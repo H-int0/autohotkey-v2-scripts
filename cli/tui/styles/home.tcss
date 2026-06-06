@@ -1,46 +1,59 @@
+/* =============================================================================
+   home.tcss
+   ============================================================================= */
+
 #left-panel {
     width: 30%;
-    border-right: solid $primary;
+    border-right: tall $primary;
     height: 100%;
     padding: 1 2;
+    background: $surface-darken-1;
 }
 
 #right-panel {
     width: 70%;
     height: 100%;
+    background: $surface;
 }
 
 .panel-title {
     text-style: bold;
     color: $accent;
     margin-bottom: 1;
+    padding-bottom: 1;
+    border-bottom: solid $primary 30%;
 }
 
 #status-text {
     height: auto;
     margin-bottom: 2;
+    color: $text;
 }
 
 #commands-text {
     height: auto;
     margin-bottom: 1;
+    color: $text-muted;
 }
 
 #home-left-content {
     height: 1fr;
     overflow-y: auto;
-    overflow-x: hidden; /* Forces text to adjust/wrap when terminal resizes */
+    overflow-x: hidden;
 }
 
 #hints-text {
     height: auto;
+    color: $accent 70%;
 }
 
 #footer-text {
-    dock: bottom; /* Pins it to the bottom */
-    color: $text-muted;
+    dock: bottom;
+    color: $text-muted 60%;
     height: 2;
     content-align: left bottom;
+    border-top: solid $primary 20%;
+    padding: 0 1;
 }
 
 RichLog {
@@ -53,9 +66,11 @@ RichLog {
 
 #prompt-row {
     dock: bottom;
-    border-top: solid $primary;
+    border-top: tall $primary;
     height: 3;
     align: left middle;
+    background: $surface-darken-1;
+    padding: 0 1;
 }
 
 #prompt-prefix {

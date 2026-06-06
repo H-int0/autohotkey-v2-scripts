@@ -3,48 +3,50 @@
    Styles for ConfigScreen, ConfigPanel, and all config popups.
    ============================================================================= */
 
-/* ---------------------------------------------------------------------------
-   Config screen layout mirrors home.tcss panels
-   --------------------------------------------------------------------------- */
-
 ConfigScreen #left-panel {
     width: 30%;
-    border-right: solid $primary;
+    border-right: tall $primary;
     height: 100%;
     padding: 1 2;
+    background: $surface-darken-1;
 }
 
 ConfigScreen #right-panel {
     width: 70%;
     height: 100%;
-    padding: 1 2;
+    background: $surface;
 }
 
 #config-status-text {
     height: auto;
     margin-bottom: 1;
+    color: $text;
 }
 
 #config-commands-text {
     height: auto;
     margin-bottom: 1;
+    color: $text-muted;
 }
 
 #config-left-content {
     height: 1fr;
     overflow-y: auto;
-    overflow-x: hidden; /* Forces text to adjust/wrap when terminal resizes */
+    overflow-x: hidden;
 }
 
 #config-hints-text {
     height: auto;
+    color: $accent 70%;
 }
 
 #config-footer-text {
-    dock: bottom; /* Pins it to the bottom */
-    color: $text-muted;
+    dock: bottom;
+    color: $text-muted 60%;
     height: 2;
     content-align: left bottom;
+    border-top: solid $primary 20%;
+    padding: 0 1;
 }
 
 /* ---------------------------------------------------------------------------
@@ -55,12 +57,15 @@ ConfigScreen #right-panel {
     text-style: bold;
     color: $accent;
     margin-bottom: 1;
+    padding-bottom: 1;
+    border-bottom: solid $primary 30%;
 }
 
 #config-panel-container {
     height: 1fr;
     overflow-y: auto;
     overflow-x: hidden;
+    padding: 0 1;
 }
 
 #config-panel {
@@ -69,9 +74,11 @@ ConfigScreen #right-panel {
 
 #config-prompt-row {
     dock: bottom;
-    border-top: solid $primary;
+    border-top: tall $primary;
     height: 3;
     align: left middle;
+    background: $surface-darken-1;
+    padding: 0 1;
 }
 
 #config-prompt-prefix {
@@ -88,7 +95,7 @@ ConfigScreen #right-panel {
 }
 
 /* ---------------------------------------------------------------------------
-   Popup styling so it replaces ONLY the right side
+   Popup styling
    --------------------------------------------------------------------------- */
 
 _BasePopup {
@@ -104,15 +111,16 @@ _BasePopup {
 .config-popup {
     height: 1fr;
     background: $surface;
-    padding: 1 2;
+    padding: 0 1;
 }
 
 .popup-prompt-row {
     dock: bottom;
-    border-top: solid $primary;
+    border-top: tall $primary;
     height: 3;
     align: left middle;
-    background: $surface;
+    background: $surface-darken-1;
+    padding: 0 1;
 }
 
 .popup-prompt-prefix {
@@ -132,22 +140,22 @@ _BasePopup {
     text-style: bold;
     color: $accent;
     margin-bottom: 1;
+    padding-bottom: 1;
+    border-bottom: solid $primary 30%;
 }
 
 .popup-divider {
-    color: $text-muted;
+    color: $text-muted 40%;
     margin-bottom: 1;
 }
 
-/* Scrollable content area inside popups */
 .popup-scroll {
     height: 1fr;
     overflow-y: auto;
 }
 
-/* Pinned help section always at bottom, never scrolls */
 .popup-help {
-    border-top: solid $primary;
+    border-top: solid $primary 30%;
     padding-top: 1;
     margin-top: 1;
     height: auto;
@@ -161,7 +169,7 @@ _BasePopup {
 #tz-saved-section {
     height: auto;
     margin-bottom: 1;
-    border-bottom: dashed $primary;
+    border-bottom: dashed $primary 50%;
     padding-bottom: 1;
 }
 
@@ -179,8 +187,8 @@ _BasePopup {
 
 #tz-search-input {
     width: 1fr;
-    border: solid $primary;
-    background: transparent;
+    border: tall $primary;
+    background: $surface-darken-1;
 }
 
 #tz-filter-btn {
@@ -192,16 +200,17 @@ _BasePopup {
     width: auto;
     height: auto;
     margin-bottom: 1;
+    color: $accent 70%;
 }
 
 #tz-filter-dropdown {
-    background: $surface;
-    border: solid $primary;
+    background: $surface-darken-1;
+    border: tall $primary;
     width: 20;
     height: auto;
     max-height: 12;
     overflow-y: auto;
-    display: none;  /* shown programmatically */
+    display: none;
 }
 
 #tz-list {
@@ -210,7 +219,7 @@ _BasePopup {
 }
 
 /* ---------------------------------------------------------------------------
-   Boolean popup option rows highlight on hover/focus
+   Boolean popup option rows
    --------------------------------------------------------------------------- */
 
 .option-row {
@@ -219,7 +228,8 @@ _BasePopup {
 }
 
 .option-row:hover {
-    background: $primary 20%;
+    background: $accent 15%;
+    color: $text;
 }
 
 .option-row.--selected {
