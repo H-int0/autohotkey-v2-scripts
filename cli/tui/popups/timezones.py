@@ -124,12 +124,29 @@ class TimezonePopup(_BasePopup):
 
     def _toggle_tz(self, win_id: str) -> None:
         if self._single:
-            self._active = [] if win_id in self._active else [win_id]
-        else:
-            if win_id in self._active:
-                self._active.remove(win_id)
+            healed_active = []
+            for tz in self._active:
+                r = self._resolve_tz_arg(tz)
+                if r: healed_active.append(r)
+            
+            active_lower = [tz.lower() for tz in healed_active]
+            if win_id.lower() in active_lower:
+                self._active = []
             else:
-                self._active.append(win_id)
+                self._active = [win_id]
+        else:
+            healed = []
+            for tz in self._active:
+                r = self._resolve_tz_arg(tz)
+                if r and r not in healed:
+                    healed.append(r)
+                    
+            healed_lower = [tz.lower() for tz in healed]
+            if win_id.lower() in healed_lower:
+                self._active = [tz for tz in healed if tz.lower() != win_id.lower()]
+            else:
+                self._active = healed + [win_id]
+                
         self._refresh_list()
 
         # Update pending state immediately so /config --save can be explicitly used while open
@@ -144,13 +161,10 @@ class TimezonePopup(_BasePopup):
                     under._update_left_panel()
 
     def _resolve_tz_arg(self, arg: str) -> str | None:
-        arg = arg.strip()
-        if arg.startswith("-set--"): arg = arg[6:]
-        if arg.isdigit() and 0 <= int(arg)-1 < len(TIMEZONE_CATALOG): return TIMEZONE_CATALOG[int(arg)-1][0]
-        
-        norm = arg.replace("_", " ").lower()
+        arg = arg.strip(' "\'')
+        norm = arg.replace("_", "").replace(" ", "").lower()
         for win_id, display, _, utc in TIMEZONE_CATALOG:
-            if win_id.lower() == norm or display.lower() == norm or utc.lower() == norm: 
+            if win_id.replace(" ", "").lower() == norm or utc.replace(" ", "").lower() == norm:
                 return win_id
         return None
 
@@ -168,15 +182,11 @@ class TimezonePopup(_BasePopup):
         if cmd.lower().startswith("/config"):
             cmd = cmd[7:].strip()
             
-        m = re.match(rf"^-!?u\s+-{self._no}(?:--(.+?))?(?:\s+(.+))?$", cmd, re.IGNORECASE)
+        # Matches specifically the space-separated format (e.g. -u -3 "UTC_+3")
+        m = re.match(rf"^-!?u\s+-{self._no}\s+(.+)$", cmd, re.IGNORECASE)
         tz_arg = None
         if m:
-            sub = m.group(1)
-            value = (m.group(2) or "").strip()
-            if not value and sub:
-                tz_arg = sub
-            elif value:
-                tz_arg = value
+            tz_arg = m.group(1).strip()
                 
         if tz_arg:
             win_id = self._resolve_tz_arg(tz_arg)
@@ -188,6 +198,7 @@ class TimezonePopup(_BasePopup):
                         under._do_save(exit_after=False)
                 return True
                 
+        # Fallback for bare direct input like "UTC_+3" inside the popup
         win_id = self._resolve_tz_arg(raw)
         if win_id:
             self._toggle_tz(win_id)
