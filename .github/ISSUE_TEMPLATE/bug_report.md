@@ -4,32 +4,29 @@ about: Report something that isn't working correctly
 labels: bug
 ---
 
-# Description
+## Description
 
-A clear description of what the bug is.
+<!-- A clear description of what the bug is. -->
 
 ## Steps to Reproduce
-
+<!--
+Walk us through the exact steps to trigger the bug.
 1.
 2.
 3.
+-->
 
-## Expected Behavior
+## What did you expect to happen?
+<!-- What should have happened instead? -->
 
-What you expected to happen.
-
-## Actual Behavior
-
-What actually happened.
+## What actually happened?
+<!-- What did Strap do instead? Include any error messages or screenshots if you have them. -->
 
 ## Environment
 
-Windows version:
+- Strap version:
+- Windows version:
+- AutoHotkey version:
 
-AutoHotkey v2 version:
-
-Strap version:
-
-## Additional Context
-
-Any other details, screenshots, or error messages.
+## Anything else?
+<!-- Any other context that might help us track this down. (optional) -->

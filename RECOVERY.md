@@ -1,94 +1,61 @@
 # Recovery Guide
 
-**These steps assume that your keyboard is not reliable/working and will primarily make use of your mouse.**
+Something went wrong with Strap and your keyboard is acting up? This guide will get you back to normal.
 
 ---
 
-If your keyboard is behaving strangely after installing Strap like,
+## Step 1: Kill the Script
 
-- sending wrong input
-- number row acting odd
-- or anything unexpected
+- Open **Task Manager**:
+- Right-click an empty spot on your taskbar → click **Task Manager**
 
-Follow the steps below to safely remove the script from the Startup.
+> [!TIP]
+> If your keyboard is partially working: `Ctrl + Shift + Esc` opens Task Manager instantly.
 
----
+- Once open:
+  1. Click the **Processes** tab
+  2. Look for **AutoHotkey** or **source.ahk**
+  3. Click it → click **End Task**
+  > If Task Manager looks tiny with no tabs, click **More details** at the bottom left first.
 
-## Step 1: Open Task Manager
+Your keyboard should return to normal immediately.
 
-- Right-click anywhere on an empty space on your **taskbar** (the bar usually at the bottom of your screen).
-- Click **Task Manager** from the menu that appears.
-- *(If your keyboard is partially working, you can alternatively press `Ctrl + Shift + Esc` to open Task Manager instantly).*
-
----
-
-## Step 2: Find and Kill the Script
-
-- In Task Manager, click the **Processes** tab from the top (if it isn't already selected).
-- Look for a process named **AutoHotkey** or **source.ahk** in the list.
-- Click on it to select it.
-- Click the **End Task** button inside the Task Manager (usually at the top right or bottom right depending on your Windows version).
-- Alternatively, right-click the **AutoHotkey** process and click **End Task** from the menu that appears.
-
-> [!Note]
-> If Task Manager looks tiny with no tabs, click "More details" at the bottom left first.
-
-Your keyboard should return to normal immediately after this process ends.
+> [!IMPORTANT]
+> If Strap is set to auto-start on boot, complete **Step 2** before restarting. Otherwise the script will launch again and you'll be back to square one.
 
 ---
 
-## Step 3: Remove the Startup Copy
+## Step 2: Remove Strap from Startup
 
-If Strap was set to launch on startup, it will come back after the next restart and cause the same problem again unless you remove it from the startup folder too.
+Killing the script is temporary. it'll come back on the next restart unless you remove it from startup.
 
-**If your keyboard is working again after Step 2**, the quickest way is:
+**If your keyboard is working again:**
 
-1. Press `Win + R`, type `shell:startup`, and press Enter.
-2. Find the shortcut named **Strap** (or `Strap.lnk`) in the folder.
-3. Right-click it and select **Delete**.
+1. Press `Win + R`
+2. Type `shell:startup` → press Enter
+3. Find **Strap** or `Strap.lnk` → right-click → **Delete**
 
----
+**If your keyboard is still unreliable (mouse only):**
 
-**If your keyboard is still unreliable**, use the mouse-only method:
+1. Click the **Start** button → open **File Explorer**
+2. Navigate to:
 
-- Click the **Start** button (Windows logo) in the taskbar.
-- Open **File Explorer** and go inside the following directory:
+    ```bash
+    # Replace `USER_NAME` with your actual Windows username
 
-*(Be sure to replace `YourName` with your actual Windows username)*
+    C:\Users\USER_NAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
+    ```
 
-```cmd
-C:\Users\YourName\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
-```
+3. Find **Strap** or `Strap.lnk` → right-click → **Delete**
 
-- Find the shortcut named **Strap** (or `Strap.lnk`) in the folder.
-- Right-click it and select **Delete**.
-
----
-
-> If you don't see an `AppData` folder, it may be hidden. To show it:
-
-- Open **File Explorer** and click the **View** tab from the top.
-- Under **Show/hide**, check **Hidden items**.
+> [!TIP]
+> Can't see the `AppData` folder? It's hidden. In File Explorer click **View** from the top ribbon → check **Hidden items**.
 
 ---
 
-## Step 4: Verify
+## Step 3: Verify
 
-Restart your computer. This time your keyboard should behave completely normally. If Strap no longer appears in Task Manager after boot, the removal was successful.
-
----
-
-## After Recovery
-
-Once your system is stable, you can investigate what went wrong before re-adding the script.
-
-Common causes of rogue behavior are:
-
-- Conflicting hotkeys with other running software.
-- Violating the single-threaded hook model (e.g., running multiple separate AHK scripts that conflict with the CapsLock hook).
-- Running an outdated version of AutoHotkey. Make sure you are running [AutoHotkey v2.0](https://www.autohotkey.com/) or later.
-
-If you want to re-add the script to startup after fixing the issue, refer to the **Auto-Start on Boot** section in [README.md](README.md).
+Restart your computer. If your keyboard is back to normal and Strap no longer appears in Task Manager you're good.
 
 ---
 
