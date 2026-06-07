@@ -215,14 +215,35 @@ def _sync_all_profiles(new_defaults: dict, version: str) -> None:
             print(f"  [√] '{profile_name}' profile stamped v{version}.")
 
 def _load_new_defaults(version: str) -> dict | None:
-    schema_path = os.path.join(INSTALL_DIR, "cli", "config", "schema.py")
+    schema_path  = os.path.join(INSTALL_DIR, "cli", "config", "schema.py")
+    features_path = os.path.join(INSTALL_DIR, "cli", "features.py")
     if not os.path.exists(schema_path):
         return None
     try:
-        namespace = {"__file__": schema_path}
-        with open(schema_path, "r", encoding="utf-8") as f:
-            exec(compile(f.read(), schema_path, "exec"), namespace)
-        return namespace.get("DEFAULT_CONFIG", {}).copy()
+        import sys
+
+        # Load the new version's features.py into a fresh namespace first
+        features_ns = {"__file__": features_path}
+        with open(features_path, "r", encoding="utf-8") as f:
+            exec(compile(f.read(), features_path, "exec"), features_ns)
+
+        # Temporarily shadow the cached module so schema.py picks up new FEATURE_REGISTRY
+        old_features = sys.modules.get("features")
+        sys.modules["features"] = type(sys)("features")
+        sys.modules["features"].FEATURE_REGISTRY = features_ns["FEATURE_REGISTRY"]
+
+        try:
+            namespace = {"__file__": schema_path}
+            with open(schema_path, "r", encoding="utf-8") as f:
+                exec(compile(f.read(), schema_path, "exec"), namespace)
+            return namespace.get("DEFAULT_CONFIG", {}).copy()
+        finally:
+            # Restore original module regardless of outcome
+            if old_features is None:
+                sys.modules.pop("features", None)
+            else:
+                sys.modules["features"] = old_features
+
     except Exception as e:
         print(f"Warning: could not load new schema: {e}")
         return None
