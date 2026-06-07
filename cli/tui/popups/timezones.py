@@ -23,7 +23,7 @@ from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.widgets import Static, Input, Button
 from textual.app import ComposeResult
 from tui.popups.base import _BasePopup
-from data.timezones_catalog import TIMEZONE_CATALOG, _live_time, _fmt_tz_entry
+from data.timezones_catalog import TIMEZONE_CATALOG, _fmt_tz_entry
 from tui.constants import get_popup_tz_text
 
 class TimezonePopup(_BasePopup):

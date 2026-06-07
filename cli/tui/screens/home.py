@@ -30,6 +30,7 @@ from textual.containers import Horizontal, Vertical, ScrollableContainer
 from textual.widgets import Static, Input, RichLog
 from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
+from commands import get_installed_version, is_ahk_running, relaunch_ahk_from_shortcut, cli_profile, cli_version
 from ops.startup import is_startup_enabled
 from tui.constants import (
     COMMANDS_TEXT, CONFIG_COMMANDS_TEXT, get_status_text, 
@@ -54,21 +55,10 @@ class HomeScreen(Screen):
         self.startup_confirmed = False
 
     def _get_installed_version(self) -> str:
-        try:
-            with open(os.path.join(INSTALL_DIR, "VERSION"), "r", encoding="utf-8") as f:
-                return f.read().strip()
-        except Exception:
-            return DEFAULT_CONFIG["version"]
+        return get_installed_version()
 
     def _is_ahk_running(self) -> bool:
-        try:
-            out = subprocess.check_output(
-                'tasklist /FI "IMAGENAME eq AutoHotkey*"', 
-                shell=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW
-            )
-            return "AutoHotkey" in out
-        except Exception:
-            return False
+        return is_ahk_running()
 
     def update_status(self, focused_flag: str = "", focused_no: int = 0):
         cfg = load_user_config()
@@ -324,46 +314,13 @@ class HomeScreen(Screen):
         self.process_next_command()
 
     def _relaunch_ahk_from_shortcut(self) -> None:
-        """Kill AHK, then relaunch from shell:startup shortcut if present."""
-        import subprocess, os
-        from ops.startup import SHORTCUT_PATH
-        subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        if os.path.exists(SHORTCUT_PATH):
-            try:
-                os.startfile(SHORTCUT_PATH)
-            except Exception:
-                pass
+        relaunch_ahk_from_shortcut()
 
     def _run_create_startup_shortcut(self):
-        import winreg
         try:
-            startup_folder = os.path.join(
-                os.environ["APPDATA"],
-                r"Microsoft\Windows\Start Menu\Programs\Startup"
-            )
-            lnk_path   = os.path.join(startup_folder, "Strap.lnk")
-            target_ahk = os.path.join(INSTALL_DIR, "core", "source.ahk")
-            working_dir = os.path.join(INSTALL_DIR, "core")
-
-            if os.path.exists(lnk_path):
-                os.remove(lnk_path)
-
-            ps_cmd = (
-                f'$ws = New-Object -ComObject WScript.Shell; '
-                f'$s = $ws.CreateShortcut("{lnk_path}"); '
-                f'$s.TargetPath = "{target_ahk}"; '
-                f'$s.WorkingDirectory = "{working_dir}"; '
-                f'$s.Save()'
-            )
-            subprocess.run(
-                ["powershell", "-NoProfile", "-Command", ps_cmd],
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                creationflags=subprocess.CREATE_NO_WINDOW,
-            )
-            self.log_widget.write(f"[√] Startup shortcut created: {lnk_path}")
+            from ops.startup import enable_startup, SHORTCUT_PATH
+            enable_startup()
+            self.log_widget.write(f"[√] Startup shortcut created: {SHORTCUT_PATH}")
         except Exception as e:
             self.log_widget.write(f"[×] Failed to create shortcut: {e}")
 
@@ -446,10 +403,6 @@ class HomeScreen(Screen):
 
     @work(exclusive=True, thread=True)
     def run_install_specific_worker(self, target_version: str) -> None:
-        import shutil
-        from ops.updater import _download_and_archive, _do_switch
-        from ops.installer import _ensure_bat, _add_to_user_path, _bootstrap_profiles, BIN_DIR
-
         class OutputRedirector:
             def __init__(self, app, log_widget): self.app = app; self.log_widget = log_widget
             def write(self, s):
@@ -457,37 +410,8 @@ class HomeScreen(Screen):
             def flush(self): pass
 
         with redirect_stdout(OutputRedirector(self.app, self.log_widget)):
-            ver_clean   = target_version.lstrip("v")
-            version_dir = os.path.join(os.environ["USERPROFILE"], ".strap_versions", f"v{ver_clean}")
-
-            # Always silently overwrite archive
-            if os.path.exists(version_dir):
-                print(f"Refreshing archive for v{ver_clean}...")
-                shutil.rmtree(version_dir)
-            zip_url = f"https://codeload.github.com/H-int0/autohotkey-v2-scripts/zip/refs/tags/v{ver_clean}"
-            _download_and_archive(zip_url, ver_clean, version_dir)
-
-            if not os.path.exists(version_dir):
-                print("[×] Download failed.")
-            elif os.path.exists(INSTALL_DIR):
-                # Strap already installed switch to the new version
-                _do_switch(ver_clean, version_dir)
-            else:
-                # Fresh install from the downloaded archive
-                print(f"Copying v{ver_clean} to %APPDATA%\\Strap...")
-                os.makedirs(INSTALL_DIR, exist_ok=True)
-                for item in os.listdir(version_dir):
-                    src = os.path.join(version_dir, item)
-                    dst = os.path.join(INSTALL_DIR, item)
-                    if os.path.isdir(src):
-                        shutil.copytree(src, dst, dirs_exist_ok=True)
-                    else:
-                        shutil.copy2(src, dst)
-                _ensure_bat()
-                _add_to_user_path(BIN_DIR)
-                _bootstrap_profiles(ver_clean)
-
-            print(f"\n[√] Strap v{ver_clean} installed successfully!")
+            from commands import cli_install
+            cli_install(target_version=target_version)
 
         self.app.call_from_thread(self.finish_worker)
 
@@ -542,92 +466,30 @@ class HomeScreen(Screen):
         self.app.call_from_thread(self.finish_worker)
 
     def _show_versions(self) -> None:
-        active = self._get_installed_version()
-        versions_dir = os.path.join(os.environ["USERPROFILE"], ".strap_versions")
-        if not os.path.exists(versions_dir):
-            self.log_widget.write("No archived versions found.")
-            return
-        versions = sorted(
-            d for d in os.listdir(versions_dir)
-            if os.path.isdir(os.path.join(versions_dir, d))
-        )
-        if not versions:
-            self.log_widget.write("No archived versions found.")
-            return
-        self.log_widget.write("Archived versions:")
-        for v in versions:
-            tag = v.lstrip("v")
-            marker = " (active)" if tag == active else ""
-            self.log_widget.write(f"  {v}{marker}")
+        from contextlib import redirect_stdout
+        import io
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            cli_version()
+        for line in buf.getvalue().splitlines():
+            if line.strip():
+                self.log_widget.write(line)
 
     def _handle_profile(self, subargs: str) -> None:
-        from config.manager import (
-            get_active_profile_name, set_active_profile,
-            create_profile, delete_profile, list_profiles,
-            load_user_config as _load
-        )
-        from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
-
-        parts = subargs.strip().split(" ", 1) if subargs.strip() else []
-        sub   = parts[0].strip() if parts else ""
-        arg   = parts[1].strip() if len(parts) > 1 else ""
-        subl  = sub.lower()
-
-        if not sub or subl == "--ls":
-            active   = get_active_profile_name()
-            profiles = list_profiles()
-            if not profiles:
-                self.log_widget.write("No profiles found.")
-            else:
-                self.log_widget.write("Profiles:")
-                for p in profiles:
-                    marker = " (active)" if p == active else ""
-                    self.log_widget.write(f"  {p}{marker}")
-
-        elif subl == "--d":
-            if not arg:
-                self.log_widget.write("Usage: /profile --d <name>")
-            else:
-                try:
-                    delete_profile(arg)
-                    self.log_widget.write(f"[√] Profile '{arg}' deleted.")
-                except ValueError as e:
-                    self.log_widget.write(f"[×] {e}")
-
-        elif subl == "--use":
-            if not arg:
-                self.log_widget.write("Usage: /profile --use <name>")
-            else:
-                profiles_dir = os.path.join(os.environ["USERPROFILE"], ".strap_profiles")
-                cfg_path = os.path.join(profiles_dir, arg, "user-config.json")
-                if os.path.exists(cfg_path):
-                    set_active_profile(arg)
-                    cfg = _load(arg)
-                    c_ahk  = os.path.join(INSTALL_DIR, "core", "config.ahk")
-                    t_vars = os.path.join(INSTALL_DIR, "core", "config-dependencies", "timezones-variables.ahk")
-                    if os.path.exists(c_ahk):
-                        update_config_ahk(cfg, c_ahk)
-                    if os.path.exists(t_vars):
-                        update_timezones_variables_ahk(cfg.get("timezones", []), t_vars)
-                    self.log_widget.write(f"[√] Switched to profile '{arg}'.")
-                    self.state = "profile_switch"
-                else:
-                    self.log_widget.write(f"[×] Profile '{arg}' does not exist.")
-
-        elif subl == "--cr":
-            if not arg:
-                self.log_widget.write("Usage: /profile --cr name")
-            else:
-                try:
-                    create_profile(arg)
-                    self.log_widget.write(f"[√] Profile '{arg}' created.")
-                except ValueError as e:
-                    self.log_widget.write(f"[×] {e}")
-        else:
-            self.log_widget.write(f"Unknown profile subcommand: '{sub}'. Use --ls, --cr, --use, --d.")
+        from contextlib import redirect_stdout
+        import io
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            cli_profile(subargs)
+        for line in buf.getvalue().splitlines():
+            if line.strip():
+                self.log_widget.write(line)
 
         self.log_widget.write("")
-        if self.state == "profile_switch":
+
+        parts = subargs.strip().split(" ", 1) if subargs.strip() else []
+        sub = parts[0].strip().lower() if parts else ""
+        if sub == "--use":
             self.log_widget.write("Do you want to restart the TUI to reflect the changes? (y/n):")
             self.state = "ask_restart"
         else:
@@ -687,8 +549,8 @@ class HomeScreen(Screen):
         if event.key == "escape":
             self.app.exit(result="exit")
 
-    def on_resize(self, event) -> None:
+    def on_resize(self, _event) -> None:
         pass
 
-    def on_click(self, event) -> None:
+    def on_click(self, _event) -> None:
         pass

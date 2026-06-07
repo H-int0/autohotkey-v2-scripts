@@ -37,6 +37,35 @@ PROFILES_DIR = os.path.join(os.environ.get("USERPROFILE", ""), ".strap_profiles"
 
 _YES = {"y", "yes", "yeah", "ya", "yep", "yup", "sure", "ok", "okay", "affirmative", "positive"}
 
+def get_installed_version() -> str:
+    try:
+        with open(os.path.join(INSTALL_DIR, "VERSION"), "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except Exception:
+        from config.schema import DEFAULT_CONFIG
+        return DEFAULT_CONFIG["version"]
+
+def is_ahk_running() -> bool:
+    try:
+        result = subprocess.check_output(
+            'tasklist /FI "IMAGENAME eq AutoHotkey*"',
+            shell=True, text=True,
+            creationflags=subprocess.CREATE_NO_WINDOW
+        )
+        return "AutoHotkey" in result
+    except Exception:
+        return False
+
+def relaunch_ahk_from_shortcut() -> None:
+    from ops.startup import SHORTCUT_PATH
+    from ops.process import stop_ahk
+    stop_ahk()
+    if os.path.exists(SHORTCUT_PATH):
+        try:
+            os.startfile(SHORTCUT_PATH)
+        except Exception:
+            pass
+
 def _print_help() -> None:
     print(TERMINAL_COMMANDS_TEXT)
 
@@ -110,12 +139,7 @@ def cli_switch(target_version: str) -> None:
     run_switch(target_version)
 
 def cli_version() -> None:
-    try:
-        with open(os.path.join(INSTALL_DIR, "VERSION"), "r", encoding="utf-8") as f:
-            active_version = f.read().strip()
-    except Exception:
-        from config.schema import DEFAULT_CONFIG
-        active_version = DEFAULT_CONFIG["version"]
+    active_version = get_installed_version()
 
     if not os.path.exists(VERSIONS_DIR):
         print("No archived versions found.")

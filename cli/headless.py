@@ -25,7 +25,6 @@ from config.manager import load_user_config, save_user_config, get_active_profil
 from config.schema import DEFAULT_CONFIG
 from ops.file_editor import update_config_ahk, update_timezones_variables_ahk
 from data.timezones_catalog import TIMEZONE_CATALOG
-from ops.process import stop_ahk
 
 # ==============================================================================
 # HEADLESS CONFIGURATION ROUTING
@@ -135,10 +134,7 @@ def apply_headless_config(args: str) -> str:
     if os.path.exists(c_ahk): update_config_ahk(cfg, c_ahk)
     if os.path.exists(t_vars): update_timezones_variables_ahk(cfg.get("timezones", []), t_vars)
     
-    stop_ahk()
-    shortcut = os.path.join(os.environ.get("APPDATA", ""), r"Microsoft\Windows\Start Menu\Programs\Startup\Strap.lnk")
-    if os.path.exists(shortcut):
-        try: os.startfile(shortcut)
-        except Exception: pass
+    from commands import relaunch_ahk_from_shortcut
+    relaunch_ahk_from_shortcut()
 
     return f"Config updated successfully: -{flag} -{no}"

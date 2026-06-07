@@ -30,6 +30,7 @@ from textual.widgets import Static, Input
 from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
 from ops.startup import is_startup_enabled
+from commands import get_installed_version, is_ahk_running, relaunch_ahk_from_shortcut
 from tui.widgets.config_panel import ConfigPanel
 from tui.popups.settings import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup
 from tui.popups.timezones import TimezonePopup
@@ -78,22 +79,10 @@ class ConfigScreen(Screen):
             self.call_after_refresh(self.route_command, self._open_popup_cmd)
 
     def _get_installed_version(self) -> str:
-        try:
-            with open(os.path.join(INSTALL_DIR, "VERSION"), "r", encoding="utf-8") as f:
-                return f.read().strip()
-        except Exception:
-            return DEFAULT_CONFIG["version"]
+        return get_installed_version()
 
     def _is_ahk_running(self) -> bool:
-        try:
-            result = subprocess.check_output(
-                'tasklist /FI "IMAGENAME eq AutoHotkey*"',
-                shell=True, text=True,
-                creationflags=subprocess.CREATE_NO_WINDOW
-            )
-            return "AutoHotkey" in result
-        except:
-            return False
+        return is_ahk_running()
 
     def _update_left_panel(self, focused_flag: str = "", focused_no: int = 0) -> None:
         cfg = load_user_config()
@@ -144,10 +133,10 @@ class ConfigScreen(Screen):
         if event.key == "escape": 
             self._try_leave()
 
-    def on_resize(self, event) -> None:
+    def on_resize(self, _event) -> None:
         pass
 
-    def on_click(self, event) -> None:
+    def on_click(self, _event) -> None:
         pass
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
@@ -434,19 +423,12 @@ class ConfigScreen(Screen):
             self.app.pop_screen()
 
     def _run_strap(self) -> None:
-        if os.path.exists(t:=os.path.join(INSTALL_DIR, "core", "source.ahk")):
-            try: os.startfile(t)
-            except: pass
+        from ops.process import start_ahk
+        start_ahk()
 
     def _stop_strap(self) -> None:
-        subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        from ops.process import stop_ahk
+        stop_ahk()
 
     def _relaunch_ahk_from_shortcut(self) -> None:
-        """Kill AHK, then relaunch from shell:startup shortcut if present."""
-        from ops.startup import SHORTCUT_PATH
-        from ops.process import stop_ahk; stop_ahk()
-        if os.path.exists(SHORTCUT_PATH):
-            try:
-                os.startfile(SHORTCUT_PATH)
-            except Exception:
-                pass
+        relaunch_ahk_from_shortcut()
