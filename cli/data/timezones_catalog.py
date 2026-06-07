@@ -52,7 +52,7 @@ TIMEZONE_CATALOG: list[tuple[str, str, str, str]] = [
     ("Arabian Standard Time", "Arabian Standard Time", "Abu Dhabi, Muscat", "UTC +4"),
     ("Afghanistan Standard Time", "Afghanistan Standard Time", "Kabul", "UTC +4:30"),
     ("Pakistan Standard Time", "Pakistan Standard Time", "Islamabad, Karachi", "UTC +5"),
-    ("India Standard Time", "India Standard Time", "Chennai, Kolkata, Mumbai", "UTC +5:30"),
+    ("India Standard Time", "India Standard Time", "Chennai, Mumbai", "UTC +5:30"),
     ("Nepal Standard Time", "Nepal Standard Time", "Kathmandu", "UTC +5:45"),
     ("Central Asia Standard Time", "Central Asia Standard Time", "Astana", "UTC +6"),
     ("Myanmar Standard Time", "Myanmar Standard Time", "Yangon (Rangoon)", "UTC +6:30"),
