@@ -30,4 +30,5 @@ FEATURE_REGISTRY = [
     {"key": "forceKillTask",    "ahk_var": "ForceKillEnabled",       "label": "Force Kill",         "default": True},
     {"key": "colorPicker",      "ahk_var": "ColorPickerEnabled",     "label": "Color Picker",       "default": True},
     {"key": "lineNavigation",   "ahk_var": "LineNavEnabled",         "label": "Line Navigation",    "default": True},
+    {"key": "vimNavigation",    "ahk_var": "VimNavigationEnabled",   "label": "Vim Navigation",     "default": True},
 ]

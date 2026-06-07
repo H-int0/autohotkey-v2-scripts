@@ -106,7 +106,7 @@ def apply_headless_config(args: str) -> str:
                 cfg["startupTZID"] = "" if resolved_st and resolved_st.lower() == win_id.lower() else win_id
                 
     elif flag == "z":
-        fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation"}
+        fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation", 7:"vimNavigation"}
         fk = fk_map.get(no)
         if fk:
             c_feats = cfg.get("features", DEFAULT_CONFIG["features"])
@@ -124,6 +124,13 @@ def apply_headless_config(args: str) -> str:
             elif sub == "2":
                 if vl == '""' or vl == "''": v = ""
                 cfg["msgColorPicker"] = v
+        elif no == 3:
+            if sub == "1":
+                if vl == "--!": cfg["vimUseLeftAlt"] = not cfg.get("vimUseLeftAlt", True)
+                elif parse_bool(vl) is not None: cfg["vimUseLeftAlt"] = parse_bool(vl)
+            elif sub == "2":
+                if vl == "--!": cfg["vimUseRightAlt"] = not cfg.get("vimUseRightAlt", True)
+                elif parse_bool(vl) is not None: cfg["vimUseRightAlt"] = parse_bool(vl)
 
     if get_active_profile_name() == "default":
         set_active_profile("ghost")

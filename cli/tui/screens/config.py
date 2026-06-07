@@ -32,7 +32,7 @@ from config.schema import DEFAULT_CONFIG
 from ops.startup import is_startup_enabled
 from commands import get_installed_version, is_ahk_running, relaunch_ahk_from_shortcut
 from tui.widgets.config_panel import ConfigPanel
-from tui.popups.settings import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup
+from tui.popups.settings import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup, VimNavigationPopup
 from tui.popups.timezones import TimezonePopup
 from tui.popups.alerts import UnsavedChangesPopup
 from data.timezones_catalog import TIMEZONE_CATALOG
@@ -242,7 +242,7 @@ class ConfigScreen(Screen):
             elif no == 3: self._toggle_tz("timezones", sub if sub else v)
             elif no == 4: self._toggle_startup_tz(sub if sub else v)
         elif flag == "z":
-            fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation"}
+            fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation", 7:"vimNavigation"}
             fk = fk_map.get(no)
             if fk:
                 c_feats = dict(self.panel._effective("features", DEFAULT_CONFIG["features"]))
@@ -260,6 +260,13 @@ class ConfigScreen(Screen):
                 elif sub == "2":
                     if vl == '""' or vl == "''": v = ""
                     self.panel.pending["msgColorPicker"] = v
+            elif no == 3:
+                if sub == "1":
+                    if vl == "--!": self.panel.pending["vimUseLeftAlt"] = not self.panel._effective("vimUseLeftAlt", True)
+                    elif parse_bool(vl) is not None: self.panel.pending["vimUseLeftAlt"] = parse_bool(vl)
+                elif sub == "2":
+                    if vl == "--!": self.panel.pending["vimUseRightAlt"] = not self.panel._effective("vimUseRightAlt", True)
+                    elif parse_bool(vl) is not None: self.panel.pending["vimUseRightAlt"] = parse_bool(vl)
 
         self.panel.refresh_display()
         self._update_left_panel(flag, no)
@@ -343,8 +350,8 @@ class ConfigScreen(Screen):
                     self._active_tz_popup = TimezonePopup("u", 4, [st] if st else [], True)
                     self.app.push_screen(self._active_tz_popup, lambda r: self._apply_result("startupTZID", r[0] if r else "", r))
             elif flag == "z":
-                f_map = {1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation"}
-                names = {1: "NumPad Emulator", 2: "ALT Codes", 3: "TimeZone Switcher", 4: "Force Kill", 5: "Color Picker", 6: "Line Navigation"}
+                f_map = {1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation", 7: "vimNavigation"}
+                names = {1: "NumPad Emulator", 2: "ALT Codes", 3: "TimeZone Switcher", 4: "Force Kill", 5: "Color Picker", 6: "Line Navigation",  7: "Vim Navigation"}
                 if fk := f_map.get(no):
                     self.app.push_screen(
                         BooleanPopup(
@@ -363,6 +370,11 @@ class ConfigScreen(Screen):
                 elif no == 2:
                     self.app.push_screen(
                         ColorPickerPopup(cfg("colorPickerMsgBox", False), cfg("msgColorPicker", "Copied to Clipboard")),
+                        lambda r: self._apply_route_result(None, r)
+                    )
+                elif no == 3:
+                    self.app.push_screen(
+                        VimNavigationPopup(cfg("vimUseLeftAlt", True), cfg("vimUseRightAlt", True)),
                         lambda r: self._apply_route_result(None, r)
                     )
         except Exception:
