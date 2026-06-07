@@ -302,10 +302,17 @@ def execute_terminal_command(cmd: str, rest: str, raw_arg: str) -> None:
     if cmd == "/install":
         if rest == "--ls":
             cli_install_ls()
+        elif rest == "--from-ps":
+            import subprocess
+            ps_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "install.ps1"))
+            if os.path.exists(ps_path):
+                subprocess.run(["powershell", "-ExecutionPolicy", "Bypass", "-File", ps_path], check=False)
+            else:
+                print(f"[×] install.ps1 not found at {ps_path}")
+        elif rest.startswith("v"):
+            cli_install(target_version=rest)
         else:
-            from_ps = rest == "--from-ps"
-            ver = rest if (rest and not rest.startswith("--")) else ""
-            cli_install(target_version=ver, from_ps=from_ps)
+            cli_install()
     elif cmd == "/update":
         cli_update()
     elif cmd == "/switch":
