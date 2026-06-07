@@ -52,7 +52,8 @@ COMMANDS_TEXT = (
     "/version             (Current versions)\n"
     "/version --ls        (List local versions)\n"
     "/switch vX.X.X       (Switch version)\n\n"
-    "/uninstall           (Uninstall Strap)\n\n"
+    "/uninstall           (Uninstall Strap)\n"
+    "/uninstall --fr      (Fully wipe Strap)\n\n"
 )
 
 TERMINAL_COMMANDS_TEXT = (
@@ -77,7 +78,8 @@ TERMINAL_COMMANDS_TEXT = (
     "strap /version                 Current versions\n"
     "strap /version --ls            List local versions\n"
     "strap /switch vX.X.X           Switch active version\n\n"
-    "strap /uninstall               Uninstall Strap\n\n"
+    "strap /uninstall               Uninstall Strap\n"
+    "strap /uninstall --fr          Fully wipe Strap\n\n"
 )
 
 

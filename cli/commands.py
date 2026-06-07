@@ -27,6 +27,8 @@ import winreg
 import ctypes
 import requests
 
+ctypes.windll.kernel32.SetConsoleMode(ctypes.windll.kernel32.GetStdHandle(-11), 7)
+
 from tui.constants import TERMINAL_COMMANDS_TEXT
 from ops.updater import GITHUB_API
 
@@ -224,12 +226,13 @@ def cli_profile(subargs: str) -> None:
     else:
         print(f"Unknown profile subcommand: '{sub}'. Use --ls, --cr, --use, --d.")
 
-def cli_uninstall() -> None:
+def cli_uninstall(hard: bool = False, skip_confirm: bool = False) -> None:
     print("\n>> STRAP UNINSTALLER\n")
-    ans = input("This will remove Strap from your system. Continue? (y/n): ").strip().lower()
-    if ans not in _YES:
-        print("Uninstall aborted.")
-        return
+    if not hard and not skip_confirm:
+        ans = input("This will remove Strap from your system. Continue? (y/n): ").strip().lower()
+        if ans not in _YES:
+            print("Uninstall aborted.")
+            return
 
     print("Terminating AHK processes...")
     from ops.process import stop_ahk
@@ -247,8 +250,12 @@ def cli_uninstall() -> None:
         shutil.rmtree(INSTALL_DIR, ignore_errors=True)
     if os.path.exists(VERSIONS_DIR):
         shutil.rmtree(VERSIONS_DIR, ignore_errors=True)
-
-    print("\n[√] Strap was uninstalled successfully.")
+    if hard:
+        if os.path.exists(PROFILES_DIR):
+            shutil.rmtree(PROFILES_DIR, ignore_errors=True)
+        print("\n[√] Strap was fully uninstalled (all profiles removed).")
+    else:
+        print("\n[√] Strap was uninstalled successfully.")
     print("До встречи!")
 
 def cli_install_ls() -> None:
@@ -322,7 +329,7 @@ def execute_terminal_command(cmd: str, rest: str, raw_arg: str) -> None:
     elif cmd == "/profile":
         cli_profile(rest)
     elif cmd == "/uninstall":
-        cli_uninstall()
+        cli_uninstall(hard=rest == "--fr")
     elif cmd == "/config":
         if rest:
             from headless import apply_headless_config

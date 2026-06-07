@@ -278,8 +278,14 @@ class HomeScreen(Screen):
             rest = cmd[8:].strip()
             self._handle_profile(rest)
 
+        elif c == "/uninstall --fr":
+            self.app.exit(result="exit")
+            import subprocess
+            subprocess.Popen(["cmd", "/k", "echo y | strap /uninstall --fr"])
+
         elif c == "/uninstall":
             self.state = "uninstall_confirm"
+            self._uninstall_hard = False
             self.log_widget.write("This will remove Strap from your system.")
             self.log_widget.write("Continue? (y/n):")
 
@@ -373,7 +379,7 @@ class HomeScreen(Screen):
             if is_yes:
                 self.state = "uninstalling"
                 self.input_widget.disabled = True
-                self.run_uninstall_worker()
+                self.run_uninstall_worker(hard=getattr(self, "_uninstall_hard", False))
             elif is_no:
                 self.log_widget.write("Uninstall aborted.")
                 self.state = "idle"
@@ -496,40 +502,17 @@ class HomeScreen(Screen):
             self.process_next_command()
 
     @work(exclusive=True, thread=True)
-    def run_uninstall_worker(self) -> None:
-        import shutil, winreg, ctypes
-        from ops.startup import disable_startup
-
-        install_dir  = os.path.join(os.environ["APPDATA"], "Strap")
-        bin_dir      = os.path.join(install_dir, "bin")
-        versions_dir = os.path.join(os.environ["USERPROFILE"], ".strap_versions")
-
+    def run_uninstall_worker(self, hard: bool = False) -> None:
         class OutputRedirector:
             def __init__(self, app, log_widget): self.app = app; self.log_widget = log_widget
             def write(self, s):
                 if s.strip(): self.app.call_from_thread(self.log_widget.write, s.strip('\r\n'))
             def flush(self): pass
 
-        redir = OutputRedirector(self.app, self.log_widget)
-        from ops.process import stop_ahk; stop_ahk()
-        disable_startup()
+        with redirect_stdout(OutputRedirector(self.app, self.log_widget)):
+            from commands import cli_uninstall
+            cli_uninstall(hard=hard, skip_confirm=True)
 
-        try:
-            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Environment", 0, winreg.KEY_ALL_ACCESS)
-            current_path, _ = winreg.QueryValueEx(key, "Path")
-            entries = [e for e in current_path.split(";") if e.lower() != bin_dir.lower()]
-            winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, ";".join(entries))
-            ctypes.windll.user32.SendMessageTimeoutW(0xFFFF, 0x001A, 0, "Environment", 2, 5000, None)
-            winreg.CloseKey(key)
-        except Exception:
-            pass
-
-        if os.path.exists(install_dir):
-            shutil.rmtree(install_dir, ignore_errors=True)
-        if os.path.exists(versions_dir):
-            shutil.rmtree(versions_dir, ignore_errors=True)
-
-        redir.write("[√] Strap was uninstalled." + " До встречи!")
         self.app.call_from_thread(self.finish_worker)
 
     def finish_worker(self):
