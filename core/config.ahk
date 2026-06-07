@@ -30,11 +30,15 @@ Global TimezoneSwitcherEnabled      := 1
 Global ForceKillEnabled             := 1
 Global ColorPickerEnabled           := 1
 Global LineNavEnabled               := 1
+Global VimNavigationEnabled         := 1
 
 Global Msg_EndTask                  := "EVAPORATED!"
 Global Msg_ColorPicker              := "Copied to Clipboard"
 
 Global ColorPickerMsgBox            := 0
+
+Global VimNavigationUseLeftAlt      := 0
+Global VimNavigationUseRightAlt     := 0
 
 #Include config-dependencies\timezones-variables.ahk
 #Include config-dependencies\timezones-list.ahk
