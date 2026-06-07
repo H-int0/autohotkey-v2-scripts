@@ -167,6 +167,16 @@ POPUP_COLOR_PICKER = (
     "/back or Esc               (Close)\n\n"
 )
 
+POPUP_VIM_NAVIGATION = (
+    "[b]CONFIG - [y3] Vim Navigation[/b]\n"
+    "─────────────────────────\n"
+    "/config -y -3--1 --!       (Flip Left Alt)\n"
+    "/config -y -3--1 value     (enable|disable)\n\n"
+    "/config -y -3--2 --!       (Flip Right Alt)\n"
+    "/config -y -3--2 value     (enable|disable)\n\n"
+    "/back or Esc               (Close)\n\n"
+)
+
 def get_popup_tz_text(flag: str, no: int, is_single: bool, title: str) -> str:
     flag_no = f"-{flag} -{no}"
     tag = 'u4' if is_single else 'u3'
