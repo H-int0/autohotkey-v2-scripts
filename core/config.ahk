@@ -33,6 +33,7 @@ Global LineNavEnabled               := 1
 Global VimNavigationEnabled         := 1
 Global CharSwapEnabled              := 1
 Global PowerPlanSwitcherEnabled     := 1
+Global PrevPasteEnabled             := 1
 
 Global Msg_EndTask                  := "EVAPORATED!"
 Global Msg_ColorPicker              := "Copied to Clipboard"

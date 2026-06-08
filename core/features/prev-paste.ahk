@@ -1,7 +1,36 @@
+; GNU GENERAL PUBLIC LICENSE
+;
+; Copyright (C) 2026 H-int0
+; GitHub: <https://github.com/H-int0/>
+; License: <https://github.com/H-int0/autohotkey-v2-scripts/blob/main/LICENSE/>
+;
+; This program is free software: you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation, either version 3 of the License, or
+; (at your option) any later version.
+;
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+; ====================================================================================
+
 #Requires AutoHotkey v2.0
 
 global ClipHistory := []
 global IgnoreChange := false
+
+if (PrevPasteEnabled)
+    HelpEntries.Push("
+(
+> PREV CLIPBOARD:
+    Win+Ctrl+V      →  paste prev item
+    Win+Ctrl+1-9    →  paste Nth prev item
+)")
 
 OnClipboardChange ClipChanged
 
@@ -14,10 +43,14 @@ ClipChanged(DataType) {
         ClipHistory.Pop()
 }
 
+#HotIf PrevPasteEnabled
+
 Loop 9 {
     Hotkey "#^" A_Index, PasteHistory.Bind(A_Index)
 }
 Hotkey "#^v", PasteHistory.Bind(1)
+
+#HotIf 
 
 PasteHistory(Index, *) {
     global ClipHistory, IgnoreChange
