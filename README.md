@@ -22,7 +22,9 @@
   | **Versions** | Install, archive, and switch between multiple versions |
   | **Startup** | Control whether Strap auto-boots with Windows |
   | **Run / Stop** | Launch and stop the AHK scripts on demand |
+  | **Install/Update/Uninstall** | Control all of them from TUI |
 
+> [!NOTE]
 > Strap is still in active development. The AHK scripts are stable, but the CLI may behave unexpectedly.
 > Don't worry it won't NUKE your system. But if something breaks, see [RECOVERY.md](RECOVERY.md) for safe removal instructions.
 
@@ -31,7 +33,7 @@
 <!-- markdownlint-disable-next-line -->
 ### Houston, we have problems!!!
 
-If something ain't working, [open a bug report](https://github.com/H-int0/autohotkey-v2-scripts/issues/new?template=bug_report.md) and we'll look forward into it.
+Something ain't working? [open a bug report](https://github.com/H-int0/autohotkey-v2-scripts/issues/new?template=bug_report.md) and we'll look forward into it.
 
 ---
 
@@ -39,51 +41,31 @@ If something ain't working, [open a bug report](https://github.com/H-int0/autoho
 
 If you have an idea for something new, adding new features or think an existing feature could be better, [open a feature request](https://github.com/H-int0/autohotkey-v2-scripts/issues/new?template=feature_request.md).
 
+> [!TIP]
+> Wondering what else you can do? [REFERENCE.md](REFERENCE.md) covers every command and how the TUI works.
+
 ---
 
-## Table of Contents
+## Perquisite
 
-- [Quickly Install Strap](#quickly-install-strap)
-- [Getting Started](#getting-started)
-  - [Hotkeys](#hotkeys)
-  - [Strap Commands](#strap-commands)
-- [Repo Structure](#repo-structure)
-- [Features](#features)
-  - [1. Numpad Emulator](#1-numpad-emulator)
-  - [2. ALT Codes](#2-alt-codes)
-  - [3. Timezone Switcher](#3-timezone-switcher)
-  - [4. Force Kill Task](#4-force-kill-task)
-  - [5. Color Picker](#5-color-picker)
-  - [6. Line Navigation](#6-line-navigation)
-- [Strap's CLI/TUI](#straps-clitui)
-  - [Startup Shortcut](#startup-shortcut)
-  - [Profiles](#profiles)
-  - [Management](#management)
-  - [Layout](#layout)
-  - [Home Screen](#home-screen)
-  - [Config Screen](#config-screen)
-- [Contributing](#contributing)
-- [Troubleshooting](#troubleshooting)
-- [LICENSE](#license)
-
-## OS Supported
+### OS Supported
 
 - [Windows 7](https://www.microsoft.com/en-us/download/details.aspx?id=53332)*
 - [Windows 8](https://www.microsoft.com/en-us/download/details.aspx?id=40745)*
 - [Windows 10](https://www.microsoft.com/en-us/software-download/windows10)
 - [Windows 11](https://www.microsoft.com/en-us/software-download/windows11)
 
-## Requirements
+### Requirements
 
-- [AutoHotkey v2.0](https://www.autohotkey.com/) installed
+- [AutoHotkey v2.0](https://www.autohotkey.com/)
 
-  ```cmd
+  ```bat
   winget install -e --id AutoHotkey.AutoHotkey
   ```
 
-- [Python3](https://www.python.org/downloads/) installed
+- [Python3](https://www.python.org/downloads/)
 
-  ```cmd
+  ```bat
   winget install Python.Python.3
   ```
 
@@ -103,18 +85,22 @@ If you have an idea for something new, adding new features or think an existing 
   irm 'https://raw.githubusercontent.com/H-int0/autohotkey-v2-scripts/main/install.ps1' | iex
   ```
 
+- With **Zip**:
+
+  ```bash
+  # Replace with your file path
+  cd C:\path_to_strap\autohotkey-v2-scripts-main
+
+  # use this to hook up the CLI/TUI:
+  python cli/main.py /install
+  ```
+
 > [!TIP]
-> Prefer the ZIP version? Simply extract the ZIP file, open the setup folder, and double-click `install.bat` inside `setup`directory to set up the TUI Automatically.
+> Prefer the ZIP version? Simply extract the ZIP file, open the setup folder, and double-click `install.bat` to set up Strap Automatically.
 
-```bash
-# Replace with your file path
-cd C:\path_to_strap\autohotkey-v2-scripts-main
-  
-# use this to hook up the CLI/TUI:
-python cli/main.py /install
-```
+---
 
-### After Installation
+## After Installation
 
 ```bash
 # verify installation (launches the TUI):
@@ -128,11 +114,25 @@ strap /run
 
 ---
 
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Repo Structure](#repo-structure)
+- [Features](#features)
+- [Strap's CLI/TUI](#straps-clitui)
+- [Contributing](#contributing)
+- [LICENSE](#license)
+
+> See [CHANGELOG.md](CHANGELOG.md) for the history of versions.
+
+---
+
 ## Getting Started
 
 Check all the Hotkeys and Commands here:
 
-### Hotkeys
+<details>
+  <summary> Full Hotkeys </summary>
 
 - **Utilities:**
 
@@ -155,10 +155,12 @@ Check all the Hotkeys and Commands here:
   | `Shift + Win + Left/Right Arrow` | Select text to start/end of line |
   | `Alt + Backspace/Delete` | Delete text to start/end of line |
 
-### Strap Commands
+</details>
 
-> [!NOTE]
-> All commands work in both the TUI and terminal. In the terminal, always prefix commands with `strap`. Inside the TUI, the prefix is optional.
+<br>
+
+<details>
+  <summary> Full Commands </summary>
 
 - **General Commands**
 
@@ -167,8 +169,8 @@ Check all the Hotkeys and Commands here:
 
   strap /run                          # Runs AHK scripts
   strap /stop                         # Stops AHK scripts
-  strap /run --cr shr                 # Enable auto-boot (creates a startup shortcut)
-  strap /run --d shr                  # Disable auto-boot (removes from startup)
+  strap /run --cr shr                 # Create startup shortcut (enables auto-boot on login)
+  strap /run --d sh                   # Delete startup shortcut (disables auto-boot)
 
   strap /config                       # Configure Strap settings
 
@@ -192,10 +194,8 @@ Check all the Hotkeys and Commands here:
   strap /switch vX.X.X                # Switch your active version
 
   strap /uninstall                    # Uninstall Strap
+  strap /uninstall --fr               # Fully Remove Strap
   ```
-
-> [!TIP]
-> Chain commands with `^`. Example: `/run ^ /config`
 
 - **Config Commands Structure**
 
@@ -225,83 +225,92 @@ Check all the Hotkeys and Commands here:
   /config --abort
   ```
 
+</details>
+
 ---
 
 ### Repo Structure
 
-```bash
-\:.
-|   CHANGELOG.md                        # version history
-|   CONTRIBUTING.md
-|   REFERENCE.md                        # documentation of how everything actually work
-|   install.ps1                         # bootstrap installer (run via irm | iex)
-|   LICENSE
-|   README.md
-|   RECOVERY.md                         # safe removal instructions
-|   VERSION                             # current version string
-|
-+---setup
-|       install.bat                     # to manually setup strap's TUI
-|
-+---cli                                 # holds the entire CLI
-|   |   commands.py                     # Handles command parsing
-|   |   features.py                     # Holds the FEATURE_REGISTRY list
-|   |   headless.py                     # Shared config parser for main.py and TUI screens
-|   |   main.py                         # THE entry point for the TUI
-|   |   requirements.txt
-|   |
-|   +---config
-|   |       manager.py                  # reads/writes .JSON
-|   |       parser.py                   # reads config.ahk into .JSON
-|   |       schema.py                   # defines the structure of the .JSON
-|   |
-|   +---data
-|   |       timezones_catalog.py        # full timezone list for TUI picker
-|   |
-|   +---ops
-|   |       file_editor.py              # writes JSON config back to config.ahk via regex
-|   |       installer.py                # install logic (from PowerShell or in-app)
-|   |       process.py                  # AHK process management (run/stop/restart)
-|   |       startup.py                  # Windows startup shortcut management
-|   |       updater.py                  # version switching and profile migrations
-|   |
-|   \---tui
-|       |   app.py                      # Textual app root
-|       |   constants.py                # shared UI strings and hint text
-|       |
-|       +---popups
-|       |       alerts.py               # generic alert dialogs
-|       |       base.py                 # base popup class
-|       |       settings.py             # boolean toggle popup
-|       |       timezones.py            # timezone selector popup
-|       |
-|       +---screens                     # holds all screens in the TUI
-|       |       config.py
-|       |       home.py
-|       |
-|       +---styles                      # holds the TUI's stylesheets
-|       |       config.tcss
-|       |       home.tcss
-|       |
-|       \---widgets
-|               config_panel.py         # config feature list widget
-|
-\---core                                # holds all the ahk scripts
-    |   config.ahk                      # user-facing config variables
-    |   source.ahk                      # entry point of .ahk scripts, loads all features
-    |
-    +---config-dependencies             # holds catalogs of data
-    |       timezones-list.ahk
-    |       timezones-variables.ahk
-    |
-    \---features                        # holds the script of all individual script
-            alt-codes.ahk
-            color-picker.ahk
-            force-kill-task.ahk
-            line-navigation.ahk
-            numpad-emulator.ahk
-            timezone-switcher.ahk
-```
+<details>
+  <summary></summary>
+
+  ```bash
+  \:.
+  |   CHANGELOG.md                        # version history
+  |   CONTRIBUTING.md
+  |   REFERENCE.md                        # documentation of how everything actually work
+  |   install.ps1                         # bootstrap installer (run via irm | iex)
+  |   LICENSE
+  |   README.md
+  |   RECOVERY.md                         # safe removal instructions
+  |   VERSION                             # current version string
+  |
+  +---setup
+  |       install.bat                     # to manually setup strap's TUI
+  |
+  +---cli                                 # holds the entire CLI
+  |   |   commands.py                     # Handles command parsing
+  |   |   features.py                     # Holds the FEATURE_REGISTRY list
+  |   |   headless.py                     # Shared config parser for main.py and TUI screens
+  |   |   main.py                         # THE entry point for the TUI
+  |   |   requirements.txt
+  |   |
+  |   +---config
+  |   |       manager.py                  # reads/writes .JSON
+  |   |       parser.py                   # reads config.ahk into .JSON
+  |   |       schema.py                   # defines the structure of the .JSON
+  |   |
+  |   +---data
+  |   |       timezones_catalog.py        # full timezone list for TUI picker
+  |   |
+  |   +---ops
+  |   |       file_editor.py              # writes JSON config back to config.ahk via regex
+  |   |       installer.py                # install logic (from PowerShell or in-app)
+  |   |       process.py                  # AHK process management (run/stop/restart)
+  |   |       startup.py                  # Windows startup shortcut management
+  |   |       updater.py                  # version switching and profile migrations
+  |   |
+  |   \---tui
+  |       |   app.py                      # Textual app root
+  |       |   constants.py                # shared UI strings and hint text
+  |       |
+  |       +---popups
+  |       |       alerts.py               # generic alert dialogs
+  |       |       base.py                 # base popup class
+  |       |       settings.py             # boolean toggle popup
+  |       |       timezones.py            # timezone selector popup
+  |       |
+  |       +---screens                     # holds all screens in the TUI
+  |       |       config.py
+  |       |       home.py
+  |       |
+  |       +---styles                      # holds the TUI's stylesheets
+  |       |       config.tcss
+  |       |       home.tcss
+  |       |
+  |       \---widgets
+  |               config_panel.py         # config feature list widget
+  |
+  \---core                                # holds all the ahk scripts
+      |   config.ahk                      # user-facing config variables
+      |   source.ahk                      # entry point of .ahk scripts, loads all features
+      |
+      +---config-dependencies             # holds catalogs of data
+      |       timezones-list.ahk
+      |       timezones-variables.ahk
+      |
+      \---features                        # holds the script of all individual script
+              alt-codes.ahk
+              color-picker.ahk
+              force-kill-task.ahk
+              line-navigation.ahk
+              numpad-emulator.ahk
+              timezone-switcher.ahk
+  ```
+
+</details>
+
+---
 
 ## Features
 
@@ -310,6 +319,9 @@ Check all the Hotkeys and Commands here:
 
 ### 1. Numpad Emulator
 
+<details>
+  <summary></summary>
+
 A hardware-level numpad substitute for Ten-key-less (TKL), 60%, and laptop keyboards, mapping the standard number row to actual Numpad keycodes.
 
 **Hotkeys:**
@@ -317,15 +329,25 @@ A hardware-level numpad substitute for Ten-key-less (TKL), 60%, and laptop keybo
 - **Toggle:** `CapsLock`
 - **Use:** Toggles number row keys between normal mode and Numpad mode with `Caps Lock` state **off** and **on** respectively.
 
+</details>
+
 ---
 
 ### 2. ALT Codes
 
-- Type Alt codes directly from your number row. (Try pressing `ALT + 9825` for a `♡`)
+<details>
+  <summary></summary>
+
+Type Alt codes directly from your number row. (Try pressing `ALT + 9825` for a `♡`)
+
+</details>
 
 ---
 
 ### 3. Timezone Switcher
+
+<details>
+  <summary></summary>
 
 A system-level utility to instantly cycle your Windows clock between different global timezones without navigating through the Windows Settings app.
 
@@ -354,50 +376,58 @@ Each time you cycle, a small tooltip appears near your cursor showing the new Ti
   | Sydney | +10 |
   | Eastern Time | -5 |
 
-**Supported Timezones:**
+<details>
+  <summary>Supported Timezones:</summary>
 
-| Label | UTC Offset | Windows ID |
-| --- | --- | --- |
-| Dateline Standard Time | -12 | `Dateline Standard Time` |
-| UTC-11 | -11 | `UTC-11` |
-| Hawaiian Standard Time | -10 | `Hawaiian Standard Time` |
-| Marquesas Standard Time | -9:30 | `Marquesas Standard Time` |
-| Alaskan Standard Time | -9 | `Alaskan Standard Time` |
-| Pacific Standard Time | -8 | `Pacific Standard Time` |
-| US Mountain Standard Time | -7 | `US Mountain Standard Time` |
-| Central Standard Time | -6 | `Central Standard Time` |
-| Eastern Standard Time | -5 | `Eastern Standard Time` |
-| Atlantic Standard Time | -4 | `Atlantic Standard Time` |
-| Venezuela Standard Time | -4 | `Venezuela Standard Time` |
-| E. South America Standard Time | -3 | `E. South America Standard Time` |
-| Argentina Standard Time | -3 | `Argentina Standard Time` |
-| UTC-02 | -2 | `UTC-02` |
-| Azores Standard Time | -1 | `Azores Standard Time` |
-| GMT Standard Time | +0 | `GMT Standard Time` |
-| W. Europe Standard Time | +1 | `W. Europe Standard Time` |
-| Israel Standard Time | +2 | `Israel Standard Time` |
-| Russian Standard Time | +3 | `Russian Standard Time` |
-| Iran Standard Time | +3:30 | `Iran Standard Time` |
-| Arabian Standard Time | +4 | `Arabian Standard Time` |
-| Afghanistan Standard Time | +4:30 | `Afghanistan Standard Time` |
-| Pakistan Standard Time | +5 | `Pakistan Standard Time` |
-| India Standard Time | +5:30 | `India Standard Time` |
-| Nepal Standard Time | +5:45 | `Nepal Standard Time` |
-| Central Asia Standard Time | +6 | `Central Asia Standard Time` |
-| Myanmar Standard Time | +6:30 | `Myanmar Standard Time` |
-| SE Asia Standard Time | +7 | `SE Asia Standard Time` |
-| China Standard Time | +8 | `China Standard Time` |
-| Tokyo Standard Time | +9 | `Tokyo Standard Time` |
-| Cen. Australia Standard Time | +9:30 | `Cen. Australia Standard Time` |
-| AUS Eastern Standard Time | +10 | `AUS Eastern Standard Time` |
-| Central Pacific Standard Time | +11 | `Central Pacific Standard Time` |
-| New Zealand Standard Time | +12 | `New Zealand Standard Time` |
-| Tonga Standard Time | +13 | `Tonga Standard Time` |
-| Line Islands Standard Time | +14 | `Line Islands Standard Time` |
+  | Label | UTC Offset | Windows ID |
+  | --- | --- | --- |
+  | Dateline Standard Time | -12 | `Dateline Standard Time` |
+  | UTC-11 | -11 | `UTC-11` |
+  | Hawaiian Standard Time | -10 | `Hawaiian Standard Time` |
+  | Marquesas Standard Time | -9:30 | `Marquesas Standard Time` |
+  | Alaskan Standard Time | -9 | `Alaskan Standard Time` |
+  | Pacific Standard Time | -8 | `Pacific Standard Time` |
+  | US Mountain Standard Time | -7 | `US Mountain Standard Time` |
+  | Central Standard Time | -6 | `Central Standard Time` |
+  | Eastern Standard Time | -5 | `Eastern Standard Time` |
+  | Atlantic Standard Time | -4 | `Atlantic Standard Time` |
+  | Venezuela Standard Time | -4 | `Venezuela Standard Time` |
+  | E. South America Standard Time | -3 | `E. South America Standard Time` |
+  | Argentina Standard Time | -3 | `Argentina Standard Time` |
+  | UTC-02 | -2 | `UTC-02` |
+  | Azores Standard Time | -1 | `Azores Standard Time` |
+  | GMT Standard Time | +0 | `GMT Standard Time` |
+  | W. Europe Standard Time | +1 | `W. Europe Standard Time` |
+  | Israel Standard Time | +2 | `Israel Standard Time` |
+  | Russian Standard Time | +3 | `Russian Standard Time` |
+  | Iran Standard Time | +3:30 | `Iran Standard Time` |
+  | Arabian Standard Time | +4 | `Arabian Standard Time` |
+  | Afghanistan Standard Time | +4:30 | `Afghanistan Standard Time` |
+  | Pakistan Standard Time | +5 | `Pakistan Standard Time` |
+  | India Standard Time | +5:30 | `India Standard Time` |
+  | Nepal Standard Time | +5:45 | `Nepal Standard Time` |
+  | Central Asia Standard Time | +6 | `Central Asia Standard Time` |
+  | Myanmar Standard Time | +6:30 | `Myanmar Standard Time` |
+  | SE Asia Standard Time | +7 | `SE Asia Standard Time` |
+  | China Standard Time | +8 | `China Standard Time` |
+  | Tokyo Standard Time | +9 | `Tokyo Standard Time` |
+  | Cen. Australia Standard Time | +9:30 | `Cen. Australia Standard Time` |
+  | AUS Eastern Standard Time | +10 | `AUS Eastern Standard Time` |
+  | Central Pacific Standard Time | +11 | `Central Pacific Standard Time` |
+  | New Zealand Standard Time | +12 | `New Zealand Standard Time` |
+  | Tonga Standard Time | +13 | `Tonga Standard Time` |
+  | Line Islands Standard Time | +14 | `Line Islands Standard Time` |
+
+</details>
+
+</details>
 
 ---
 
 ### 4. Force Kill Task
+
+<details>
+  <summary></summary>
 
 A smart, context-aware window closer that gracefully exits healthy programs and ruthlessly terminates frozen ones.
 
@@ -407,9 +437,14 @@ A smart, context-aware window closer that gracefully exits healthy programs and 
 - If the window is frozen or unresponsive, it force‑kills the process.
 - A tooltip appears confirming the action.
 
+</details>
+
 ---
 
 ### 5. Color Picker
+
+<details>
+  <summary></summary>
 
 A developer-centric, floating live color picker that captures screen pixels, translates them into Hex and RGB, and copies them to your clipboard.
 
@@ -419,9 +454,14 @@ A developer-centric, floating live color picker that captures screen pixels, tra
 - Press again to close the picker and instantly copy the color (Hex, RGB, and screen coordinates) to the clipboard.
 - By default, a tooltip confirms the copy. You can optionally enable a summary Message Box.
 
+</details>
+
 ---
 
 ### 6. Line Navigation
+
+<details>
+  <summary></summary>
 
 Translates modern text-editor navigation shortcuts into standard Windows keystrokes, allowing for rapid text manipulation without reaching for the physical `Home` or `End` keys.
 
@@ -436,34 +476,32 @@ Translates modern text-editor navigation shortcuts into standard Windows keystro
 | Delete from cursor to start of line | `Alt + Backspace` |
 | Delete from cursor to end of line | `Alt + Delete` |
 
----
-
-### Startup Shortcut
-
-Controls whether Strap auto-launches on Windows login via a shortcut in the Windows Startup folder.
-
-```bash
-/run --cr shr               # Create startup shortcut (enables auto-boot on login)
-/run --d shr                # Delete startup shortcut (disables auto-boot)
-```
+</details>
 
 ---
 
 ## Strap's CLI/TUI
 
-- Run `strap` in your terminal to launch the TUI, a lightweight terminal interface for managing everything in Strap. From here you can run and stop the AHK scripts, configure features, manage profiles, install and switch between versions, and handle startup behavior, all without touching a config file directly.
-- You can use all these commands directly inside your terminal with the prefix `strap`.
+Run `strap` in your terminal to launch the TUI, a lightweight terminal interface for managing everything in Strap. From here you can run and stop the AHK scripts, configure features, manage profiles, install and switch between versions, and handle startup behavior, all without touching a config file directly.
+
+> [!NOTE]
+> All commands work in both the TUI and terminal. In the terminal, always prefix commands with `strap`. Inside the TUI, the prefix is optional.
+
+<!-- markdownlint-disable-next-line -->
 
 > [!TIP]
-> Wondering what else you can do? [REFERENCE.md](REFERENCE.md) covers every command and how the TUI works.
+> Chain commands with `^`. Example: `/run ^ /config`
+
+<details>
+  <summary>Commands</summary>
 
 ```bash
 strap /help, /?                     # Show all available strap commands
 
 strap /run                          # Runs AHK scripts
 strap /stop                         # Stops AHK scripts
-strap /run --cr shr                 # Enable auto-boot (creates a startup shortcut)
-strap /run --d shr                  # Disable auto-boot (removes from startup)
+strap /run --cr shr                 # Create startup shortcut (enables auto-boot on login)
+strap /run --d sh                   # Delete startup shortcut (disables auto-boot)
 
 strap /config                       # Configure Strap settings
 
@@ -486,14 +524,21 @@ strap /version --ls                 # List local versions
 strap /switch vX.X.X                # Switch your active version
 
 strap /uninstall                    # Uninstall Strap
+strap /uninstall --fr               # Fully Remove Strap
 ```
+
+</details>
 
 ---
 
 ### Profiles
 
-- Profiles store your config separately so you can switch between different setups without losing settings.
-- When you switch versions, all profiles are automatically updated new config keys are added at their defaults, and unknown keys from older versions are left alone.
+<details>
+  <summary></summary>
+
+Profiles store your config separately so you can switch between different setups without losing settings.
+
+When you switch versions, all profiles are automatically updated new config keys are added at their defaults, and unknown keys from older versions are left alone.
 
 Three profile types:
 
@@ -510,9 +555,14 @@ Three profile types:
 /profile --d name                   # Delete a profile
 ```
 
+</details>
+
 ---
 
 ### Management
+
+<details>
+  <summary></summary>
 
 Installed versions are archived locally and never modified. You can install multiple versions and switch between them without re-downloading.
 
@@ -526,9 +576,14 @@ Installed versions are archived locally and never modified. You can install mult
 /version --ls                       # List locally installed versions
 ```
 
+</details>
+
 ---
 
 ### Layout
+
+<details>
+  <summary></summary>
 
 The TUI has two screens.
 
@@ -538,6 +593,8 @@ The TUI has two screens.
 - **Config screen:**
   - opened via `/config`. Has the same left panel layout (status + contextual hints) but the right side is replaced by an interactive settings list instead of a log.
   - Changes are staged as pending and only written to disk when user explicitly save.
+
+</details>
 
 ---
 
@@ -576,7 +633,8 @@ Type any command into the `>>` prompt.
 | `z` | Feature toggle (enable / disable) |
 | `y` | Feature toggle + sub-settings |
 
-- **Config Commands Structure**
+<details>
+  <summary>Config Commands Structure</summary>
 
   ```bash
   # Opens a Popup
@@ -603,10 +661,15 @@ Type any command into the `>>` prompt.
   # Discard all pending changes
   /config --abort
   ```
+
+</details>
+
+<br>
   
 ---
 
-#### 1. Configure settings with -u {flag}
+<details>
+  <summary>Configure settings with -u {flag}</summary>
 
 ```bash
 /config -u -1 value                 # Tray icon (visible | hidden)
@@ -615,7 +678,10 @@ Type any command into the `>>` prompt.
 /config -u -3 "UTC_+/-No."          # Set startup timezone (same value again = reset)
 ```
 
-#### 2. Configure settings with -z {flag}
+</details>
+
+<details>
+<summary>Configure settings with -z {flag}</summary>
 
 > [!TIP]
 > Use commands in the format `strap /config -!z -2 --!` to quickly change that setting. (Works with any flag)
@@ -629,13 +695,18 @@ Type any command into the `>>` prompt.
 /config -z -6 value                 # Line Navigation
 ```
 
-#### 3. Configure settings with -y {flag}
+</details>
+
+<details>
+<summary>Configure settings with -y {flag}</summary>
 
 ```bash
 /config -y -1--1 text               # Force Kill set tooltip text
 /config -y -2--1 value              # Color Picker msgbox toggle (enable | disable)
 /config -y -2--2 text               # Color Picker set tooltip text
 ```
+
+</details>
 
 ---
 
@@ -660,13 +731,16 @@ Bug fixes, new features, improvements to the CLI/TUI, whatever you've got. And r
 
 ---
 
-## Troubleshooting
+<details>
+  <summary>Troubleshooting</summary>
 
 - **Numpad keys aren't working**: Make sure CapsLock is ON. If it still doesn't work, try reloading the script through the tray icon.
 - **Timezone isn't switching**: Go to **Settings > Time & Language > Date & Time** and make sure **"Set time zone automatically"** is turned off.
 - **Script seems to be running but nothing works**: Right-click the tray icon (make it visible first with `Win + Ctrl + \`) and select **Reload**.
 
 > **Keyboard is behaving strangely after installing the script**: See [RECOVERY.md](RECOVERY.md) for step-by-step instructions to safely remove the script.
+
+</details>
 
 ---
 
