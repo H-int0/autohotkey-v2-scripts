@@ -50,6 +50,7 @@ if (IsSet(StartupTZID) && StartupTZID != "")
 #Include features/color-picker.ahk
 #Include features/line-navigation.ahk
 #Include features/vim-navigation.ahk
+#Include features/powerplan-switcher.ahk
 
 #HotIf
 #^\::
