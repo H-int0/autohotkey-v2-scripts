@@ -106,7 +106,11 @@ def apply_headless_config(args: str) -> str:
                 cfg["startupTZID"] = "" if resolved_st and resolved_st.lower() == win_id.lower() else win_id
                 
     elif flag == "z":
-        fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation", 7:"vimNavigation"}
+        fk_map = {
+            1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 
+            4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation", 
+            7: "vimNavigation", 8: "charSwap", 9: "powerPlan", 10: "prevPaste"
+        }
         fk = fk_map.get(no)
         if fk:
             c_feats = cfg.get("features", DEFAULT_CONFIG["features"])

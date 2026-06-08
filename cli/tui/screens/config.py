@@ -242,7 +242,11 @@ class ConfigScreen(Screen):
             elif no == 3: self._toggle_tz("timezones", sub if sub else v)
             elif no == 4: self._toggle_startup_tz(sub if sub else v)
         elif flag == "z":
-            fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation", 7:"vimNavigation"}
+            fk_map = {
+                1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 
+                4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation", 
+                7: "vimNavigation", 8: "charSwap", 9: "powerPlan", 10: "prevPaste"
+            }
             fk = fk_map.get(no)
             if fk:
                 c_feats = dict(self.panel._effective("features", DEFAULT_CONFIG["features"]))
@@ -350,8 +354,17 @@ class ConfigScreen(Screen):
                     self._active_tz_popup = TimezonePopup("u", 4, [st] if st else [], True)
                     self.app.push_screen(self._active_tz_popup, lambda r: self._apply_result("startupTZID", r[0] if r else "", r))
             elif flag == "z":
-                f_map = {1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation", 7: "vimNavigation"}
-                names = {1: "NumPad Emulator", 2: "ALT Codes", 3: "TimeZone Switcher", 4: "Force Kill", 5: "Color Picker", 6: "Line Navigation",  7: "Vim Navigation"}
+                f_map = {
+                    1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 
+                    4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation", 
+                    7: "vimNavigation", 8: "charSwap", 9: "powerPlan", 10: "prevPaste"
+                }
+                names = {
+                    1: "NumPad Emulator", 2: "ALT Codes", 3: "TimeZone Switcher", 
+                    4: "Force Kill", 5: "Color Picker", 6: "Line Navigation",  
+                    7: "Vim Navigation", 8: "CharSwap (RU-EN)", 9: "Power Plan Switcher", 
+                    10: "Previous Paste"
+                }
                 if fk := f_map.get(no):
                     self.app.push_screen(
                         BooleanPopup(
