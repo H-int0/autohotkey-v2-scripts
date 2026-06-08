@@ -21,29 +21,46 @@
 
 #Requires AutoHotkey v2.0
 
-A_IconHidden                        := 1
-Global Config_TooltipDuration       := 2500
+global ClipHistory := []
+global IgnoreChange := false
 
-Global NumpadEmulatorEnabled        := 1
-Global AltCodesEnabled              := 1
-Global TimezoneSwitcherEnabled      := 1
-Global ForceKillEnabled             := 1
-Global ColorPickerEnabled           := 1
-Global LineNavEnabled               := 1
-Global VimNavigationEnabled         := 1
-Global CharSwapEnabled              := 1
-Global PowerPlanSwitcherEnabled     := 1
-Global PrevPasteEnabled             := 1
+if (PrevPasteEnabled)
+    HelpEntries.Push("
+(
+> PREV CLIPBOARD:
+    Win+Ctrl+V      →  paste prev item
+    Win+Ctrl+1-9    →  paste Nth prev item
+)")
 
-Global Msg_EndTask                  := "EVAPORATED!"
-Global Msg_ColorPicker              := "Copied to Clipboard"
+OnClipboardChange ClipChanged
 
-Global ColorPickerMsgBox            := 0
+ClipChanged(DataType) {
+    global ClipHistory, IgnoreChange
+    if (IgnoreChange || DataType == 0)
+        return
+    ClipHistory.InsertAt(1, ClipboardAll())
+    if (ClipHistory.Length > 10)
+        ClipHistory.Pop()
+}
 
-Global VimNavigationUseLeftAlt      := 1
-Global VimNavigationUseRightAlt     := 1
+#HotIf PrevPasteEnabled
 
-#Include config-dependencies\timezones-variables.ahk
-#Include config-dependencies\timezones-list.ahk
+Loop 9 {
+    Hotkey "#^" A_Index, PasteHistory.Bind(A_Index)
+}
+Hotkey "#^v", PasteHistory.Bind(1)
 
-StartupTZID                         := ""
+#HotIf 
+
+PasteHistory(Index, *) {
+    global ClipHistory, IgnoreChange
+    TargetIndex := Index + 1
+    if (ClipHistory.Length < TargetIndex)
+        return
+    IgnoreChange := true
+    A_Clipboard := ClipHistory[TargetIndex]
+    Sleep 50
+    Send "^v"
+    Sleep 100
+    IgnoreChange := false
+}

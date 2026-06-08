@@ -43,8 +43,8 @@ Check all the Hotkeys and Commands here:
 
   strap /run                          # Runs AHK scripts
   strap /stop                         # Stops AHK scripts
-  strap /run --cr shr                 # Enable auto-boot (creates a startup shortcut)
-  strap /run --d shr                  # Disable auto-boot (removes from startup)
+  strap /run --cr shr                 # Create startup shortcut (enables auto-boot on login)
+  strap /run --d sh                   # Delete startup shortcut (disables auto-boot)
 
   strap /config                       # Configure Strap settings
 
@@ -68,6 +68,7 @@ Check all the Hotkeys and Commands here:
   strap /switch vX.X.X                # Switch your active version
 
   strap /uninstall                    # Uninstall Strap
+  strap /uninstall --fr               # Fully Remove Strap
   ```
 
 > [!TIP]
@@ -122,7 +123,6 @@ Check all the Hotkeys and Commands here:
   - [5. Color Picker](#5-color-picker)
   - [6. Line Navigation](#6-line-navigation)
 - [Strap CLI/TUI](#strap-clitui)
-  - [Startup Shortcut](#startup-shortcut)
   - [Profiles](#profiles)
   - [Management](#management)
   - [Layout](#layout)
@@ -444,8 +444,8 @@ strap /command    # headless runs the command and exits
 
   strap /run                          # Runs AHK scripts
   strap /stop                         # Stops AHK scripts
-  strap /run --cr shr                 # Enable auto-boot (creates a startup shortcut)
-  strap /run --d shr                  # Disable auto-boot (removes from startup)
+  strap /run --cr shr                 # Create startup shortcut (enables auto-boot on login)
+  strap /run --d sh                   # Delete startup shortcut (disables auto-boot)
 
   strap /config                       # Configure Strap settings
 
@@ -468,18 +468,10 @@ strap /command    # headless runs the command and exits
   strap /switch vX.X.X                # Switch your active version
 
   strap /uninstall                    # Uninstall Strap
+  strap /uninstall --fr               # Fully Remove Strap
   ```
 
 ---
-
-### Startup Shortcut
-
-Controls whether Strap auto-launches on Windows login via a shortcut in the Windows Startup folder.
-
-```bash
-/run --cr shr               # Create startup shortcut (enables auto-boot on login)
-/run --d shr                # Delete startup shortcut (disables auto-boot)
-```
 
 - Creating the shortcut places `Strap.lnk` in `shell:startup` (`%APPDATA%\Roaming\Microsoft\Windows\Start Menu\Programs\Startup`).
 - Removing it deletes `Strap.lnk` from that same folder.
@@ -807,11 +799,13 @@ Type any command into the `>>` prompt. Commands must start with `/`. Inside the 
 ## Uninstallation
 
   ```bash
-  /uninstall
+  /uninstall                      # Uninstall Strap
+  /uninstall --fr                 # Fully Remove Strap
   ```
 
 - Stops AHK, removes the startup shortcut, removes `strap` from your PATH, and deletes `%APPDATA%\Strap`and Version archives.
 - Profiles are preserved for future use case.
+- If `--fr` flag is used profiles are also deleted.
 
 ---
 
