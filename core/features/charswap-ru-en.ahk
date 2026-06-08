@@ -20,7 +20,17 @@
 ; ====================================================================================
 
 #Requires AutoHotkey v2.0
-#SingleInstance Force
+
+if !IsSet(HelpEntries)
+    global HelpEntries := []
+if (CharSwapEnabled)
+    HelpEntries.Push("
+(
+> RU-EN CHARSWAP:
+    Win+Ctrl+Space  →  swap character
+)")
+
+#HotIf CharSwapEnabled
 
 ; Hotkey: Win + Ctrl + Space
 #^Space::
@@ -51,6 +61,8 @@
 
     A_Clipboard := SavedClip
 }
+
+#HotIf
 
 ; --- Core Transliteration Logic ---
 ; TransMap stores all three case variants explicitly.
