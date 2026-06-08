@@ -110,6 +110,14 @@ def _load_active_version() -> str:
         return DEFAULT_CONFIG["version"]
 
 def _do_switch(version: str, version_dir: str) -> None:
+    from commands import is_ahk_running
+    from ops.process import stop_ahk, start_ahk
+
+    was_running = is_ahk_running()
+    if was_running:
+        print("Terminating running AHK scripts...")
+        stop_ahk()
+
     print(f"Switching to v{version}...")
     print("Clearing current active version...")
     for item in os.listdir(INSTALL_DIR):
@@ -145,6 +153,10 @@ def _do_switch(version: str, version_dir: str) -> None:
         enable_startup()
 
     print(f"\n[√] Switched to v{version} successfully!")
+
+    if was_running:
+        print("Relaunching AHK scripts...")
+        start_ahk()
 
 def _download_and_archive(zip_url: str, version: str, version_dir: str) -> None:
     tmp_zip = os.path.join(VERSIONS_DIR, "tmp_download.zip")
