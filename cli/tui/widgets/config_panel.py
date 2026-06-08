@@ -88,6 +88,7 @@ class ConfigPanel(Static):
             "Configure - Features\n",
             f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y1') else ' '}\\[y1] Force Kill",
             f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y2') else ' '}\\[y2] Color Picker",
+            f"{'[bold yellow]*[/bold yellow]' if self._mark_bool('y3') else ' '}\\[y3] Vim Navigation",
         ]
         return "\n".join(lines)
 
@@ -103,8 +104,14 @@ class ConfigPanel(Static):
             return False
 
         keys = {
-            "u1": ["trayIconVisible"], "u2": ["tooltipDuration"], "u3": ["timezones"], "u4": ["startupTZID"],
-            "y1": ["msgEndTask"], "y2": ["colorPickerMsgBox", "msgColorPicker"]
+            "u1": ["trayIconVisible"],
+            "u2": ["tooltipDuration"],
+            "u3": ["timezones"],
+            "u4": ["startupTZID"],
+
+            "y1": ["msgEndTask"],
+            "y2": ["colorPickerMsgBox", "msgColorPicker"],
+            "y3": ["vimUseLeftAlt", "vimUseRightAlt"]
         }
         for k in keys.get(flag_no, []):
             if k in self.pending: return True
@@ -138,6 +145,8 @@ class ConfigPanel(Static):
             "msgEndTask": "Force Kill Tooltip",
             "colorPickerMsgBox": "Color Picker Box",
             "msgColorPicker": "Color Picker Tooltip",
+            "vimUseLeftAlt":  "Vim Nav - Left Alt",
+            "vimUseRightAlt": "Vim Nav - Right Alt",
         }
         for key, new_val in self.pending.items():
             if key == "features":

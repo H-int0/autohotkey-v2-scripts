@@ -131,6 +131,23 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
     with open(ahk_path, "w", encoding="utf-8") as f:
         f.write(content)
 
+    # --- [y3] Vim Arrow Keys settings ---
+    if "vimUseLeftAlt" in config_data:
+        ahk_lalt = 1 if config_data["vimUseLeftAlt"] else 0
+        content = re.sub(
+            r"(VimNavigationUseLeftAlt\s*:=\s*)\d+",
+            rf"\g<1>{ahk_lalt}",
+            content, flags=re.IGNORECASE
+        )
+    
+    if "vimUseRightAlt" in config_data:
+        ahk_ralt = 1 if config_data["vimUseRightAlt"] else 0
+        content = re.sub(
+            r"(VimNavigationUseRightAlt\s*:=\s*)\d+",
+            rf"\g<1>{ahk_ralt}",
+            content, flags=re.IGNORECASE
+        )
+
 
 def update_timezones_variables_ahk(timezones: list, ahk_path: str) -> None:
     """

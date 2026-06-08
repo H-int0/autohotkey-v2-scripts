@@ -30,8 +30,9 @@ from textual.widgets import Static, Input
 from config.manager import load_user_config
 from config.schema import DEFAULT_CONFIG
 from ops.startup import is_startup_enabled
+from commands import get_installed_version, is_ahk_running, relaunch_ahk_from_shortcut
 from tui.widgets.config_panel import ConfigPanel
-from tui.popups.settings import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup
+from tui.popups.settings import BooleanPopup, IntegerPopup, ForceKillPopup, ColorPickerPopup, VimNavigationPopup
 from tui.popups.timezones import TimezonePopup
 from tui.popups.alerts import UnsavedChangesPopup
 from data.timezones_catalog import TIMEZONE_CATALOG
@@ -78,22 +79,10 @@ class ConfigScreen(Screen):
             self.call_after_refresh(self.route_command, self._open_popup_cmd)
 
     def _get_installed_version(self) -> str:
-        try:
-            with open(os.path.join(INSTALL_DIR, "VERSION"), "r", encoding="utf-8") as f:
-                return f.read().strip()
-        except Exception:
-            return DEFAULT_CONFIG["version"]
+        return get_installed_version()
 
     def _is_ahk_running(self) -> bool:
-        try:
-            result = subprocess.check_output(
-                'tasklist /FI "IMAGENAME eq AutoHotkey*"',
-                shell=True, text=True,
-                creationflags=subprocess.CREATE_NO_WINDOW
-            )
-            return "AutoHotkey" in result
-        except:
-            return False
+        return is_ahk_running()
 
     def _update_left_panel(self, focused_flag: str = "", focused_no: int = 0) -> None:
         cfg = load_user_config()
@@ -144,10 +133,10 @@ class ConfigScreen(Screen):
         if event.key == "escape": 
             self._try_leave()
 
-    def on_resize(self, event) -> None:
+    def on_resize(self, _event) -> None:
         pass
 
-    def on_click(self, event) -> None:
+    def on_click(self, _event) -> None:
         pass
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
@@ -253,7 +242,11 @@ class ConfigScreen(Screen):
             elif no == 3: self._toggle_tz("timezones", sub if sub else v)
             elif no == 4: self._toggle_startup_tz(sub if sub else v)
         elif flag == "z":
-            fk_map = {1:"numpadEmulator", 2:"altCodes", 3:"timezoneSwitcher", 4:"forceKillTask", 5:"colorPicker", 6:"lineNavigation"}
+            fk_map = {
+                1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 
+                4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation", 
+                7: "vimNavigation", 8: "charSwap", 9: "powerPlan", 10: "prevPaste"
+            }
             fk = fk_map.get(no)
             if fk:
                 c_feats = dict(self.panel._effective("features", DEFAULT_CONFIG["features"]))
@@ -271,6 +264,13 @@ class ConfigScreen(Screen):
                 elif sub == "2":
                     if vl == '""' or vl == "''": v = ""
                     self.panel.pending["msgColorPicker"] = v
+            elif no == 3:
+                if sub == "1":
+                    if vl == "--!": self.panel.pending["vimUseLeftAlt"] = not self.panel._effective("vimUseLeftAlt", True)
+                    elif parse_bool(vl) is not None: self.panel.pending["vimUseLeftAlt"] = parse_bool(vl)
+                elif sub == "2":
+                    if vl == "--!": self.panel.pending["vimUseRightAlt"] = not self.panel._effective("vimUseRightAlt", True)
+                    elif parse_bool(vl) is not None: self.panel.pending["vimUseRightAlt"] = parse_bool(vl)
 
         self.panel.refresh_display()
         self._update_left_panel(flag, no)
@@ -354,8 +354,17 @@ class ConfigScreen(Screen):
                     self._active_tz_popup = TimezonePopup("u", 4, [st] if st else [], True)
                     self.app.push_screen(self._active_tz_popup, lambda r: self._apply_result("startupTZID", r[0] if r else "", r))
             elif flag == "z":
-                f_map = {1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation"}
-                names = {1: "NumPad Emulator", 2: "ALT Codes", 3: "TimeZone Switcher", 4: "Force Kill", 5: "Color Picker", 6: "Line Navigation"}
+                f_map = {
+                    1: "numpadEmulator", 2: "altCodes", 3: "timezoneSwitcher", 
+                    4: "forceKillTask", 5: "colorPicker", 6: "lineNavigation", 
+                    7: "vimNavigation", 8: "charSwap", 9: "powerPlan", 10: "prevPaste"
+                }
+                names = {
+                    1: "NumPad Emulator", 2: "ALT Codes", 3: "TimeZone Switcher", 
+                    4: "Force Kill", 5: "Color Picker", 6: "Line Navigation",  
+                    7: "Vim Navigation", 8: "CharSwap (RU-EN)", 9: "Power Plan Switcher", 
+                    10: "Previous Paste"
+                }
                 if fk := f_map.get(no):
                     self.app.push_screen(
                         BooleanPopup(
@@ -374,6 +383,11 @@ class ConfigScreen(Screen):
                 elif no == 2:
                     self.app.push_screen(
                         ColorPickerPopup(cfg("colorPickerMsgBox", False), cfg("msgColorPicker", "Copied to Clipboard")),
+                        lambda r: self._apply_route_result(None, r)
+                    )
+                elif no == 3:
+                    self.app.push_screen(
+                        VimNavigationPopup(cfg("vimUseLeftAlt", True), cfg("vimUseRightAlt", True)),
                         lambda r: self._apply_route_result(None, r)
                     )
         except Exception:
@@ -434,19 +448,12 @@ class ConfigScreen(Screen):
             self.app.pop_screen()
 
     def _run_strap(self) -> None:
-        if os.path.exists(t:=os.path.join(INSTALL_DIR, "core", "source.ahk")):
-            try: os.startfile(t)
-            except: pass
+        from ops.process import start_ahk
+        start_ahk()
 
     def _stop_strap(self) -> None:
-        subprocess.run('taskkill /F /IM "AutoHotkey*"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        from ops.process import stop_ahk
+        stop_ahk()
 
     def _relaunch_ahk_from_shortcut(self) -> None:
-        """Kill AHK, then relaunch from shell:startup shortcut if present."""
-        from ops.startup import SHORTCUT_PATH
-        from ops.process import stop_ahk; stop_ahk()
-        if os.path.exists(SHORTCUT_PATH):
-            try:
-                os.startfile(SHORTCUT_PATH)
-            except Exception:
-                pass
+        relaunch_ahk_from_shortcut()

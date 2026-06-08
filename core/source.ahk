@@ -52,6 +52,7 @@ if (IsSet(StartupTZID) && StartupTZID != "")
 #Include features/vim-navigation.ahk
 #Include features/charswap-ru-en.ahk
 #Include features/powerplan-switcher.ahk
+#Include features/prev-paste.ahk
 
 #HotIf
 #^\::

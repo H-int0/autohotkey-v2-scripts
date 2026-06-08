@@ -113,3 +113,25 @@ class ColorPickerPopup(_BasePopup):
 
     def process_cmd_input(self, raw: str) -> bool:
         return False
+    
+class VimNavigationPopup(_BasePopup):
+    def __init__(self, use_lalt: bool, use_ralt: bool, **kwargs):
+        super().__init__(**kwargs)
+        self._use_lalt = use_lalt
+        self._use_ralt = use_ralt
+
+    def popup_title(self) -> str: return "Configure - Vim Navigation"
+    def input_placeholder(self) -> str: return "/config -y -3--No. value"
+
+    def compose_content(self):
+        lalt_val = "enable" if self._use_lalt else "disable"
+        ralt_val = "enable" if self._use_ralt else "disable"
+        yield Static(f"[1] Left Alt                      \\[{lalt_val}]", id="vn-opt-1")
+        yield Static(f"[2] Right Alt                     \\[{ralt_val}]", id="vn-opt-2")
+
+    def help_text(self) -> str:
+        from tui.constants import POPUP_VIM_NAVIGATION
+        return POPUP_VIM_NAVIGATION
+
+    def process_cmd_input(self, raw: str) -> bool:
+        return False

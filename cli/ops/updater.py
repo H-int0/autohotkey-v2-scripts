@@ -110,6 +110,14 @@ def _load_active_version() -> str:
         return DEFAULT_CONFIG["version"]
 
 def _do_switch(version: str, version_dir: str) -> None:
+    from commands import is_ahk_running
+    from ops.process import stop_ahk, start_ahk
+
+    was_running = is_ahk_running()
+    if was_running:
+        print("Terminating running AHK scripts...")
+        stop_ahk()
+
     print(f"Switching to v{version}...")
     print("Clearing current active version...")
     for item in os.listdir(INSTALL_DIR):
@@ -145,6 +153,10 @@ def _do_switch(version: str, version_dir: str) -> None:
         enable_startup()
 
     print(f"\n[√] Switched to v{version} successfully!")
+
+    if was_running:
+        print("Relaunching AHK scripts...")
+        start_ahk()
 
 def _download_and_archive(zip_url: str, version: str, version_dir: str) -> None:
     tmp_zip = os.path.join(VERSIONS_DIR, "tmp_download.zip")
@@ -215,14 +227,35 @@ def _sync_all_profiles(new_defaults: dict, version: str) -> None:
             print(f"  [√] '{profile_name}' profile stamped v{version}.")
 
 def _load_new_defaults(version: str) -> dict | None:
-    schema_path = os.path.join(INSTALL_DIR, "cli", "config", "schema.py")
+    schema_path  = os.path.join(INSTALL_DIR, "cli", "config", "schema.py")
+    features_path = os.path.join(INSTALL_DIR, "cli", "features.py")
     if not os.path.exists(schema_path):
         return None
     try:
-        namespace = {"__file__": schema_path}
-        with open(schema_path, "r", encoding="utf-8") as f:
-            exec(compile(f.read(), schema_path, "exec"), namespace)
-        return namespace.get("DEFAULT_CONFIG", {}).copy()
+        import sys
+
+        # Load the new version's features.py into a fresh namespace first
+        features_ns = {"__file__": features_path}
+        with open(features_path, "r", encoding="utf-8") as f:
+            exec(compile(f.read(), features_path, "exec"), features_ns)
+
+        # Temporarily shadow the cached module so schema.py picks up new FEATURE_REGISTRY
+        old_features = sys.modules.get("features")
+        sys.modules["features"] = type(sys)("features")
+        sys.modules["features"].FEATURE_REGISTRY = features_ns["FEATURE_REGISTRY"]
+
+        try:
+            namespace = {"__file__": schema_path}
+            with open(schema_path, "r", encoding="utf-8") as f:
+                exec(compile(f.read(), schema_path, "exec"), namespace)
+            return namespace.get("DEFAULT_CONFIG", {}).copy()
+        finally:
+            # Restore original module regardless of outcome
+            if old_features is None:
+                sys.modules.pop("features", None)
+            else:
+                sys.modules["features"] = old_features
+
     except Exception as e:
         print(f"Warning: could not load new schema: {e}")
         return None

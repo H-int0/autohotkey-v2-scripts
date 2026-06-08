@@ -19,27 +19,10 @@
 #
 # ====================================================================================
 
-from datetime import datetime
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-
 # ---------------------------------------------------------------------------
 # Windows TZ ID  ->  IANA tz name mapping (subset used for live clock)
 # Only the most common ones; falls back gracefully if not found.
 # ---------------------------------------------------------------------------
-
-_WIN_TO_IANA: dict[str, str] = {
-    "Eastern Standard Time":       "America/New_York",
-    "Central Standard Time":       "America/Chicago",
-    "Mountain Standard Time":      "America/Denver",
-    "Pacific Standard Time":       "America/Los_Angeles",
-    "W. Europe Standard Time":     "Europe/Berlin",
-    "GMT Standard Time":           "Europe/London",
-    "Russian Standard Time":       "Europe/Moscow",
-    "Tokyo Standard Time":         "Asia/Tokyo",
-    "China Standard Time":         "Asia/Shanghai",
-    "AUS Eastern Standard Time":   "Australia/Sydney",
-    "UTC":                         "UTC",
-}
 
 # Full list of Windows TZ IDs with their display metadata.
 # Each entry: (windows_id, display_name, city_hint, utc_label)
@@ -90,37 +73,12 @@ _UTC_OFFSETS: list[str] = sorted(
     key=lambda s: float(s.replace("UTC", "").replace("+", "").replace(":30", ".5").replace(":45", ".75") or "0")
 )
 
-
-def _live_time(windows_tz_id: str) -> str:
-    """Return 'HH:MM, MMM-DD-YYYY' for a Windows TZ ID, or '' on failure."""
-    iana = None
-    
-    for k, v in _WIN_TO_IANA.items():
-        if k.replace(".", "").lower() == windows_tz_id.replace(".", "").lower():
-            iana = v
-            break
-            
-    if not iana: return ""
-    try:
-        now = datetime.now(ZoneInfo(iana))
-        return now.strftime("%H:%M, %b-%d-%Y")
-    except (ZoneInfoNotFoundError, Exception):
-        return ""
-
-
 def _fmt_tz_entry(idx: int, win_id: str, display: str, cities: str, utc: str, selected: bool = False) -> str:
-    time_str = _live_time(win_id)
-    time_part = f"{{{time_str}}}" if time_str else ""
     mark = "[bold yellow]*[/bold yellow]" if selected else " "
-    
-    # Format: [24] Russian Standard Time {17:36, Apr-21-2029}      [UTC +3]
-    raw_left = f"[{idx}] {display} {time_part}"
+    raw_left = f"[{idx}] {display}"
     left = f"{mark}{raw_left}"
-    
-    # Pad so UTC lines up at ~75
     padding = max(1, 75 - len(raw_left))
     row = f"{left}{' ' * padding}[{utc}]"
-    
     if cities:
         row += f"\n   ({cities})"
     return row
