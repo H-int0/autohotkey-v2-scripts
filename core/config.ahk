@@ -37,8 +37,8 @@ Global Msg_ColorPicker              := "Copied to Clipboard"
 
 Global ColorPickerMsgBox            := 0
 
-Global VimNavigationUseLeftAlt      := 0
-Global VimNavigationUseRightAlt     := 0
+Global VimNavigationUseLeftAlt      := 1
+Global VimNavigationUseRightAlt     := 1
 
 #Include config-dependencies\timezones-variables.ahk
 #Include config-dependencies\timezones-list.ahk
