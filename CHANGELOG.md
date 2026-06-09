@@ -24,13 +24,14 @@ Format: [version]: release date, followed by what changed.
 - **Power Plan Switcher** cycle through Windows power plans without opening Control Panel
 - **Previous Paste** maintains a rolling history of the last 10 copied items for pasting
 - `/uninstall --fr` flag for full system wide removal of strap
-- Installer now automatically downloads Python 3 and AutoHotkey v2 if missing
+- `install.ps1` now automatically installs AutoHotkey v2 (via winget) and Python 3.10+ (via official installer) if missing
 
 ### Changed in [v0.2.2]
 
 - Centralized command logic into `commands.py`
 - Removed live clock from timezone catalog
 - Revised versioning of strap
+- Introduced `--handoff` internal flag to prevent install loop when running via `irm | iex`
 
 ### Fixed in [v0.2.2]
 
