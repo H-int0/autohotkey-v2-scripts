@@ -508,7 +508,7 @@ Maintains a rolling, short-term history of the last 10 items you copied, allowin
 
 - **`OnClipboardChange` Hook:** The script attaches to the native Windows clipboard listener. Every time you press `Ctrl+C`, the hook fires and inserts the copied item into the front of the `ClipHistory` array, popping the oldest item if the array exceeds 10 items.
 - **Rich Data Preservation:** It stores `ClipboardAll()`, not just plain text. This means it perfectly preserves formatted text, images, and copied files.
-- **Mutual Exclusion (`IgnoreChange`):** When you trigger a historical paste, the script puts the old item back into `A_Clipboard` to send the `^v` command. To prevent the listener from seeing *this* as a new copy event and ruining the history order, it toggles a global `IgnoreChange := true` flag, pastes the text, and turns the flag back off.
+- **Mutual Exclusion (`IgnoreChange`):** When you trigger a historical paste, the script temporarily sets `A_Clipboard` to the history item to send the `^v` command, then restores it to the most recent copied item (`ClipHistory[1]`). To prevent the listener from treating either of these internal clipboard writes as new copy events and corrupting the history order, it toggles `IgnoreChange := true` for the duration and turns it off once done.
 
 ---
 
