@@ -33,7 +33,7 @@
 #   5. Copies contents into %APPDATA%\Strap\ (excluding docs/git noise)
 #   6. Creates strap.bat and adds bin\ to user PATH
 #   7. Installs Python dependencies (pip)
-#   8. Hands off to Python: python cli/main.py /install --from-ps
+#   8. Hands off to Python: python cli/main.py /install --handoff
 # =============================================================================
 
 $ErrorActionPreference = "Stop"
@@ -246,4 +246,4 @@ if (Test-Path $requirementsPath) {
 # -----------------------------------------------------------------------------
 Write-Host ""
 Write-Host "Handing off to Python..." -ForegroundColor Cyan
-python "$INSTALL_DIR\cli\main.py" /install --from-ps
+python "$INSTALL_DIR\cli\main.py" /install --handoff

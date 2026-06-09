@@ -316,6 +316,8 @@ def execute_terminal_command(cmd: str, rest: str, raw_arg: str) -> None:
                 subprocess.run(["powershell", "-ExecutionPolicy", "Bypass", "-File", ps_path], check=False)
             else:
                 print(f"[×] install.ps1 not found at {ps_path}")
+        elif rest == "--handoff":
+            cli_install(from_ps=True)
         elif rest.startswith("v"):
             cli_install(target_version=rest)
         else:
