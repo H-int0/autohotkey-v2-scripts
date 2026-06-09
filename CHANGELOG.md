@@ -7,17 +7,36 @@ Format: [version]: release date, followed by what changed.
 
 ## Unreleased
 
-- Auto download python and other dependencies
 - **Features**
-  - Battery Plan Switcher
-  - Vim Arrow Keys
   - Move the Selected Word/Line
-  - System Temperatures & Fan Speed Monitor
   - Printscreen to Menu button
-  - Select Multiple CLipboard
 - CLI
-  - Add new commands such as '/uninstall --hard', and much more
   - command history
+
+---
+
+## [v0.2.2] 2026-06-09
+
+### Added in [v0.2.2]
+
+- **Vim Navigation** brings Vim `H/J/K/L` cursor movement to every text field in Windows
+- **CharSwap (RU↔EN)** instantly transliterates highlighted text between Cyrillic and Latin characters
+- **Power Plan Switcher** cycle through Windows power plans without opening Control Panel
+- **Previous Paste** maintains a rolling history of the last 10 copied items for pasting
+- `/uninstall --fr` flag for full system wide removal of strap
+- Installer now automatically downloads Python 3 and AutoHotkey v2 if missing
+
+### Changed in [v0.2.2]
+
+- Centralized command logic into `commands.py`
+- Removed live clock from timezone catalog
+- Revised versioning of strap
+
+### Fixed in [v0.2.2]
+
+- User profile preferences now preserved across version switches
+- `/install --from-ps` handoff working correctly
+- AHK process now terminated before version switch to prevent copy failure of the version in the %APPDATA%
 
 ---
 
