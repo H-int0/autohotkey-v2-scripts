@@ -23,6 +23,7 @@ import os
 import shutil
 import winreg
 import ctypes
+import json
 
 from config.schema  import DEFAULT_CONFIG
 from ops.startup    import enable_startup
@@ -217,11 +218,14 @@ def _add_missing_keys(target: dict, source: dict) -> bool:
     return changed
 
 def _load_json(path: str) -> dict:
-    import json
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
-    except Exception:
+    except json.JSONDecodeError as e:
+        print(f"Warning: corrupt profile JSON at {path}: {e}")
+        return {}
+    except OSError as e:
+        print(f"Warning: could not read profile at {path}: {e}")
         return {}
 
 def _add_to_user_path(new_path: str) -> None:

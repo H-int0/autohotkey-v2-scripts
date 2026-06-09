@@ -24,10 +24,14 @@
 # ==============================================================================
 
 FEATURE_REGISTRY = [
-    {"key": "numpadEmulator",   "ahk_var": "NumpadEmulatorEnabled",  "label": "NumPad Emulator",    "default": True},
-    {"key": "altCodes",         "ahk_var": "AltCodesEnabled",        "label": "ALT Codes",          "default": True},
-    {"key": "timezoneSwitcher", "ahk_var": "TimezoneSwitcherEnabled","label": "TimeZone Switcher",  "default": True},
-    {"key": "forceKillTask",    "ahk_var": "ForceKillEnabled",       "label": "Force Kill",         "default": True},
-    {"key": "colorPicker",      "ahk_var": "ColorPickerEnabled",     "label": "Color Picker",       "default": True},
-    {"key": "lineNavigation",   "ahk_var": "LineNavEnabled",         "label": "Line Navigation",    "default": True},
+    {"key": "numpadEmulator",       "ahk_var": "NumpadEmulatorEnabled",         "label": "NumPad Emulator",         "default": True},
+    {"key": "altCodes",             "ahk_var": "AltCodesEnabled",               "label": "ALT Codes",               "default": True},
+    {"key": "timezoneSwitcher",     "ahk_var": "TimezoneSwitcherEnabled",       "label": "TimeZone Switcher",       "default": True},
+    {"key": "forceKillTask",        "ahk_var": "ForceKillEnabled",              "label": "Force Kill",              "default": True},
+    {"key": "colorPicker",          "ahk_var": "ColorPickerEnabled",            "label": "Color Picker",            "default": True},
+    {"key": "lineNavigation",       "ahk_var": "LineNavEnabled",                "label": "Line Navigation",         "default": True},
+    {"key": "vimNavigation",        "ahk_var": "VimNavigationEnabled",          "label": "Vim Navigation",          "default": True},
+    {"key": "charSwap",             "ahk_var": "CharSwapEnabled",               "label": "CharSwap (RU-EN)",        "default": True},
+    {"key": "powerPlan",            "ahk_var": "PowerPlanSwitcherEnabled",      "label": "Power Plan Switcher",     "default": True},
+    {"key": "prevPaste",            "ahk_var": "PrevPasteEnabled",              "label": "Previous Paste",          "default": True},
 ]

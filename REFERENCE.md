@@ -30,6 +30,12 @@ Check all the Hotkeys and Commands here:
   | `Shift + Alt + Left/Right Arrow` | Move cursor to start/end of line |
   | `Shift + Win + Left/Right Arrow` | Select text to start/end of line |
   | `Alt + Backspace/Delete` | Delete text to start/end of line |
+  | `Alt + H/J/K/L` | Move Cursor (← ↓ ↑ →) |
+  | `Win + Ctrl + Space` | Swap character (RU-EN) |
+  | `Win + Alt + ]` | Cycle Power plan |
+  | `Win + Ctrl + ]` | Show current Power plan |
+  | `Win + Ctrl + V` | Paste prev item from Clipboard |
+  | `Ctrl + Alt + 1-9` | Paste Nth prev item from Clipboard |
 
 ### Strap Commands
 
@@ -43,8 +49,8 @@ Check all the Hotkeys and Commands here:
 
   strap /run                          # Runs AHK scripts
   strap /stop                         # Stops AHK scripts
-  strap /run --cr shr                 # Enable auto-boot (creates a startup shortcut)
-  strap /run --d shr                  # Disable auto-boot (removes from startup)
+  strap /run --cr shr                 # Create startup shortcut (enables auto-boot on login)
+  strap /run --d sh                   # Delete startup shortcut (disables auto-boot)
 
   strap /config                       # Configure Strap settings
 
@@ -68,6 +74,7 @@ Check all the Hotkeys and Commands here:
   strap /switch vX.X.X                # Switch your active version
 
   strap /uninstall                    # Uninstall Strap
+  strap /uninstall --fr               # Fully Remove Strap
   ```
 
 > [!TIP]
@@ -121,8 +128,11 @@ Check all the Hotkeys and Commands here:
   - [4. Force Kill Task](#4-force-kill-task)
   - [5. Color Picker](#5-color-picker)
   - [6. Line Navigation](#6-line-navigation)
+  - [7. Vim Navigation](#7-vim-navigation)
+  - [8. CharSwap (RU-EN)](#8-charswap-ru-en)
+  - [9. Power Plan Switcher](#9-power-plan-switcher)
+  - [10. Previous Paste (Clipboard History)](#10-previous-paste-clipboard-history)
 - [Strap CLI/TUI](#strap-clitui)
-  - [Startup Shortcut](#startup-shortcut)
   - [Profiles](#profiles)
   - [Management](#management)
   - [Layout](#layout)
@@ -140,58 +150,66 @@ Check all the Hotkeys and Commands here:
 
 - With **Command Prompt (CMD)**:
 
-  ```bat
+```bat
   powershell -ExecutionPolicy Bypass -Command "irm 'https://raw.githubusercontent.com/H-int0/autohotkey-v2-scripts/main/install.ps1' | iex"
-  ```
+```
 
 - With **PowerShell**:
 
-  ```pwsh
+```pwsh
   irm 'https://raw.githubusercontent.com/H-int0/autohotkey-v2-scripts/main/install.ps1' | iex
-  ```
+```
 
-> [!TIP]
-> Prefer the ZIP version? Simply extract the ZIP file, open the setup folder, and double-click `install.bat` inside `setup`directory to set up the TUI.
+- With **Zip:**
 
-  ```bash
+```bash
   # Replace with your file path to the root directory of the project after extracting the zip
   cd C:\path_to_strap\autohotkey-v2-scripts-main
-  
+
   # use this to hook up the CLI/TUI:
   python cli/main.py /install
-  ```
+```
 
 ---
 
-### How Installations work behind the scenes
+### How installations work behind the scenes
 
 When you run the one-liner above, `install.ps1` takes over and does the following:
 
-1. **Checks for Python** exits immediately if Python 3 isn't found.
-2. **Fetches the latest tag from GitHub** hits the GitHub tags API and grabs the latest tag name and its zip URL.
-3. **Archives the release** creates `~/.strap_versions/vX.X.X/` and downloads the release zip into it. If that version folder already exists, the download is skipped entirely.
-4. **Copies to `%APPDATA%\Strap\`** if a previous installation exists, everything except `bin\` is wiped first. Then the archived version is copied in fresh.
-5. **Creates `strap.bat`** only if it doesn't already exist. Points permanently to `%APPDATA%\Strap\cli\main.py` and never gets touched again, even across version switches.
-6. **Adds `bin\` to PATH** modifies the user-level `PATH` registry key and broadcasts `WM_SETTINGCHANGE` so open terminals pick up the new `strap` command without needing a restart.
-7. **Installs Python dependencies** runs `pip install -r requirements.txt` quietly.
-8. **Hands off to Python** calls `python cli/main.py /install --from-ps`.
+1. **Checks for AutoHotkey v2** installs it silently via `winget` if not found.
+2. **Checks for Python 3.10+** if missing or outdated, downloads and installs Python 3.12 silently via the official installer with no UAC prompt (per-user install). Refreshes `PATH` in the current session immediately after.
+3. **Fetches the latest tag from GitHub** hits the GitHub tags API and grabs the latest tag name and its zip URL.
+4. **Archives the release** creates `~/.strap_versions/vX.X.X/` and downloads the release zip into it. If that version folder already exists, the download is skipped entirely.
+5. **Copies to `%APPDATA%\Strap\`** if a previous installation exists, everything except `bin\` is wiped first. Then the archived version is copied in fresh.
+6. **Creates `strap.bat`** only if it doesn't already exist. Points permanently to `%APPDATA%\Strap\cli\main.py` and never gets touched again, even across version switches.
+7. **Adds `bin\` to PATH** modifies the user-level `PATH` registry key and broadcasts `WM_SETTINGCHANGE` so open terminals pick up the new `strap` command without needing a restart.
+8. **Installs Python dependencies** runs `pip install -r requirements.txt` quietly.
+9. **Hands off to Python** calls `python cli/main.py /install --handoff`.
 
 ---
 
-### The `--from-ps` flag
+### The `--handoff` flag
 
-`--from-ps` is an internal flag passed automatically by `install.ps1` in step 8. It tells the CLI that file copying, `strap.bat` creation, and PATH setup are already done so it skips those and only handles:
-
-```bash
-python cli/main.py /install --from-ps
-```
+`--handoff` is an internal flag passed automatically by `install.ps1` in step 9. It tells the CLI that file copying, `strap.bat` creation, and PATH setup are already done, so it skips those and only handles:
 
 - Bootstrapping the `default` and `ghost` profiles
 - Stamping the active version into the profile
 - Writing `config.ahk` and `timezones-variables.ahk` from the active profile
 - Prompting the user for startup shortcut preference
 
-You will never need to type this flag manually unless you are testing the Python-side of the install flow without re-running the full PowerShell script.
+This flag is never meant to be typed manually. It exists purely to prevent a re-entry loop that would otherwise occur if `install.ps1` were called recursively when running via `irm | iex`.
+
+---
+
+### The `--from-ps` flag
+
+`--from-ps` is a developer-facing flag that re-runs `install.ps1` from within the CLI:
+
+```bash
+strap /install --from-ps
+```
+
+This replicates exactly what a user would get by running the `irm | iex` one-liner useful for testing the full PowerShell install flow without leaving the terminal.
 
 ---
 
@@ -203,7 +221,7 @@ If you're not using the PowerShell bootstrapper, you can run the installer manua
 python cli/main.py /install
 ```
 
-Without `--from-ps`, the CLI assumes it is running in a fresh environment and handles the full install flow itself creating `strap.bat`, adding `bin\` to PATH, bootstrapping profiles, and prompting for startup. Use this when setting up manually from a ZIP or a cloned repo instead of the one-liner.
+Without any flags, the CLI assumes it is running in a fresh environment and handles the full install flow itself creating `strap.bat`, adding `bin\` to PATH, bootstrapping profiles, and prompting for startup. Use this when setting up manually from a ZIP or a cloned repo instead of the one-liner.
 
 ---
 
@@ -276,6 +294,12 @@ A lightweight, semi-transparent (`Opacity: 225`) black overlay that follows your
   | `Shift + Alt + Left/Right Arrow` | Move cursor to start/end of line |
   | `Shift + Win + Left/Right Arrow` | Select text to start/end of line |
   | `Alt + Backspace/Delete` | Delete text to start/end of line |
+  | `Alt + H/J/K/L` | Move Cursor (← ↓ ↑ →) |
+  | `Win + Ctrl + Space` | Swap character (RU-EN) |
+  | `Win + Alt + ]` | Cycle Power plan |
+  | `Win + Ctrl + ]` | Show current Power plan |
+  | `Win + Ctrl + V` | Paste prev item from Clipboard |
+  | `Ctrl + Alt + 1-9` | Paste Nth prev item from Clipboard |
 
 ---
 
@@ -428,6 +452,74 @@ This provides universally compatible text navigation across almost every Windows
 
 ---
 
+### 7. Vim Navigation
+
+Brings the classic Vim `H/J/K/L` cursor movement to every text field and application in Windows, eliminating the need to move your hand to the physical arrow keys.
+
+**Hotkeys:**
+
+- **Standard Movement:** `Alt + H/J/K/L` (← ↓ ↑ →)
+- **Select Text:** `Shift + Alt + H/J/K/L`
+- **Jump Words:** `Ctrl + Alt + H/J/K/L`
+- **Jump & Select:** `Ctrl + Shift + Alt + H/J/K/L`
+
+**How it works:**
+
+- **Conditional Binding:** The feature evaluates `VimNavigationUseLeftAlt` and `VimNavigationUseRightAlt` from `config.ahk`. It uses `#HotIf` directives to selectively bind the hotkeys to Left Alt (`<!`), Right Alt (`>!`), or both, depending on your TUI configuration.
+- **Native OS Hooks:** Instead of complex text evaluation, it translates the Alt+Letter combos directly into native Windows arrow key events (`{Left}`, `{Down}`, etc.).
+- **Modifier Passthrough:** It explicitly maps out all combination modifiers (Shift, Ctrl, Ctrl+Shift) so that native text-editing shortcuts (like holding Ctrl to jump whole words) work flawlessly alongside the Vim keys.
+
+---
+
+### 8. CharSwap (RU-EN)
+
+Instantly transliterates highlighted text between Cyrillic (Russian) and Latin (English) characters. Perfect for when you accidentally type a whole sentence in the wrong keyboard layout.
+
+**Hotkey:** `Win + Ctrl + Space`
+
+**How it works:**
+
+- **Clipboard Preservation:** Before touching your text, it safely backs up your current clipboard state using `ClipboardAll()`. After the conversion is pasted, it restores your original clipboard, so your previously copied links/images are never lost.
+- **Regex Parsing:** It uses a PCRE (Perl Compatible Regular Expression) loop with the `(*UCP)` modifier to properly respect Unicode properties. It parses the text token by token, ensuring multi-character sounds (like "shch" -> "щ") are evaluated before single characters (like "s" -> "с").
+- **Smart Case Mapping:** The script relies on a massive static dictionary (`TransMap`). It doesn't use simple case-insensitive matching; it explicitly maps `Shch` (Titlecase), `SHCH` (Uppercase), and `shch` (Lowercase) to their exact Cyrillic visual equivalents.
+
+---
+
+### 9. Power Plan Switcher
+
+A headless utility to instantly cycle through your available Windows power plans without opening the Control Panel.
+
+**Hotkeys:**
+
+- **Cycle Plan:** `Win + Alt + ]`
+- **Check Current Plan:** `Win + Ctrl + ]`
+
+**How it works:**
+
+- **Direct `powercfg` Integration:** It completely bypasses the Windows UI by invoking the native command-line utility via `A_ComSpec ' /c powercfg'`.
+- **Temp File Routing:** Because AHK v2 doesn't have a native, invisible `stdout` reader, the script pipes the command line output into a temporary text file (`A_Temp "\ahk_powercfg_out.txt"`), reads the string into memory, and immediately deletes the temp file.
+- **Regex Extraction:** It parses the output using `RegExMatch("i)GUID:\s+([a-f0-9-]+)\s+\((.+?)\)")` to isolate the unique GUIDs and human-readable names of every power plan currently installed on your PC.
+- **Modulo Cycling:** It loads the plans into an array and uses Modulo arithmetic (`Mod(activeIndex, plans.Length) + 1`) to seamlessly wrap from the last plan back to the first, pushing the active GUID back into `powercfg /setactive`.
+
+---
+
+### 10. Previous Paste (Clipboard History)
+
+Maintains a rolling, short-term history of the last 10 items you copied, allowing you to paste items you overwrote without needing Windows Clipboard History enabled.
+
+**Hotkeys:**
+
+- **Paste Previous:** `Win + Ctrl + V` (Pastes the 2nd item in history)
+- **Paste Nth Item:** `Ctrl + Alt + 1-9`
+
+**How it works:**
+
+- **`OnClipboardChange` Hook:** The script attaches to the native Windows clipboard listener. Every time you press `Ctrl+C`, the hook fires and inserts the copied item into the front of the `ClipHistory` array, popping the oldest item if the array exceeds 10 items.
+- **Rich Data Preservation:** It stores `ClipboardAll()`, not just plain text. This means it perfectly preserves formatted text, images, and copied files.
+- **Mutual Exclusion (`IgnoreChange`):** When you trigger a historical paste, the script temporarily sets `A_Clipboard` to the history item to send the `^v` command, then restores it to the most recent copied item (`ClipHistory[1]`). To prevent the listener from treating either of these internal clipboard writes as new copy events and corrupting the history order, it toggles `IgnoreChange := true` for the duration and turns it off once done.
+
+---
+
 ## Strap CLI/TUI
 
 Run `strap` in your terminal to launch the TUI. If you pass arguments directly, it runs headlessly without opening the TUI.
@@ -444,8 +536,8 @@ strap /command    # headless runs the command and exits
 
   strap /run                          # Runs AHK scripts
   strap /stop                         # Stops AHK scripts
-  strap /run --cr shr                 # Enable auto-boot (creates a startup shortcut)
-  strap /run --d shr                  # Disable auto-boot (removes from startup)
+  strap /run --cr shr                 # Create startup shortcut (enables auto-boot on login)
+  strap /run --d sh                   # Delete startup shortcut (disables auto-boot)
 
   strap /config                       # Configure Strap settings
 
@@ -468,18 +560,10 @@ strap /command    # headless runs the command and exits
   strap /switch vX.X.X                # Switch your active version
 
   strap /uninstall                    # Uninstall Strap
+  strap /uninstall --fr               # Fully Remove Strap
   ```
 
 ---
-
-### Startup Shortcut
-
-Controls whether Strap auto-launches on Windows login via a shortcut in the Windows Startup folder.
-
-```bash
-/run --cr shr               # Create startup shortcut (enables auto-boot on login)
-/run --d shr                # Delete startup shortcut (disables auto-boot)
-```
 
 - Creating the shortcut places `Strap.lnk` in `shell:startup` (`%APPDATA%\Roaming\Microsoft\Windows\Start Menu\Programs\Startup`).
 - Removing it deletes `Strap.lnk` from that same folder.
@@ -807,11 +891,13 @@ Type any command into the `>>` prompt. Commands must start with `/`. Inside the 
 ## Uninstallation
 
   ```bash
-  /uninstall
+  /uninstall                      # Uninstall Strap
+  /uninstall --fr                 # Fully Remove Strap
   ```
 
 - Stops AHK, removes the startup shortcut, removes `strap` from your PATH, and deletes `%APPDATA%\Strap`and Version archives.
 - Profiles are preserved for future use case.
+- If `--fr` flag is used profiles are also deleted.
 
 ---
 

@@ -26,12 +26,14 @@
 #    irm 'https://raw.githubusercontent.com/H-int0/autohotkey-v2-scripts/main/install.ps1' | iex
 #
 # What this does:
-#   1. Checks for Python
-#   2. Fetches the latest tag from GitHub
-#   3. Creates .strap_versions\vX.X.X\ and downloads the release zip into it
-#   4. Copies contents into %APPDATA%\Strap\ (excluding docs/git noise)
-#   5. Installs Python dependencies
-#   6. Hands off to Python: python cli/main.py /install --from-ps
+#   1. Checks for AutoHotkey v2 (installs via winget if missing)
+#   2. Checks for Python 3.10+ (installs via official installer if missing)
+#   3. Fetches the latest tag from GitHub
+#   4. Creates .strap_versions\vX.X.X\ and downloads the release zip into it
+#   5. Copies contents into %APPDATA%\Strap\ (excluding docs/git noise)
+#   6. Creates strap.bat and adds bin\ to user PATH
+#   7. Installs Python dependencies (pip)
+#   8. Hands off to Python: python cli/main.py /install --handoff
 # =============================================================================
 
 $ErrorActionPreference = "Stop"
@@ -51,20 +53,69 @@ Write-Host ">> STRAP INSTALLER" -ForegroundColor Cyan
 Write-Host ""
 
 # -----------------------------------------------------------------------------
-# 1. Check Python
+# 1. Check for AutoHotkey v2 (install via winget if missing)
 # -----------------------------------------------------------------------------
-Write-Host "Checking for Python..."
-try {
-    $pyver = python --version 2>&1
-    Write-Host "  Found: $pyver"
-} catch {
-    Write-Host "[X] Python not found. Please install Python 3.10+ and try again." -ForegroundColor Red
-    Write-Host "    https://www.python.org/downloads/"
-    exit 1
+Write-Host "Checking for AutoHotkey v2..."
+$ahkPath = "${env:ProgramFiles}\AutoHotkey\v2\AutoHotkey64.exe"
+if (Test-Path $ahkPath) {
+    Write-Host "  Found: $ahkPath"
+} else {
+    Write-Host "  AutoHotkey v2 not found. Installing via winget..."
+    try {
+        winget install --id AutoHotkey.AutoHotkey --silent --accept-package-agreements --accept-source-agreements | Out-Null
+        Write-Host "  [OK] AutoHotkey v2 installed."
+    } catch {
+        Write-Host "[X] Failed to install AutoHotkey v2: $_" -ForegroundColor Red
+        Write-Host "    Install manually: https://www.autohotkey.com/download/" -ForegroundColor Yellow
+        exit 1
+    }
 }
 
 # -----------------------------------------------------------------------------
-# 2. Fetch latest tag from GitHub
+# 2. Check for Python 3.10+ (install via official installer if missing)
+# -----------------------------------------------------------------------------
+Write-Host "Checking for Python..."
+$pyFound = $false
+try {
+    $pyver = python --version 2>&1
+    if ($pyver -match "Python (\d+)\.(\d+)") {
+        $pyMajor = [int]$Matches[1]
+        $pyMinor = [int]$Matches[2]
+        if ($pyMajor -gt 3 -or ($pyMajor -eq 3 -and $pyMinor -ge 10)) {
+            Write-Host "  Found: $pyver"
+            $pyFound = $true
+        } else {
+            Write-Host "  Found $pyver but Strap requires 3.10+. Installing a compatible version..." -ForegroundColor Yellow
+        }
+    }
+} catch {
+    Write-Host "  Python not found. Installing..."
+}
+
+if (-not $pyFound) {
+    $pyInstallerUrl = "https://www.python.org/ftp/python/3.12.9/python-3.12.9-amd64.exe"
+    $pyInstallerPath = Join-Path $env:TEMP "python-installer.exe"
+    try {
+        Write-Host "  Downloading Python 3.12.9..."
+        Invoke-WebRequest -Uri $pyInstallerUrl -OutFile $pyInstallerPath -UseBasicParsing
+        Write-Host "  Installing Python 3.12.9 (per-user, no UAC required)..."
+        Start-Process -FilePath $pyInstallerPath -ArgumentList "/quiet InstallAllUsers=0 PrependPath=1 Include_launcher=0" -Wait -NoNewWindow
+        Remove-Item $pyInstallerPath -Force -ErrorAction SilentlyContinue
+
+        # Refresh PATH in current session so subsequent python calls work immediately
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "User") + ";" + $env:Path
+
+        $pyver = python --version 2>&1
+        Write-Host "  [OK] $pyver installed."
+    } catch {
+        Write-Host "[X] Failed to install Python: $_" -ForegroundColor Red
+        Write-Host "    Install manually: https://www.python.org/downloads/" -ForegroundColor Yellow
+        exit 1
+    }
+}
+
+# -----------------------------------------------------------------------------
+# 3. Fetch latest tag from GitHub
 # -----------------------------------------------------------------------------
 Write-Host "Fetching latest version from GitHub..."
 try {
@@ -80,7 +131,7 @@ try {
 Write-Host "  Latest version: $latestTag"
 
 # -----------------------------------------------------------------------------
-# 3. Create .strap_versions\vX.X.X\ and download zip
+# 4. Create .strap_versions\vX.X.X\ and download zip
 # -----------------------------------------------------------------------------
 $versionDir = Join-Path $VERSIONS_DIR $latestTag
 
@@ -128,7 +179,7 @@ if (Test-Path $versionDir) {
 }
 
 # -----------------------------------------------------------------------------
-# 4. Copy into %APPDATA%\Strap\ (wipe everything except bin\ if reinstalling)
+# 5. Copy into %APPDATA%\Strap\ (wipe everything except bin\ if reinstalling)
 # -----------------------------------------------------------------------------
 if (Test-Path $INSTALL_DIR) {
     Write-Host "Existing installation found. Overwriting (keeping bin\)..."
@@ -147,7 +198,7 @@ Get-ChildItem -Path $versionDir | ForEach-Object {
 }
 
 # -----------------------------------------------------------------------------
-# 5. Create strap.bat if it doesn't exist
+# 6. Create strap.bat if it doesn't exist
 # -----------------------------------------------------------------------------
 if (-not (Test-Path $BAT_PATH)) {
     Write-Host "Creating strap.bat..."
@@ -159,7 +210,7 @@ if (-not (Test-Path $BAT_PATH)) {
 }
 
 # -----------------------------------------------------------------------------
-# 6. Add bin\ to user PATH if not already there
+# 7. Add bin\ to user PATH if not already there
 # -----------------------------------------------------------------------------
 $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 if ($userPath -notlike "*$BIN_DIR*") {
@@ -180,7 +231,7 @@ public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, UIntPtr wP
 }
 
 # -----------------------------------------------------------------------------
-# 7. Install Python dependencies
+# 8. Install Python dependencies
 # -----------------------------------------------------------------------------
 $requirementsPath = Join-Path $INSTALL_DIR "cli\requirements.txt"
 if (Test-Path $requirementsPath) {
@@ -191,8 +242,8 @@ if (Test-Path $requirementsPath) {
 }
 
 # -----------------------------------------------------------------------------
-# 8. Hand off to Python for profiles + startup prompt
+# 9. Hand off to Python for profiles + startup prompt
 # -----------------------------------------------------------------------------
 Write-Host ""
 Write-Host "Handing off to Python..." -ForegroundColor Cyan
-python "$INSTALL_DIR\cli\main.py" /install --from-ps
+python "$INSTALL_DIR\cli\main.py" /install --handoff

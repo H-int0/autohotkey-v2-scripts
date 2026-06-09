@@ -27,6 +27,8 @@ import winreg
 import ctypes
 import requests
 
+ctypes.windll.kernel32.SetConsoleMode(ctypes.windll.kernel32.GetStdHandle(-11), 7)
+
 from tui.constants import TERMINAL_COMMANDS_TEXT
 from ops.updater import GITHUB_API
 
@@ -36,6 +38,35 @@ VERSIONS_DIR = os.path.join(os.environ.get("USERPROFILE", ""), ".strap_versions"
 PROFILES_DIR = os.path.join(os.environ.get("USERPROFILE", ""), ".strap_profiles")
 
 _YES = {"y", "yes", "yeah", "ya", "yep", "yup", "sure", "ok", "okay", "affirmative", "positive"}
+
+def get_installed_version() -> str:
+    try:
+        with open(os.path.join(INSTALL_DIR, "VERSION"), "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except Exception:
+        from config.schema import DEFAULT_CONFIG
+        return DEFAULT_CONFIG["version"]
+
+def is_ahk_running() -> bool:
+    try:
+        result = subprocess.check_output(
+            'tasklist /FI "IMAGENAME eq AutoHotkey*"',
+            shell=True, text=True,
+            creationflags=subprocess.CREATE_NO_WINDOW
+        )
+        return "AutoHotkey" in result
+    except Exception:
+        return False
+
+def relaunch_ahk_from_shortcut() -> None:
+    from ops.startup import SHORTCUT_PATH
+    from ops.process import stop_ahk
+    stop_ahk()
+    if os.path.exists(SHORTCUT_PATH):
+        try:
+            os.startfile(SHORTCUT_PATH)
+        except Exception:
+            pass
 
 def _print_help() -> None:
     print(TERMINAL_COMMANDS_TEXT)
@@ -110,12 +141,7 @@ def cli_switch(target_version: str) -> None:
     run_switch(target_version)
 
 def cli_version() -> None:
-    try:
-        with open(os.path.join(INSTALL_DIR, "VERSION"), "r", encoding="utf-8") as f:
-            active_version = f.read().strip()
-    except Exception:
-        from config.schema import DEFAULT_CONFIG
-        active_version = DEFAULT_CONFIG["version"]
+    active_version = get_installed_version()
 
     if not os.path.exists(VERSIONS_DIR):
         print("No archived versions found.")
@@ -200,12 +226,13 @@ def cli_profile(subargs: str) -> None:
     else:
         print(f"Unknown profile subcommand: '{sub}'. Use --ls, --cr, --use, --d.")
 
-def cli_uninstall() -> None:
+def cli_uninstall(hard: bool = False, skip_confirm: bool = False) -> None:
     print("\n>> STRAP UNINSTALLER\n")
-    ans = input("This will remove Strap from your system. Continue? (y/n): ").strip().lower()
-    if ans not in _YES:
-        print("Uninstall aborted.")
-        return
+    if not hard and not skip_confirm:
+        ans = input("This will remove Strap from your system. Continue? (y/n): ").strip().lower()
+        if ans not in _YES:
+            print("Uninstall aborted.")
+            return
 
     print("Terminating AHK processes...")
     from ops.process import stop_ahk
@@ -223,8 +250,12 @@ def cli_uninstall() -> None:
         shutil.rmtree(INSTALL_DIR, ignore_errors=True)
     if os.path.exists(VERSIONS_DIR):
         shutil.rmtree(VERSIONS_DIR, ignore_errors=True)
-
-    print("\n[√] Strap was uninstalled successfully.")
+    if hard:
+        if os.path.exists(PROFILES_DIR):
+            shutil.rmtree(PROFILES_DIR, ignore_errors=True)
+        print("\n[√] Strap was fully uninstalled (all profiles removed).")
+    else:
+        print("\n[√] Strap was uninstalled successfully.")
     print("До встречи!")
 
 def cli_install_ls() -> None:
@@ -278,10 +309,19 @@ def execute_terminal_command(cmd: str, rest: str, raw_arg: str) -> None:
     if cmd == "/install":
         if rest == "--ls":
             cli_install_ls()
+        elif rest == "--from-ps":
+            import subprocess
+            ps_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "install.ps1"))
+            if os.path.exists(ps_path):
+                subprocess.run(["powershell", "-ExecutionPolicy", "Bypass", "-File", ps_path], check=False)
+            else:
+                print(f"[×] install.ps1 not found at {ps_path}")
+        elif rest == "--handoff":
+            cli_install(from_ps=True)
+        elif rest.startswith("v"):
+            cli_install(target_version=rest)
         else:
-            from_ps = rest == "--from-ps"
-            ver = rest if (rest and not rest.startswith("--")) else ""
-            cli_install(target_version=ver, from_ps=from_ps)
+            cli_install()
     elif cmd == "/update":
         cli_update()
     elif cmd == "/switch":
@@ -291,7 +331,7 @@ def execute_terminal_command(cmd: str, rest: str, raw_arg: str) -> None:
     elif cmd == "/profile":
         cli_profile(rest)
     elif cmd == "/uninstall":
-        cli_uninstall()
+        cli_uninstall(hard=rest == "--fr")
     elif cmd == "/config":
         if rest:
             from headless import apply_headless_config

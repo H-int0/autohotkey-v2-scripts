@@ -52,7 +52,8 @@ COMMANDS_TEXT = (
     "/version             (Current versions)\n"
     "/version --ls        (List local versions)\n"
     "/switch vX.X.X       (Switch version)\n\n"
-    "/uninstall           (Uninstall Strap)\n\n"
+    "/uninstall           (Uninstall Strap)\n"
+    "/uninstall --fr      (Fully wipe Strap)\n\n"
 )
 
 TERMINAL_COMMANDS_TEXT = (
@@ -77,7 +78,8 @@ TERMINAL_COMMANDS_TEXT = (
     "strap /version                 Current versions\n"
     "strap /version --ls            List local versions\n"
     "strap /switch vX.X.X           Switch active version\n\n"
-    "strap /uninstall               Uninstall Strap\n\n"
+    "strap /uninstall               Uninstall Strap\n"
+    "strap /uninstall --fr          Fully wipe Strap\n\n"
 )
 
 
@@ -162,6 +164,16 @@ POPUP_COLOR_PICKER = (
     "/config -y -2--1 --!       (Flip value)\n"
     "/config -y -2--1 value     (enable|disable)\n\n"
     "/config -y -2--2 text      (Set Text)\n\n"
+    "/back or Esc               (Close)\n\n"
+)
+
+POPUP_VIM_NAVIGATION = (
+    "[b]CONFIG - [y3] Vim Navigation[/b]\n"
+    "─────────────────────────\n"
+    "/config -y -3--1 --!       (Flip Left Alt)\n"
+    "/config -y -3--1 value     (enable|disable)\n\n"
+    "/config -y -3--2 --!       (Flip Right Alt)\n"
+    "/config -y -3--2 value     (enable|disable)\n\n"
     "/back or Esc               (Close)\n\n"
 )
 

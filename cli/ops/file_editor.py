@@ -57,6 +57,8 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
         msgEndTask          -> Msg_EndTask
         msgColorPicker      -> Msg_ColorPicker
         colorPickerMsgBox   -> ColorPickerMsgBox
+        vimUseLeftAlt       -> VimNavigationUseLeftAlt
+        vimUseRightAlt      -> VimNavigationUseRightAlt
     """
     with open(ahk_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -95,7 +97,6 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
             ahk_var = entry.get("ahk_var")
             default = entry.get("default", True)
             if key not in features:
-                # This feature doesn't exist in the profile's config   skip it
                 continue
             ahk_val = 1 if features[key] else 0
             content = re.sub(
@@ -128,25 +129,34 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
             content, flags=re.IGNORECASE
         )
 
+    # --- [y3] Vim Arrow Keys settings ---
+    if "vimUseLeftAlt" in config_data:
+        ahk_lalt = 1 if config_data["vimUseLeftAlt"] else 0
+        content = re.sub(
+            r"(VimNavigationUseLeftAlt\s*:=\s*)\d+",
+            rf"\g<1>{ahk_lalt}",
+            content, flags=re.IGNORECASE
+        )
+    
+    if "vimUseRightAlt" in config_data:
+        ahk_ralt = 1 if config_data["vimUseRightAlt"] else 0
+        content = re.sub(
+            r"(VimNavigationUseRightAlt\s*:=\s*)\d+",
+            rf"\g<1>{ahk_ralt}",
+            content, flags=re.IGNORECASE
+        )
+
     with open(ahk_path, "w", encoding="utf-8") as f:
         f.write(content)
 
-
 def update_timezones_variables_ahk(timezones: list, ahk_path: str) -> None:
-    """
-    Re-apply the active timezone list onto timezones-variables.ahk.
+    from data.timezones_catalog import TIMEZONE_CATALOG
 
-    For each TZ_* var in the file:
-        - Set to 1 if its reconstructed TZ ID is in the active list.
-        - Set to 0 otherwise.
-
-    TZ var name convention:
-        "Eastern Standard Time" <-> TZ_Eastern_Standard_Time
-
-    Vars in the file that have no match in the timezones list are set to 0,
-    not removed   the file structure is always preserved.
-    """
-    active_set = {tz.replace(" ", "_") for tz in timezones}
+    id_to_var = {
+        tz_id: tz_id.replace(" ", "_").replace(".", "_").replace("-", "_")
+        for tz_id, *_ in TIMEZONE_CATALOG
+    }
+    active_set = {id_to_var[tz] for tz in timezones if tz in id_to_var}
 
     pattern = re.compile(
         r"^([ \t]*TZ_([A-Za-z0-9_]+)\s*:=\s*)([01])",

@@ -94,6 +94,10 @@ DEFAULT_CONFIG = {
     # --- [y2] Color Picker feature settings ---
     "colorPickerMsgBox": False,
     "msgColorPicker":    "Copied to Clipboard",
+
+    # --- [y3] Vim Arrow Keys feature settings ---
+    "vimUseLeftAlt":  True,
+    "vimUseRightAlt": True,
 }
 
 # -----------------------------------------------------------------------------
