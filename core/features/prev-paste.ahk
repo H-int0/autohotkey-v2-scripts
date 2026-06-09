@@ -27,9 +27,9 @@ global IgnoreChange := false
 if (PrevPasteEnabled)
     HelpEntries.Push("
 (
-> PREV CLIPBOARD:
+> PREV PASTE:
     Win+Ctrl+V      →  paste prev item
-    Win+Ctrl+1-9    →  paste Nth prev item
+    Ctrl+Alt+1-9    →  paste Nth prev item
 )")
 
 OnClipboardChange ClipChanged
@@ -46,7 +46,7 @@ ClipChanged(DataType) {
 #HotIf PrevPasteEnabled
 
 Loop 9 {
-    Hotkey "#^" A_Index, PasteHistory.Bind(A_Index)
+    Hotkey "^!" A_Index, PasteHistory.Bind(A_Index)
 }
 Hotkey "#^v", PasteHistory.Bind(1)
 
@@ -57,10 +57,13 @@ PasteHistory(Index, *) {
     TargetIndex := Index + 1
     if (ClipHistory.Length < TargetIndex)
         return
+    SavedClip := ClipHistory[1]
     IgnoreChange := true
     A_Clipboard := ClipHistory[TargetIndex]
     Sleep 50
     Send "^v"
     Sleep 100
+    A_Clipboard := SavedClip
+    Sleep 50
     IgnoreChange := false
 }

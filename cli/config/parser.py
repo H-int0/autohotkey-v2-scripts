@@ -94,28 +94,23 @@ def parse_config_ahk(ahk_content: str) -> dict:
 
 
 def parse_timezones_variables_ahk(ahk_content: str) -> list:
-    """
-    Parse timezones-variables.ahk and return a list of active Windows TZ IDs.
+    from data.timezones_catalog import TIMEZONE_CATALOG
 
-    Each enabled entry looks like:
-        TZ_Eastern_Standard_Time := 1
+    var_to_id = {
+        tz_id.replace(" ", "_").replace(".", "_").replace("-", "_"): tz_id
+        for tz_id, *_ in TIMEZONE_CATALOG
+    }
 
-    The TZ ID used in TZData (e.g., "Eastern Standard Time") is reconstructed
-    by replacing underscores with spaces and stripping the leading "TZ_" prefix.
-
-    Returns a list of TZ ID strings that are currently set to 1, preserving
-    the order they appear in the file.
-    """
     active = []
     pattern = re.compile(
         r"^[ \t]*TZ_([A-Za-z0-9_]+)\s*:=\s*([01])",
         re.MULTILINE
     )
     for m in pattern.finditer(ahk_content):
-        underscore_name = m.group(1)   # e.g., "Eastern_Standard_Time"
+        underscore_name = m.group(1)
         enabled         = m.group(2) == "1"
-        tz_id           = underscore_name.replace("_", " ")  # "Eastern Standard Time"
-        if enabled:
+        tz_id           = var_to_id.get(underscore_name)
+        if enabled and tz_id:
             active.append(tz_id)
 
     return active
