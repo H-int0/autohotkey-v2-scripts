@@ -57,6 +57,8 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
         msgEndTask          -> Msg_EndTask
         msgColorPicker      -> Msg_ColorPicker
         colorPickerMsgBox   -> ColorPickerMsgBox
+        vimUseLeftAlt       -> VimNavigationUseLeftAlt
+        vimUseRightAlt      -> VimNavigationUseRightAlt
     """
     with open(ahk_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -95,7 +97,6 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
             ahk_var = entry.get("ahk_var")
             default = entry.get("default", True)
             if key not in features:
-                # This feature doesn't exist in the profile's config   skip it
                 continue
             ahk_val = 1 if features[key] else 0
             content = re.sub(
@@ -128,9 +129,6 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
             content, flags=re.IGNORECASE
         )
 
-    with open(ahk_path, "w", encoding="utf-8") as f:
-        f.write(content)
-
     # --- [y3] Vim Arrow Keys settings ---
     if "vimUseLeftAlt" in config_data:
         ahk_lalt = 1 if config_data["vimUseLeftAlt"] else 0
@@ -148,6 +146,8 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
             content, flags=re.IGNORECASE
         )
 
+    with open(ahk_path, "w", encoding="utf-8") as f:
+        f.write(content)
 
 def update_timezones_variables_ahk(timezones: list, ahk_path: str) -> None:
     """

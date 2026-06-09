@@ -27,7 +27,7 @@ global IgnoreChange := false
 if (PrevPasteEnabled)
     HelpEntries.Push("
 (
-> PREV CLIPBOARD:
+> PREV PASTE:
     Win+Ctrl+V      →  paste prev item
     Win+Ctrl+1-9    →  paste Nth prev item
 )")
