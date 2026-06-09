@@ -150,58 +150,66 @@ Check all the Hotkeys and Commands here:
 
 - With **Command Prompt (CMD)**:
 
-  ```bat
+```bat
   powershell -ExecutionPolicy Bypass -Command "irm 'https://raw.githubusercontent.com/H-int0/autohotkey-v2-scripts/main/install.ps1' | iex"
-  ```
+```
 
 - With **PowerShell**:
 
-  ```pwsh
+```pwsh
   irm 'https://raw.githubusercontent.com/H-int0/autohotkey-v2-scripts/main/install.ps1' | iex
-  ```
+```
 
-> [!TIP]
-> Prefer the ZIP version? Simply extract the ZIP file, open the setup folder, and double-click `install.bat` inside `setup`directory to set up the TUI.
+- With **Zip:**
 
-  ```bash
+```bash
   # Replace with your file path to the root directory of the project after extracting the zip
   cd C:\path_to_strap\autohotkey-v2-scripts-main
-  
+
   # use this to hook up the CLI/TUI:
   python cli/main.py /install
-  ```
+```
 
 ---
 
-### How Installations work behind the scenes
+### How installations work behind the scenes
 
 When you run the one-liner above, `install.ps1` takes over and does the following:
 
-1. **Checks for Python** exits immediately if Python 3 isn't found.
-2. **Fetches the latest tag from GitHub** hits the GitHub tags API and grabs the latest tag name and its zip URL.
-3. **Archives the release** creates `~/.strap_versions/vX.X.X/` and downloads the release zip into it. If that version folder already exists, the download is skipped entirely.
-4. **Copies to `%APPDATA%\Strap\`** if a previous installation exists, everything except `bin\` is wiped first. Then the archived version is copied in fresh.
-5. **Creates `strap.bat`** only if it doesn't already exist. Points permanently to `%APPDATA%\Strap\cli\main.py` and never gets touched again, even across version switches.
-6. **Adds `bin\` to PATH** modifies the user-level `PATH` registry key and broadcasts `WM_SETTINGCHANGE` so open terminals pick up the new `strap` command without needing a restart.
-7. **Installs Python dependencies** runs `pip install -r requirements.txt` quietly.
-8. **Hands off to Python** calls `python cli/main.py /install --from-ps`.
+1. **Checks for AutoHotkey v2** installs it silently via `winget` if not found.
+2. **Checks for Python 3.10+** if missing or outdated, downloads and installs Python 3.12 silently via the official installer with no UAC prompt (per-user install). Refreshes `PATH` in the current session immediately after.
+3. **Fetches the latest tag from GitHub** hits the GitHub tags API and grabs the latest tag name and its zip URL.
+4. **Archives the release** creates `~/.strap_versions/vX.X.X/` and downloads the release zip into it. If that version folder already exists, the download is skipped entirely.
+5. **Copies to `%APPDATA%\Strap\`** if a previous installation exists, everything except `bin\` is wiped first. Then the archived version is copied in fresh.
+6. **Creates `strap.bat`** only if it doesn't already exist. Points permanently to `%APPDATA%\Strap\cli\main.py` and never gets touched again, even across version switches.
+7. **Adds `bin\` to PATH** modifies the user-level `PATH` registry key and broadcasts `WM_SETTINGCHANGE` so open terminals pick up the new `strap` command without needing a restart.
+8. **Installs Python dependencies** runs `pip install -r requirements.txt` quietly.
+9. **Hands off to Python** calls `python cli/main.py /install --handoff`.
 
 ---
 
-### The `--from-ps` flag
+### The `--handoff` flag
 
-`--from-ps` is an internal flag passed automatically by `install.ps1` in step 8. It tells the CLI that file copying, `strap.bat` creation, and PATH setup are already done so it skips those and only handles:
-
-```bash
-python cli/main.py /install --from-ps
-```
+`--handoff` is an internal flag passed automatically by `install.ps1` in step 9. It tells the CLI that file copying, `strap.bat` creation, and PATH setup are already done, so it skips those and only handles:
 
 - Bootstrapping the `default` and `ghost` profiles
 - Stamping the active version into the profile
 - Writing `config.ahk` and `timezones-variables.ahk` from the active profile
 - Prompting the user for startup shortcut preference
 
-You will never need to type this flag manually unless you are testing the Python-side of the install flow without re-running the full PowerShell script.
+This flag is never meant to be typed manually. It exists purely to prevent a re-entry loop that would otherwise occur if `install.ps1` were called recursively when running via `irm | iex`.
+
+---
+
+### The `--from-ps` flag
+
+`--from-ps` is a developer-facing flag that re-runs `install.ps1` from within the CLI:
+
+```bash
+strap /install --from-ps
+```
+
+This replicates exactly what a user would get by running the `irm | iex` one-liner useful for testing the full PowerShell install flow without leaving the terminal.
 
 ---
 
@@ -213,7 +221,7 @@ If you're not using the PowerShell bootstrapper, you can run the installer manua
 python cli/main.py /install
 ```
 
-Without `--from-ps`, the CLI assumes it is running in a fresh environment and handles the full install flow itself creating `strap.bat`, adding `bin\` to PATH, bootstrapping profiles, and prompting for startup. Use this when setting up manually from a ZIP or a cloned repo instead of the one-liner.
+Without any flags, the CLI assumes it is running in a fresh environment and handles the full install flow itself creating `strap.bat`, adding `bin\` to PATH, bootstrapping profiles, and prompting for startup. Use this when setting up manually from a ZIP or a cloned repo instead of the one-liner.
 
 ---
 
