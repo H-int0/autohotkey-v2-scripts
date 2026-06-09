@@ -37,6 +37,7 @@ Format: [version]: release date, followed by what changed.
 - User profile preferences now preserved across version switches
 - `/install --from-ps` handoff working correctly
 - AHK process now terminated before version switch to prevent copy failure of the version in the %APPDATA%
+- Fixed timezone var name normalization: spaces, dots, and dashes are now all converted consistently, preventing similar timezone IDs from colliding during save and load.
 
 ---
 
