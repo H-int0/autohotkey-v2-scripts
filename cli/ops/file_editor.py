@@ -150,20 +150,13 @@ def update_config_ahk(config_data: dict, ahk_path: str) -> None:
         f.write(content)
 
 def update_timezones_variables_ahk(timezones: list, ahk_path: str) -> None:
-    """
-    Re-apply the active timezone list onto timezones-variables.ahk.
+    from data.timezones_catalog import TIMEZONE_CATALOG
 
-    For each TZ_* var in the file:
-        - Set to 1 if its reconstructed TZ ID is in the active list.
-        - Set to 0 otherwise.
-
-    TZ var name convention:
-        "Eastern Standard Time" <-> TZ_Eastern_Standard_Time
-
-    Vars in the file that have no match in the timezones list are set to 0,
-    not removed   the file structure is always preserved.
-    """
-    active_set = {tz.replace(" ", "_") for tz in timezones}
+    id_to_var = {
+        tz_id: tz_id.replace(" ", "_").replace(".", "_").replace("-", "_")
+        for tz_id, *_ in TIMEZONE_CATALOG
+    }
+    active_set = {id_to_var[tz] for tz in timezones if tz in id_to_var}
 
     pattern = re.compile(
         r"^([ \t]*TZ_([A-Za-z0-9_]+)\s*:=\s*)([01])",
