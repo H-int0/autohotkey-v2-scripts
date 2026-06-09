@@ -30,6 +30,12 @@ Check all the Hotkeys and Commands here:
   | `Shift + Alt + Left/Right Arrow` | Move cursor to start/end of line |
   | `Shift + Win + Left/Right Arrow` | Select text to start/end of line |
   | `Alt + Backspace/Delete` | Delete text to start/end of line |
+  | `Alt + H/J/K/L` | Move Cursor (← ↓ ↑ →) |
+  | `Win + Ctrl + Space` | Swap character (RU-EN) |
+  | `Win + Alt + ]` | Cycle Power plan |
+  | `Win + Ctrl + ]` | Show current Power plan |
+  | `Win + Ctrl + V` | Paste prev item from Clipboard |
+  | `Ctrl + Alt + 1-9` | Paste Nth prev item from Clipboard |
 
 ### Strap Commands
 
@@ -122,6 +128,10 @@ Check all the Hotkeys and Commands here:
   - [4. Force Kill Task](#4-force-kill-task)
   - [5. Color Picker](#5-color-picker)
   - [6. Line Navigation](#6-line-navigation)
+  - [7. Vim Navigation](#7-vim-navigation)
+  - [8. CharSwap (RU-EN)](#8-charswap-ru-en)
+  - [9. Power Plan Switcher](#9-power-plan-switcher)
+  - [10. Previous Paste (Clipboard History)](#10-previous-paste-clipboard-history)
 - [Strap CLI/TUI](#strap-clitui)
   - [Profiles](#profiles)
   - [Management](#management)
@@ -276,6 +286,12 @@ A lightweight, semi-transparent (`Opacity: 225`) black overlay that follows your
   | `Shift + Alt + Left/Right Arrow` | Move cursor to start/end of line |
   | `Shift + Win + Left/Right Arrow` | Select text to start/end of line |
   | `Alt + Backspace/Delete` | Delete text to start/end of line |
+  | `Alt + H/J/K/L` | Move Cursor (← ↓ ↑ →) |
+  | `Win + Ctrl + Space` | Swap character (RU-EN) |
+  | `Win + Alt + ]` | Cycle Power plan |
+  | `Win + Ctrl + ]` | Show current Power plan |
+  | `Win + Ctrl + V` | Paste prev item from Clipboard |
+  | `Ctrl + Alt + 1-9` | Paste Nth prev item from Clipboard |
 
 ---
 
@@ -425,6 +441,74 @@ It leverages standard OS-level text inputs.
 - Selecting sends `+{Home}` (Shift+Home) or `+{End}` (Shift+End).
 - Deleting evaluates the cursor position and sends a selection command followed immediately by `{Backspace}` or `{Delete}`.
 This provides universally compatible text navigation across almost every Windows application, browser, and IDE.
+
+---
+
+### 7. Vim Navigation
+
+Brings the classic Vim `H/J/K/L` cursor movement to every text field and application in Windows, eliminating the need to move your hand to the physical arrow keys.
+
+**Hotkeys:**
+
+- **Standard Movement:** `Alt + H/J/K/L` (← ↓ ↑ →)
+- **Select Text:** `Shift + Alt + H/J/K/L`
+- **Jump Words:** `Ctrl + Alt + H/J/K/L`
+- **Jump & Select:** `Ctrl + Shift + Alt + H/J/K/L`
+
+**How it works:**
+
+- **Conditional Binding:** The feature evaluates `VimNavigationUseLeftAlt` and `VimNavigationUseRightAlt` from `config.ahk`. It uses `#HotIf` directives to selectively bind the hotkeys to Left Alt (`<!`), Right Alt (`>!`), or both, depending on your TUI configuration.
+- **Native OS Hooks:** Instead of complex text evaluation, it translates the Alt+Letter combos directly into native Windows arrow key events (`{Left}`, `{Down}`, etc.).
+- **Modifier Passthrough:** It explicitly maps out all combination modifiers (Shift, Ctrl, Ctrl+Shift) so that native text-editing shortcuts (like holding Ctrl to jump whole words) work flawlessly alongside the Vim keys.
+
+---
+
+### 8. CharSwap (RU-EN)
+
+Instantly transliterates highlighted text between Cyrillic (Russian) and Latin (English) characters. Perfect for when you accidentally type a whole sentence in the wrong keyboard layout.
+
+**Hotkey:** `Win + Ctrl + Space`
+
+**How it works:**
+
+- **Clipboard Preservation:** Before touching your text, it safely backs up your current clipboard state using `ClipboardAll()`. After the conversion is pasted, it restores your original clipboard, so your previously copied links/images are never lost.
+- **Regex Parsing:** It uses a PCRE (Perl Compatible Regular Expression) loop with the `(*UCP)` modifier to properly respect Unicode properties. It parses the text token by token, ensuring multi-character sounds (like "shch" -> "щ") are evaluated before single characters (like "s" -> "с").
+- **Smart Case Mapping:** The script relies on a massive static dictionary (`TransMap`). It doesn't use simple case-insensitive matching; it explicitly maps `Shch` (Titlecase), `SHCH` (Uppercase), and `shch` (Lowercase) to their exact Cyrillic visual equivalents.
+
+---
+
+### 9. Power Plan Switcher
+
+A headless utility to instantly cycle through your available Windows power plans without opening the Control Panel.
+
+**Hotkeys:**
+
+- **Cycle Plan:** `Win + Alt + ]`
+- **Check Current Plan:** `Win + Ctrl + ]`
+
+**How it works:**
+
+- **Direct `powercfg` Integration:** It completely bypasses the Windows UI by invoking the native command-line utility via `A_ComSpec ' /c powercfg'`.
+- **Temp File Routing:** Because AHK v2 doesn't have a native, invisible `stdout` reader, the script pipes the command line output into a temporary text file (`A_Temp "\ahk_powercfg_out.txt"`), reads the string into memory, and immediately deletes the temp file.
+- **Regex Extraction:** It parses the output using `RegExMatch("i)GUID:\s+([a-f0-9-]+)\s+\((.+?)\)")` to isolate the unique GUIDs and human-readable names of every power plan currently installed on your PC.
+- **Modulo Cycling:** It loads the plans into an array and uses Modulo arithmetic (`Mod(activeIndex, plans.Length) + 1`) to seamlessly wrap from the last plan back to the first, pushing the active GUID back into `powercfg /setactive`.
+
+---
+
+### 10. Previous Paste (Clipboard History)
+
+Maintains a rolling, short-term history of the last 10 items you copied, allowing you to paste items you overwrote without needing Windows Clipboard History enabled.
+
+**Hotkeys:**
+
+- **Paste Previous:** `Win + Ctrl + V` (Pastes the 2nd item in history)
+- **Paste Nth Item:** `Ctrl + Alt + 1-9`
+
+**How it works:**
+
+- **`OnClipboardChange` Hook:** The script attaches to the native Windows clipboard listener. Every time you press `Ctrl+C`, the hook fires and inserts the copied item into the front of the `ClipHistory` array, popping the oldest item if the array exceeds 10 items.
+- **Rich Data Preservation:** It stores `ClipboardAll()`, not just plain text. This means it perfectly preserves formatted text, images, and copied files.
+- **Mutual Exclusion (`IgnoreChange`):** When you trigger a historical paste, the script puts the old item back into `A_Clipboard` to send the `^v` command. To prevent the listener from seeing *this* as a new copy event and ruining the history order, it toggles a global `IgnoreChange := true` flag, pastes the text, and turns the flag back off.
 
 ---
 

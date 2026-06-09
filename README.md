@@ -1,19 +1,31 @@
 # Strap
 
-**Strap** adds keyboard shortcuts for quick system-level actions at your finger tips, configurable with a Python based CLI/TUI.
+**Strap** is a Windows power-up that puts system-level actions right under your fingertips, all controllable and configurable from a single, sleek Python based terminal UI.
 
-- Currently, it ships with Six features with more planned for the future!
+> [!IMPORTANT]
+> **TUI support requires Strap v0.2.0 or later.**  
+> If you're using an older release, please update to the latest version to access the TUI.
+
+## What’s inside
+
+- Currently, Strap ships with **Ten** features with more planned for the future!
 
   | Feature | What it does |
   | --- | --- |
-  | NumPad Emulator | Turns the number row into a real Numpad when Caps Lock is ON. |
-  | ALT Code | Makes ALT codes work with Number Row keys. (Type ALT + 9825 for ♡) |
-  | TimeZone Switcher | Switch your Timezone with a single keyboard shortcut. |
-  | Force Kill | Instantly kills the active window, even the frozen ones with a single shortcut. |
-  | Color Picker | Opens up a floating Color Picker. |
-  | Line Navigation | Instantly navigate or select an entire line at once. |
+  | 1. NumPad Emulator | Turns the number row into a real Numpad when Caps Lock is ON. |
+  | 2. ALT Code | Makes ALT codes work with Number Row keys. (Type ALT + 9825 for ♡) |
+  | 3. TimeZone Switcher | Switch your Timezone with a single keyboard shortcut. |
+  | 4. Force Kill | Instantly kills the active window, even the frozen ones with a single shortcut. |
+  | 5. Color Picker | Opens up a floating Color Picker. |
+  | 6. Line Navigation | Instantly navigate or select an entire line at once. |
+  | 7. Vim Navigation | Brings Vim `H/J/K/L` cursor movement to every text field in Windows. |
+  | 8. CharSwap (RU-EN) | Instantly transliterates highlighted text between Cyrillic and Latin characters. |
+  | 9. Power Plan Switcher | Instantly cycle through Windows power plans without opening Control Panel. |
+  | 10. Previous Paste (Clipboard History) | Maintains a rolling history of the last 10 copied items for pasting. |
 
-- Strap also ships with a terminal UI for managing everything without touching config files directly.
+## Manage everything from the terminal
+
+- Strap’s TUI puts you in total control, no hand-editing of AHK scripts or JSON files needed.
 
   | | |
   | --- | --- |
@@ -21,25 +33,25 @@
   | **Profiles** | Save and switch between named configurations |
   | **Versions** | Install, archive, and switch between multiple versions |
   | **Startup** | Control whether Strap auto-boots with Windows |
-  | **Run / Stop** | Launch and stop the AHK scripts on demand |
+  | **Run/Stop** | Launch and stop the AHK scripts on demand |
   | **Install/Update/Uninstall** | Control all of them from TUI |
 
 > [!NOTE]
-> Strap is still in active development. The AHK scripts are stable, but the CLI may behave unexpectedly.
-> Don't worry it won't NUKE your system. But if something breaks, see [RECOVERY.md](RECOVERY.md) for safe removal instructions.
+> Strap is under active development. The AHK scripts are solid, but the CLI might still have rough edges.
+> Don't worry it won't NUKE your system, but if anything acts up, check [RECOVERY.md](RECOVERY.md) for safe removal steps.
 
 ---
 
 <!-- markdownlint-disable-next-line -->
 ### Houston, we have problems!!!
 
-Something ain't working? [open a bug report](https://github.com/H-int0/autohotkey-v2-scripts/issues/new?template=bug_report.md) and we'll look forward into it.
+Something ain't working? [Open a bug report](https://github.com/H-int0/autohotkey-v2-scripts/issues/new?template=bug_report.md) and we'll look into it.
 
 ---
 
 ### Got a big brain idea?
 
-If you have an idea for something new, adding new features or think an existing feature could be better, [open a feature request](https://github.com/H-int0/autohotkey-v2-scripts/issues/new?template=feature_request.md).
+If you have an idea for something new, adding new features or think an existing feature could be better, [Open a feature request](https://github.com/H-int0/autohotkey-v2-scripts/issues/new?template=feature_request.md).
 
 > [!TIP]
 > Wondering what else you can do? [REFERENCE.md](REFERENCE.md) covers every command and how the TUI works.
@@ -56,6 +68,9 @@ If you have an idea for something new, adding new features or think an existing 
 - [Windows 11](https://www.microsoft.com/en-us/software-download/windows11)
 
 ### Requirements
+
+> [!TIP]
+> The CMD and PowerShell commands will automatically install AutoHotkey v2 and Python 3 if they aren't already on your system no manual setup required.
 
 - [AutoHotkey v2.0](https://www.autohotkey.com/)
 
@@ -85,6 +100,9 @@ If you have an idea for something new, adding new features or think an existing 
   irm 'https://raw.githubusercontent.com/H-int0/autohotkey-v2-scripts/main/install.ps1' | iex
   ```
 
+> [!TIP]
+> Prefer the ZIP version? Simply extract the ZIP file, open the setup folder, and double-click `install.bat` to set up Strap Automatically.
+
 - With **Zip**:
 
   ```bash
@@ -94,9 +112,6 @@ If you have an idea for something new, adding new features or think an existing 
   # use this to hook up the CLI/TUI:
   python cli/main.py /install
   ```
-
-> [!TIP]
-> Prefer the ZIP version? Simply extract the ZIP file, open the setup folder, and double-click `install.bat` to set up Strap Automatically.
 
 ---
 
@@ -116,11 +131,28 @@ strap /run
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
+- [Perquisite](#perquisite)
+- [Quickly Install Strap](#quickly-install-strap)
 - [Repo Structure](#repo-structure)
 - [Features](#features)
+  - [1. Numpad Emulator](#1-numpad-emulator)
+  - [2. ALT Codes](#2-alt-codes)
+  - [3. Timezone Switcher](#3-timezone-switcher)
+  - [4. Force Kill Task](#4-force-kill-task)
+  - [5. Color Picker](#5-color-picker)
+  - [6. Line Navigation](#6-line-navigation)
+  - [7. Vim Navigation](#7-vim-navigation)
+  - [8. CharSwap (RU-EN)](#8-charswap-ru-en)
+  - [9. Power Plan Switcher](#9-power-plan-switcher)
+  - [10. Previous Paste (Clipboard History)](#10-previous-paste-clipboard-history)
 - [Strap's CLI/TUI](#straps-clitui)
+  - [Profiles](#profiles)
+  - [Management](#management)
+  - [Layout](#layout)
+  - [Home Screen](#home-screen)
+  - [Config Screen](#config-screen)
 - [Contributing](#contributing)
+- [Troubleshooting](#troubleshooting)
 - [LICENSE](#license)
 
 > See [CHANGELOG.md](CHANGELOG.md) for the history of versions.
@@ -154,6 +186,12 @@ Check all the Hotkeys and Commands here:
   | `Shift + Alt + Left/Right Arrow` | Move cursor to start/end of line |
   | `Shift + Win + Left/Right Arrow` | Select text to start/end of line |
   | `Alt + Backspace/Delete` | Delete text to start/end of line |
+  | `Alt + H/J/K/L` | Move Cursor (← ↓ ↑ →) |
+  | `Win + Ctrl + Space` | Swap character (RU-EN) |
+  | `Win + Alt + ]` | Cycle Power plan |
+  | `Win + Ctrl + ]` | Show current Power plan |
+  | `Win + Ctrl + V` | Paste prev item from Clipboard |
+  | `Ctrl + Alt + 1-9` | Paste Nth prev item from Clipboard |
 
 </details>
 
@@ -301,11 +339,15 @@ Check all the Hotkeys and Commands here:
       |
       \---features                        # holds the script of all individual script
               alt-codes.ahk
+              charswap-ru-en.ahk
               color-picker.ahk
               force-kill-task.ahk
               line-navigation.ahk
               numpad-emulator.ahk
+              powerplan-switcher.ahk
+              prev-paste.ahk
               timezone-switcher.ahk
+              vim-navigation.ahk
   ```
 
 </details>
@@ -469,12 +511,79 @@ Translates modern text-editor navigation shortcuts into standard Windows keystro
 
 | Action | Shortcut |
 | --- | --- |
-| Move cursor to start of line | `Shift + Alt + Left` |
-| Move cursor to end of line | `Shift + Alt + Right` |
-| Select to start of line | `Shift + Win + Left` |
-| Select to end of line | `Shift + Win + Right` |
-| Delete from cursor to start of line | `Alt + Backspace` |
-| Delete from cursor to end of line | `Alt + Delete` |
+| Move cursor to start/end of line | `Shift + Alt + ←/→` |
+| Select text to start/end of line | `Shift + Win + ←/→` |
+| Delete text to start/end of line | `Alt + Backspace/Delete` |
+
+</details>
+
+---
+
+### 7. Vim Navigation
+
+<details>
+  <summary></summary>
+
+Brings the classic Vim `H/J/K/L` cursor movement to every text field and application in Windows, eliminating the need to move your hand to the physical arrow keys.
+
+**Hotkeys:**
+
+| Action | Shortcut |
+| --- | --- |
+| Standard Movement | `Alt + H/J/K/L` (← ↓ ↑ →) |
+| Select Text | `Shift + Alt + H/J/K/L` |
+| Jump Words | `Ctrl + Alt + H/J/K/L` |
+| Jump & Select | `Ctrl + Shift + Alt + H/J/K/L` |
+
+</details>
+
+---
+
+### 8. CharSwap (RU-EN)
+
+<details>
+  <summary></summary>
+
+Instantly transliterates highlighted text between Cyrillic (Russian) and Latin (English) characters. Perfect for when you accidentally type a whole sentence in the wrong keyboard layout.
+
+**Hotkey:** `Win + Ctrl + Space`
+
+- Select the text and press the hotkey
+- The Cyrillic characters will get replaced with their Latin equivalents and vice versa.
+
+</details>
+
+---
+
+### 9. Power Plan Switcher
+
+<details>
+  <summary></summary>
+
+A headless utility to instantly cycle through your available Windows power plans without opening the Control Panel.
+
+**Hotkeys:**
+
+- **Cycle Plan:** `Win + Alt + ]`
+- **Check Current Plan:** `Win + Ctrl + ]`
+
+</details>
+
+---
+
+### 10. Previous Paste (Clipboard History)
+
+<details>
+  <summary></summary>
+
+Maintains a rolling, short-term history of the last 10 items you copied, allowing you to paste items you overwrote without needing Windows Clipboard History enabled.
+
+**Hotkeys:**
+
+- **Paste Previous:** `Win + Ctrl + V`
+- **Paste Nth Item:** `Ctrl + Alt + 1-9`
+
+Here, `Win + Ctrl + V` is configured to do exactly what `Ctrl + Alt + 1` will, for more reliable usability.
 
 </details>
 
@@ -718,7 +827,7 @@ Bug fixes, new features, improvements to the CLI/TUI, whatever you've got. And r
 
 > Check out [CONTRIBUTING.md](CONTRIBUTING.md) for the full development pipeline.
 
-**Quick start:**
+### Quick start
 
 1. Fork the repo and clone your fork
 2. Create a feature branch off `dev`
@@ -731,16 +840,13 @@ Bug fixes, new features, improvements to the CLI/TUI, whatever you've got. And r
 
 ---
 
-<details>
-  <summary>Troubleshooting</summary>
+## Troubleshooting
 
 - **Numpad keys aren't working**: Make sure CapsLock is ON. If it still doesn't work, try reloading the script through the tray icon.
 - **Timezone isn't switching**: Go to **Settings > Time & Language > Date & Time** and make sure **"Set time zone automatically"** is turned off.
 - **Script seems to be running but nothing works**: Right-click the tray icon (make it visible first with `Win + Ctrl + \`) and select **Reload**.
 
 > **Keyboard is behaving strangely after installing the script**: See [RECOVERY.md](RECOVERY.md) for step-by-step instructions to safely remove the script.
-
-</details>
 
 ---
 
